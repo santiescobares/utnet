@@ -1,4 +1,4 @@
-package ar.net.ut.backend.course;
+package ar.net.ut.backend.course.entity;
 
 import ar.net.ut.backend.enums.ProfessorPosition;
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
