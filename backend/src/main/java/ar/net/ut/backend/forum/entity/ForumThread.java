@@ -61,8 +61,6 @@ public class ForumThread extends CUDLoggableEntity {
     }
 
     public boolean removeReply(ForumThread reply) {
-        reply.setForum(null);
-        reply.setRoot(null);
         return replies.remove(reply);
     }
 

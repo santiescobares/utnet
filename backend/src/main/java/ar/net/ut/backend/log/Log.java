@@ -9,6 +9,8 @@ import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.Map;
+
 @Entity
 @Table(name = "logs")
 @Getter
@@ -31,7 +33,7 @@ public class Log extends CLoggableEntity {
     private Action action;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    private String details;
+    private Map<String, Object> details;
 
     public enum Action {
         CREATE,

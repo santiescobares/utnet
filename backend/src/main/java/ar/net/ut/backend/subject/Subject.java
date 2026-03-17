@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "subjects")
@@ -82,5 +83,10 @@ public class Subject {
     public boolean equals(Object obj) {
         if (!(obj instanceof Subject other)) return false;
         return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

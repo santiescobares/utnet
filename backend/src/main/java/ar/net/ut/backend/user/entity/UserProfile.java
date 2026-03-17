@@ -37,7 +37,7 @@ public class UserProfile {
     @Column(columnDefinition = "jsonb")
     private Map<Preference, String> preferences;
 
-    private int averageContributionPoints;
+    private double averageContributionPoints;
 
     public Map<Preference, String> getPreferences() {
         return preferences != null ? Collections.unmodifiableMap(preferences) : Collections.emptyMap();

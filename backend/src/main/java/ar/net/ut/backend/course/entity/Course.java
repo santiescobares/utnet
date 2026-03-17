@@ -67,7 +67,6 @@ public class Course extends CUDLoggableEntity {
     }
 
     public boolean removeEvent(CourseEvent event) {
-        event.setCourse(null);
         return events.remove(event);
     }
 
@@ -84,7 +83,6 @@ public class Course extends CUDLoggableEntity {
     }
 
     public boolean removeReview(CourseReview review) {
-        review.setResource(null);
         return reviews.remove(review);
     }
 

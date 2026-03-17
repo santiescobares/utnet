@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ public class User extends CUDLoggableEntity {
     private String firstName;
     @Column(length = 20)
     private String lastName;
-    private LocalDateTime birthday;
+    private LocalDate birthday;
     @Column(length = 320, unique = true)
     private String email;
 
@@ -44,10 +45,9 @@ public class User extends CUDLoggableEntity {
     @JoinColumn(name = "referred_by_id")
     private User referredBy;
 
-    private LocalDateTime bannedUntil;
+    private Instant bannedUntil;
 
     @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @PrimaryKeyJoinColumn
     private UserProfile profile;
     @OneToMany(mappedBy = "resource", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserComment> comments;
@@ -57,7 +57,7 @@ public class User extends CUDLoggableEntity {
     private List<UserInteraction> interactions;
 
     public boolean isBanned() {
-        return LocalDateTime.now().isBefore(bannedUntil);
+        return bannedUntil != null && Instant.now().isBefore(bannedUntil);
     }
 
     public boolean addComment(UserComment comment) {
@@ -69,7 +69,6 @@ public class User extends CUDLoggableEntity {
     }
 
     public boolean removeComment(UserComment comment) {
-        comment.setResource(null);
         return comments.remove(comment);
     }
 
@@ -86,7 +85,6 @@ public class User extends CUDLoggableEntity {
     }
 
     public boolean removeContribution(UserContribution contribution) {
-        contribution.setUser(null);
         return contributions.remove(contribution);
     }
 
@@ -103,7 +101,6 @@ public class User extends CUDLoggableEntity {
     }
 
     public boolean removeInteraction(UserInteraction interaction) {
-        interaction.setUser(null);
         return interactions.remove(interaction);
     }
 
