@@ -16,6 +16,7 @@ public class Career {
 
     @Column(length = 50)
     private String name;
+    @Column(unique = true)
     private char idCharacter;
     private int sortPosition;
 }
