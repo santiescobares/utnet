@@ -35,8 +35,10 @@ public class Course extends CUDLoggableEntity {
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CourseSubject> subjects;
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
     private List<CourseEvent> events;
     @OneToMany(mappedBy = "resource", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Setter(AccessLevel.NONE)
     private List<CourseReview> reviews;
 
     public void setName() {
@@ -60,10 +62,12 @@ public class Course extends CUDLoggableEntity {
         if (events == null) {
             events = new ArrayList<>();
         }
+        event.setCourse(this);
         return events.add(event);
     }
 
     public boolean removeEvent(CourseEvent event) {
+        event.setCourse(null);
         return events.remove(event);
     }
 
@@ -75,10 +79,12 @@ public class Course extends CUDLoggableEntity {
         if (reviews == null) {
             reviews = new ArrayList<>();
         }
+        review.setResource(this);
         return reviews.add(review);
     }
 
     public boolean removeReview(CourseReview review) {
+        review.setResource(null);
         return reviews.remove(review);
     }
 

@@ -64,7 +64,13 @@ public class User extends CUDLoggableEntity {
         if (comments == null) {
             comments = new ArrayList<>();
         }
+        comment.setResource(this);
         return comments.add(comment);
+    }
+
+    public boolean removeComment(UserComment comment) {
+        comment.setResource(null);
+        return comments.remove(comment);
     }
 
     public List<UserComment> getComments() {
@@ -75,7 +81,13 @@ public class User extends CUDLoggableEntity {
         if (contributions == null) {
             contributions = new ArrayList<>();
         }
+        contribution.setUser(this);
         return contributions.add(contribution);
+    }
+
+    public boolean removeContribution(UserContribution contribution) {
+        contribution.setUser(null);
+        return contributions.remove(contribution);
     }
 
     public List<UserContribution> getContributions() {
@@ -86,7 +98,13 @@ public class User extends CUDLoggableEntity {
         if (interactions == null) {
             interactions = new ArrayList<>();
         }
+        interaction.setUser(this);
         return interactions.add(interaction);
+    }
+
+    public boolean removeInteraction(UserInteraction interaction) {
+        interaction.setUser(null);
+        return interactions.remove(interaction);
     }
 
     public List<UserInteraction> getInteractions() {
