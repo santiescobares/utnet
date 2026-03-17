@@ -60,33 +60,33 @@ public class User extends CUDLoggableEntity {
         return LocalDateTime.now().isBefore(bannedUntil);
     }
 
-    public void addComment(UserComment comment) {
+    public boolean addComment(UserComment comment) {
         if (comments == null) {
             comments = new ArrayList<>();
         }
-        comments.add(comment);
+        return comments.add(comment);
     }
 
     public List<UserComment> getComments() {
         return comments != null ? Collections.unmodifiableList(comments) : Collections.emptyList();
     }
 
-    public void addContribution(UserContribution contribution) {
+    public boolean addContribution(UserContribution contribution) {
         if (contributions == null) {
             contributions = new ArrayList<>();
         }
-        contributions.add(contribution);
+        return contributions.add(contribution);
     }
 
     public List<UserContribution> getContributions() {
         return contributions != null ? Collections.unmodifiableList(contributions) : Collections.emptyList();
     }
 
-    public void addInteraction(UserInteraction interaction) {
+    public boolean addInteraction(UserInteraction interaction) {
         if (interactions == null) {
             interactions = new ArrayList<>();
         }
-        interactions.add(interaction);
+        return interactions.add(interaction);
     }
 
     public List<UserInteraction> getInteractions() {
