@@ -34,3 +34,13 @@ spring:
   flyway:
     enabled: false
     baseline-on-migrate: false
+
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      issuer: utnet
+      access-expiration: 86400000
+      registration-expiration: 900000
+
+  google:
+    client-id: ${GOOGLE_CLIENT_ID}
