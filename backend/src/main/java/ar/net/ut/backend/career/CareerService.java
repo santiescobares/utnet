@@ -3,10 +3,14 @@ package ar.net.ut.backend.career;
 import ar.net.ut.backend.career.dto.CareerCreateDTO;
 import ar.net.ut.backend.career.dto.CareerDTO;
 import ar.net.ut.backend.career.dto.CareerUpdateDTO;
+import ar.net.ut.backend.career.event.CareerCreateEvent;
+import ar.net.ut.backend.career.event.CareerDeleteEvent;
+import ar.net.ut.backend.career.event.CareerUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,8 @@ public class CareerService {
     private final CareerRepository careerRepository;
 
     private final CareerMapper careerMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CareerDTO createCareer(CareerCreateDTO dto) {
@@ -33,6 +39,8 @@ public class CareerService {
 
         Career career = careerMapper.createEntity(dto);
         careerRepository.save(career);
+
+        eventPublisher.publishEvent(new CareerCreateEvent(career));
 
         return careerMapper.toDTO(career);
     }
@@ -52,6 +60,8 @@ public class CareerService {
 
         careerMapper.updateFromDTO(career, dto);
 
+        eventPublisher.publishEvent(new CareerUpdateEvent(career));
+
         return careerMapper.toDTO(career);
     }
 
@@ -63,6 +73,8 @@ public class CareerService {
         // TODO set career field to null on users over it
 
         careerRepository.delete(career);
+
+        eventPublisher.publishEvent(new CareerDeleteEvent(career));
     }
 
     @Transactional(readOnly = true)

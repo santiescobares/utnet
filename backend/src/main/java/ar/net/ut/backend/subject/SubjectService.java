@@ -6,7 +6,11 @@ import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.subject.dto.SubjectCreateDTO;
 import ar.net.ut.backend.subject.dto.SubjectDTO;
 import ar.net.ut.backend.subject.dto.SubjectUpdateDTO;
+import ar.net.ut.backend.subject.event.SubjectCreateEvent;
+import ar.net.ut.backend.subject.event.SubjectDeleteEvent;
+import ar.net.ut.backend.subject.event.SubjectUpdateEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +23,8 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
 
     private final SubjectMapper subjectMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public SubjectDTO createSubject(SubjectCreateDTO dto) {
@@ -33,6 +39,8 @@ public class SubjectService {
 
         Subject subject = subjectMapper.createEntity(dto);
         subjectRepository.save(subject);
+
+        eventPublisher.publishEvent(new SubjectCreateEvent(subject));
 
         return subjectMapper.toDTO(subject);
     }
@@ -52,6 +60,8 @@ public class SubjectService {
 
         subjectMapper.updateFromDTO(subject, dto);
 
+        eventPublisher.publishEvent(new SubjectUpdateEvent(subject));
+
         return subjectMapper.toDTO(subject);
     }
 
@@ -62,6 +72,8 @@ public class SubjectService {
         // TODO set subject field to null on course subjects and study records over it
 
         subjectRepository.delete(subject);
+
+        eventPublisher.publishEvent(new SubjectDeleteEvent(subject));
     }
 
     @Transactional(readOnly = true)
