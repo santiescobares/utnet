@@ -17,12 +17,18 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // TODO remove for production
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponseDTO> handleGenericExceptions(Exception e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "GENERIC_EXCEPTION", e.getMessage());
+    }
+
     @ExceptionHandler({
             IllegalArgumentException.class,
             IllegalStateException.class
     })
-    public ResponseEntity<ExceptionResponseDTO> handleGenericExceptions(Exception e) {
-        return buildResponse(HttpStatus.BAD_REQUEST, "GENERIC_EXCEPTION", e.getMessage());
+    public ResponseEntity<ExceptionResponseDTO> handleGenericObjectExceptions(Exception e) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "GENERIC_OBJECT_EXCEPTION", e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
