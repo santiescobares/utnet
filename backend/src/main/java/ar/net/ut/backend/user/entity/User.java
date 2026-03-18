@@ -47,7 +47,7 @@ public class User extends CUDLoggableEntity {
 
     private Instant bannedUntil;
 
-    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile profile;
     @OneToMany(mappedBy = "resource", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserComment> comments;
@@ -58,6 +58,16 @@ public class User extends CUDLoggableEntity {
 
     public boolean isBanned() {
         return bannedUntil != null && Instant.now().isBefore(bannedUntil);
+    }
+
+    public void createProfile() {
+        if (profile != null) {
+            throw new IllegalStateException("User profile is already created");
+        }
+        profile = new UserProfile();
+        profile.setUser(this);
+
+        // TODO set default preferences
     }
 
     public boolean addComment(UserComment comment) {
