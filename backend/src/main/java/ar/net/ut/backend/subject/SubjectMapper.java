@@ -18,15 +18,15 @@ public abstract class SubjectMapper {
     @Autowired
     protected SubjectRepository subjectRepository;
 
-    @Mapping(source = "careerIds", target = "careers", qualifiedByName = "parseCareerIds")
-    @Mapping(source = "correlativeIds", target = "correlatives", qualifiedByName = "parseSubjectIds")
-    protected abstract Subject createEntity(SubjectCreateDTO dto);
+    @Mapping(source = "careerIds", target = "careers", qualifiedByName = "careerIdsToCareers")
+    @Mapping(source = "correlativeIds", target = "correlatives", qualifiedByName = "subjectIdsToSubjects")
+    public abstract Subject createEntity(SubjectCreateDTO dto);
 
-    protected abstract SubjectDTO toDTO(Subject subject);
+    public abstract SubjectDTO toDTO(Subject subject);
 
     @Mapping(target = "careers", ignore = true)
     @Mapping(target = "correlatives", ignore = true)
-    protected abstract void updateFromDTO(@MappingTarget Subject subject, SubjectUpdateDTO dto);
+    public abstract void updateFromDTO(@MappingTarget Subject subject, SubjectUpdateDTO dto);
 
     @AfterMapping
     protected void updateCollections(@MappingTarget Subject subject, SubjectUpdateDTO dto) {
@@ -38,7 +38,7 @@ public abstract class SubjectMapper {
         }
     }
 
-    @Named("parseCareerIds")
+    @Named("careerIdsToCareers")
     protected List<Career> mapCareerIdsToCareers(List<Long> careerIds) {
         List<Career> careers = careerIds != null ? careerRepository.findAllById(careerIds) : null;
         if (careers == null || careers.isEmpty()) {
@@ -47,7 +47,7 @@ public abstract class SubjectMapper {
         return careers;
     }
 
-    @Named("parseSubjectIds")
+    @Named("subjectIdsToSubjects")
     protected List<Subject> mapSubjectIdsToSubjects(List<Long> subjectIds) {
         if (subjectIds == null) return null;
         return subjectRepository.findAllById(subjectIds);
