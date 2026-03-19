@@ -10,7 +10,7 @@ import ar.net.ut.backend.auth.exception.BannedUserException;
 import ar.net.ut.backend.auth.token.TokenException;
 import ar.net.ut.backend.auth.token.TokenService;
 import ar.net.ut.backend.config.JwtConfig;
-import ar.net.ut.backend.exception.BackendException;
+import ar.net.ut.backend.exception.impl.ThirdPartyException;
 import ar.net.ut.backend.user.UserMapper;
 import ar.net.ut.backend.user.UserService;
 import ar.net.ut.backend.user.entity.User;
@@ -64,11 +64,7 @@ public class AuthService {
             }
         } catch (Exception e) {
             log.error("An error ocurred while trying to login with Google. {}", e.getMessage());
-            throw new BackendException(
-                    "An error ocurred while trying to login with Google",
-                    HttpStatus.BAD_REQUEST,
-                    "INVALID_LOGIN"
-            );
+            throw new ThirdPartyException("An error ocurred while trying to login with Google");
         }
 
         String incomingAccessToken = CookieUtil.getCookie(request, ACCESS_TOKEN_COOKIE);
