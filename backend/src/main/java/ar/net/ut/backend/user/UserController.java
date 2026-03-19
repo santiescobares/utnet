@@ -4,7 +4,9 @@ import ar.net.ut.backend.Global;
 import ar.net.ut.backend.user.dto.UserCreateDTO;
 import ar.net.ut.backend.user.dto.UserDTO;
 import ar.net.ut.backend.user.dto.UserUpdateDTO;
+import ar.net.ut.backend.user.dto.profile.UserProfileDTO;
 import ar.net.ut.backend.user.dto.profile.UserProfilePictureResponseDTO;
+import ar.net.ut.backend.user.dto.profile.UserProfileUpdateDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -44,5 +46,10 @@ public class UserController {
     @PatchMapping(value = "/profile/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserProfilePictureResponseDTO> updateUserProfilePicture(@RequestPart("pictureFile") MultipartFile pictureFile) {
         return ResponseEntity.ok(userService.updateUserProfilePicture(pictureFile));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<UserProfileDTO> updateUserProfile(@RequestBody @Valid UserProfileUpdateDTO dto) {
+        return ResponseEntity.ok(userService.updateUserProfile(dto));
     }
 }

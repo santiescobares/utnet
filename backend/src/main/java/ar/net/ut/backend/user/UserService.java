@@ -11,7 +11,9 @@ import ar.net.ut.backend.service.StorageService;
 import ar.net.ut.backend.user.dto.UserCreateDTO;
 import ar.net.ut.backend.user.dto.UserDTO;
 import ar.net.ut.backend.user.dto.UserUpdateDTO;
+import ar.net.ut.backend.user.dto.profile.UserProfileDTO;
 import ar.net.ut.backend.user.dto.profile.UserProfilePictureResponseDTO;
+import ar.net.ut.backend.user.dto.profile.UserProfileUpdateDTO;
 import ar.net.ut.backend.user.entity.User;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.event.UserCreateEvent;
@@ -156,6 +158,17 @@ public class UserService {
         userRepository.save(user);
 
         return new UserProfilePictureResponseDTO(Global.R2.PUBLIC_URL + "/" + pictureKey);
+    }
+
+    @Transactional
+    public UserProfileDTO updateUserProfile(UserProfileUpdateDTO dto) {
+        User user = getCurrentUser();
+        userMapper.updateProfileFromDTO(user.getProfile(), dto);
+        userRepository.save(user);
+
+        eventPublisher.publishEvent(new UserUpdateEvent(user));
+
+        return userMapper.toProfileDTO(user.getProfile());
     }
 
     public User getById(UUID id) {

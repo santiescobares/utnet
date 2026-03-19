@@ -1,0 +1,36 @@
+tablas
+
+- users(id, created_at, updated_at, deleted_at, first_name, last_name, birthday, email, role, google_id, referral_id, referred_by_id, banned_until)
+- user_profiles(user_id, career_id, picture_key, biography, preferences, average_contribution_points)
+- user_comments(id, created_at, deleted_at, resource_id, posted_by_id, content)
+- user_contributions(id, created_at, deleted_at, user_id, resource_type, resource_id, awarded_points)
+- user_interactions(id, created_at, user_id, type, resource_type, resource_id)
+
+- careers(id, name, id_character, sort_position)
+- subjects(id, name, short_name, sort_position, career_ids, correlative_ids)
+- courses(id, created_at, updated_at, deleted_at, career_id, year, division, name)
+- course_subjects(id, created_at, updated_at, deleted_at, course_id, subject_id, professors, class_days)
+- course_events(id, created_at, updated_at, deleted_at, course_id, date, start_time, end_time, description, created_by_id, last_editor_id)
+- course_reviews(id, created_at, deleted_at, resource_id, posted_by_id, content, rating)
+
+- forum_topics(id, name, sort_position)
+- forums(id, created_at, updated_at, deleted_at, topic_id, sort_position, created_by_id, title, slug, open, permanent)
+- forum_threads(id, created_at, updated_at, deleted_at, forum_id, posted_by_id, root_id, content, image_keys)
+
+- study_records(id, created_at, updated_at, deleted_at, created_by_id, subject_id, title, slug, description, tags, resource_key, downloads, hidden)
+
+- reports(id, created_at, deleted_at, reporter_id, resource_type, resource_id, reason, status, votes_in_favor, votes_against, required_votes)
+
+- punishments(id, created_at, user_id, reason, expiration_date, punished_by_id)
+
+- logs(id, created_at, user_id, resource_type, resource_id, action, details)
+
+enums
+
+- Role: NEW_USER, CONTRIBUTOR_1, CONTRIBUTOR_2, CONTRIBUTOR_3, ADMINISTRATOR   // users
+- InteractionType: LIKE, DISLIKE, VOTED_IN_FAVOR, VOTED_AGAINST   // user_interactions
+- ResourceType: USER, USER_PROFILE, USER_COMMENT, COURSE_EVENT, COURSE_REVIEW, FORUM, FORUM_THREAD, STUDY_RECORD   // reports
+- ReportStatus: UNRESOLVED, RESOLVED_ACCEPTED, RESOLVED_DENIED   // reports
+- Action: CREATE, EDIT, DELETE, ROLL_BACK, OPEN, CLOSE, LOG_IN, LOG_OUT   // logs
+
+

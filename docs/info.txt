@@ -1,0 +1,52 @@
+UTNet
+
+- poder descentralizado. los usuarios publican, moderan y toman decisiones
+- comunidad exclusivamente utn (cursos, foros, materiales)
+- registro con google para no pedir contraseña. código de referido por cada usuario para invitar personas y tener seguimiento
+- pagina principal con información por carrera, correlativas y calendario academico
+- tableros por comisión: docentes, calendario de eventos, reseñas
+- foros comunes con categorías: off-topic por carrera, grupos, trabajo, comercio, deporte, etc
+- foros privados de acceso publico y duración limitada (24 horas)
+- material de estudio por carrera
+- historial de acciones de moderación/contribución de usuarios
+- chat efimero global de 24 horas
+
+moderación
+
+- obtención de roles por antigüedad y contribuciones. usuario nuevo, contribuidor nivel 1, nivel 2 y nivel 3
+- los usuarios con rol de contribuidor nivel 1 pueden empezar a editar/publicar nuevas cosas
+- cuando un usuario ve una publicación inapropiada, la reporta. los reportes son visibles para contribuidores nivel 2 en adelante, allí votan para aceptar o rechazar el reporte. si llega al mínimo requerido se acepta. si pasa un tiempo determinado y no hay decision (o antes se vota en contra), se rechaza.
+- los contribuidores nivel 3 pueden eliminar contenido inapropiado directamente sin pasar por votación
+
+permisos de cada rol
+
+- usuario nuevo
+	- puede leer calendarios
+	- puede leer reseñas
+	- puede participar en foros
+	- puede descargar material de estudio
+- contribuidor nivel 1 (requiere: 1 mes de antigüedad)
+	- todos los permisos de usuario
+	- puede editar calendarios
+	- puede publicar reseñas
+	- puede subir material de estudio
+- contribuidor nivel 2 (requiere: 3 meses de antigüedad + 5 referidos + puntaje promedio de contribuciones > 30)
+	- todos los permisos del nivel 1
+	- puede ver reportes y votar decisiones
+- contribuidor nivel 3 (requiere: 9 meses de antigüedad + 5 referidos + puntaje promedio de contribuciones > 50)
+	- todos los permisos del nivel 2
+	- puede eliminar contenido sin pasar por votación (soft-delete) (espera de 5 minutos entre cada accion)
+	- puede editar información de docentes
+	- puede ver y votar reportes de abuso de poder
+
+- el puntaje promedio de contribuciones se calcula dia a dia mensualmente
+- en el caso de que, por ejemplo, un contribuidor nivel 3 baje su puntaje promedio de contribuciones, bajara de nivel gradualmente hasta el nivel 1
+- enero, y febrero son meses de gracia para la contabilización de puntos, es decir, no se degradaran roles aunque no haya contribuciones
+- a fin de evitar el abuso de poder del contribuidor nivel 3, cualquier usuario puede reportar el abuso, generando una votación visible solo para contribuidores del mismo nivel excluyendo al acusado. en caso de aceptarse el reporte, el abusador es sancionado temporalmente con modo solo lectura y posterior degradación a nivel 1 con reset de contribuciones
+
+definición de contribución y puntajes
+
+- crear/editar fechas en calendarios -> 1 punto
+- subir material de estudio -> 5 puntos
+- reportar contenido/usuarios -> 2 puntos (solo se contabilizan cuando el reporte es aceptado)
+- accionar ante contenido reportado (votación/eliminación directa) -> 5 puntos
