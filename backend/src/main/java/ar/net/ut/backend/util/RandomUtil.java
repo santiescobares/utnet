@@ -2,6 +2,7 @@ package ar.net.ut.backend.util;
 
 import lombok.experimental.UtilityClass;
 
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 @UtilityClass
@@ -15,5 +16,9 @@ public final class RandomUtil {
                 (long) Math.pow(10, length - 1),
                 (long) Math.pow(10, length)
         );
+    }
+
+    public String randomHexString() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

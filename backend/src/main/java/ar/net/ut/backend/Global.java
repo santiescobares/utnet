@@ -13,7 +13,7 @@ public final class Global {
 
     @AllArgsConstructor
     public enum R2 {
-        PUBLIC_URL(""),
+        PUBLIC_URL("https://pub-fa1fe6bf17ea4df8be4a643dc20d8669.r2.dev"),
         PROFILE_PICTURES_PATH("profile-pictures/");
 
         final String value;
