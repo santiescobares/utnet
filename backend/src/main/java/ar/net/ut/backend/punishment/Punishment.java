@@ -1,7 +1,7 @@
 package ar.net.ut.backend.punishment;
 
 import ar.net.ut.backend.model.loggable.CLoggableEntity;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

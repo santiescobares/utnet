@@ -1,18 +1,18 @@
 package ar.net.ut.backend.course.service;
 
+import ar.net.ut.backend.course.CourseEvent;
 import ar.net.ut.backend.course.mapper.CourseEventMapper;
 import ar.net.ut.backend.course.repository.CourseEventRepository;
 import ar.net.ut.backend.course.dto.event.CourseEventCreateDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventUpdateDTO;
-import ar.net.ut.backend.course.CourseEvent;
-import ar.net.ut.backend.course.event.CourseEventResourceCreateEvent;
-import ar.net.ut.backend.course.event.CourseEventResourceDeleteEvent;
-import ar.net.ut.backend.course.event.CourseEventResourceUpdateEvent;
+import ar.net.ut.backend.course.event.event.CourseEventResourceCreateEvent;
+import ar.net.ut.backend.course.event.event.CourseEventResourceDeleteEvent;
+import ar.net.ut.backend.course.event.event.CourseEventResourceUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.user.UserService;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.service.UserService;
+import ar.net.ut.backend.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

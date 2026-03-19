@@ -1,7 +1,7 @@
 package ar.net.ut.backend.model;
 
 import ar.net.ut.backend.model.loggable.CDLoggableEntity;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -2,7 +2,7 @@ package ar.net.ut.backend.studyrecord;
 
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
 import ar.net.ut.backend.subject.Subject;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.util.StringUtil;
 import jakarta.persistence.*;
 import lombok.Getter;

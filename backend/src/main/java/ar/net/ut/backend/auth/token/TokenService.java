@@ -1,7 +1,7 @@
 package ar.net.ut.backend.auth.token;
 
 import ar.net.ut.backend.config.JwtConfig;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;

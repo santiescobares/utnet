@@ -1,7 +1,7 @@
 package ar.net.ut.backend.user.dto.interaction;
 
 import ar.net.ut.backend.enums.ResourceType;
-import ar.net.ut.backend.user.entity.UserInteraction;
+import ar.net.ut.backend.user.UserInteraction;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

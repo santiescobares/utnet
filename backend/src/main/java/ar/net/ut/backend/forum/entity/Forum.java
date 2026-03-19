@@ -1,7 +1,7 @@
 package ar.net.ut.backend.forum.entity;
 
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

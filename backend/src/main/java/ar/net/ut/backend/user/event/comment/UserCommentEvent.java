@@ -1,6 +1,6 @@
 package ar.net.ut.backend.user.event.comment;
 
-import ar.net.ut.backend.user.entity.UserComment;
+import ar.net.ut.backend.user.UserComment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

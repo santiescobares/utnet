@@ -1,7 +1,7 @@
 package ar.net.ut.backend.auth.event.login;
 
 import ar.net.ut.backend.auth.event.AuthEvent;
-import ar.net.ut.backend.user.entity.User;
+import ar.net.ut.backend.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
