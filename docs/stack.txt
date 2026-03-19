@@ -1,0 +1,30 @@
+backend
+
+Framework:    Spring Boot 3 + Spring Security
+Auth:         JWT + OAuth2 (Google) via Spring Security OAuth2 Client
+ORM:          Spring Data JPA + Hibernate
+DB principal: PostgreSQL
+DB efímera:   Redis (TTL nativo para chat/foros temporales)
+Real-time:    Spring WebSocket + STOMP
+Archivos:     Cloudflare R2
+Migraciones:  Flyway
+Validación:   Bean Validation (Jakarta)
+
+frontend
+
+Build:        Vite
+Estado servidor: TanStack Query
+Estado cliente:  Zustand
+Routing:      React Router v6
+Estilos:      Tailwind CSS + shadcn/ui
+WebSocket:    STOMP.js + sockjs-client
+Forms:        React Hook Form + Zod
+
+devops / infraestructura
+
+Contenedores: Docker + Docker Compose (dev local)
+CI/CD:        GitHub Actions
+Deploy front: Vercel
+Deploy back:  Railway o Render
+DB en prod:   Supabase o Railway Postgres
+Redis en prod: Upstash (free tier disponible)
