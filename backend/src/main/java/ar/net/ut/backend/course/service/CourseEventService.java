@@ -6,11 +6,15 @@ import ar.net.ut.backend.course.dto.event.CourseEventCreateDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventUpdateDTO;
 import ar.net.ut.backend.course.CourseEvent;
+import ar.net.ut.backend.course.event.CourseEventResourceCreateEvent;
+import ar.net.ut.backend.course.event.CourseEventResourceDeleteEvent;
+import ar.net.ut.backend.course.event.CourseEventResourceUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.user.UserService;
 import ar.net.ut.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,8 @@ public class CourseEventService {
 
     private final UserService userService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Transactional
     public CourseEventDTO createCourseEvent(CourseEventCreateDTO dto) {
         User currentUser = userService.getCurrentUser();
@@ -38,6 +44,8 @@ public class CourseEventService {
         courseEvent.setCreatedBy(currentUser);
 
         courseEventRepository.save(courseEvent);
+
+        eventPublisher.publishEvent(new CourseEventResourceCreateEvent(courseEvent));
 
         return courseEventMapper.toDTO(courseEvent);
     }
@@ -52,6 +60,8 @@ public class CourseEventService {
 
         // TODO: register UserContribution of 1 point for calendar edit (info.txt)
 
+        eventPublisher.publishEvent(new CourseEventResourceUpdateEvent(courseEvent));
+
         return courseEventMapper.toDTO(courseEvent);
     }
 
@@ -59,6 +69,8 @@ public class CourseEventService {
     public void deleteCourseEvent(Long id) {
         CourseEvent courseEvent = getById(id);
         courseEventRepository.delete(courseEvent);
+
+        eventPublisher.publishEvent(new CourseEventResourceDeleteEvent(courseEvent));
     }
 
     @Transactional(readOnly = true)

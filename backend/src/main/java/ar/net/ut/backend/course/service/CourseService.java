@@ -8,10 +8,14 @@ import ar.net.ut.backend.course.dto.CourseCreateDTO;
 import ar.net.ut.backend.course.dto.CourseDTO;
 import ar.net.ut.backend.course.dto.CourseUpdateDTO;
 import ar.net.ut.backend.course.Course;
+import ar.net.ut.backend.course.event.CourseCreateEvent;
+import ar.net.ut.backend.course.event.CourseDeleteEvent;
+import ar.net.ut.backend.course.event.CourseUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +30,8 @@ public class CourseService {
     private final CourseRepository courseRepository;
 
     private final CourseMapper courseMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CourseDTO createCourse(CourseCreateDTO dto) {
@@ -44,6 +50,8 @@ public class CourseService {
         course.setName();
 
         courseRepository.save(course);
+
+        eventPublisher.publishEvent(new CourseCreateEvent(course));
 
         return courseMapper.toDTO(course);
     }
@@ -71,6 +79,10 @@ public class CourseService {
         course.setDivision(division);
         course.setName();
 
+        courseRepository.save(course);
+
+        eventPublisher.publishEvent(new CourseUpdateEvent(course));
+
         return courseMapper.toDTO(course);
     }
 
@@ -78,6 +90,8 @@ public class CourseService {
     public void deleteCourse(Long id) {
         Course course = getById(id);
         courseRepository.delete(course);
+
+        eventPublisher.publishEvent(new CourseDeleteEvent(course));
     }
 
     @Transactional(readOnly = true)

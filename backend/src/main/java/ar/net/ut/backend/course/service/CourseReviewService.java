@@ -5,12 +5,15 @@ import ar.net.ut.backend.course.repository.CourseReviewRepository;
 import ar.net.ut.backend.course.dto.review.CourseReviewCreateDTO;
 import ar.net.ut.backend.course.dto.review.CourseReviewDTO;
 import ar.net.ut.backend.course.CourseReview;
+import ar.net.ut.backend.course.event.CourseReviewCreateEvent;
+import ar.net.ut.backend.course.event.CourseReviewDeleteEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.user.UserService;
 import ar.net.ut.backend.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,8 @@ public class CourseReviewService {
 
     private final UserService userService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     @Transactional
     public CourseReviewDTO createReview(CourseReviewCreateDTO dto) {
         User currentUser = userService.getCurrentUser();
@@ -43,6 +48,8 @@ public class CourseReviewService {
 
         courseReviewRepository.save(review);
 
+        eventPublisher.publishEvent(new CourseReviewCreateEvent(review));
+
         return courseReviewMapper.toDTO(review);
     }
 
@@ -51,6 +58,8 @@ public class CourseReviewService {
         CourseReview review = getById(id);
         // TODO: authorize — only the author or CONTRIBUTOR_3+ should be able to delete
         courseReviewRepository.delete(review);
+
+        eventPublisher.publishEvent(new CourseReviewDeleteEvent(review));
     }
 
     @Transactional(readOnly = true)

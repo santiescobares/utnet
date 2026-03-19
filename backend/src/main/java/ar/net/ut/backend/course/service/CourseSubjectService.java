@@ -6,12 +6,16 @@ import ar.net.ut.backend.course.dto.subject.CourseSubjectCreateDTO;
 import ar.net.ut.backend.course.dto.subject.CourseSubjectDTO;
 import ar.net.ut.backend.course.dto.subject.CourseSubjectUpdateDTO;
 import ar.net.ut.backend.course.CourseSubject;
+import ar.net.ut.backend.course.event.CourseSubjectCreateEvent;
+import ar.net.ut.backend.course.event.CourseSubjectDeleteEvent;
+import ar.net.ut.backend.course.event.CourseSubjectUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.subject.Subject;
 import ar.net.ut.backend.subject.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,8 @@ public class CourseSubjectService {
     private final CourseService courseService;
 
     private final SubjectService subjectService;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CourseSubjectDTO addSubjectToCourse(CourseSubjectCreateDTO dto) {
@@ -46,6 +52,8 @@ public class CourseSubjectService {
 
         courseSubjectRepository.save(courseSubject);
 
+        eventPublisher.publishEvent(new CourseSubjectCreateEvent(courseSubject));
+
         return courseSubjectMapper.toDTO(courseSubject);
     }
 
@@ -53,6 +61,9 @@ public class CourseSubjectService {
     public CourseSubjectDTO updateCourseSubject(Long id, CourseSubjectUpdateDTO dto) {
         CourseSubject courseSubject = getById(id);
         courseSubjectMapper.updateFromDTO(courseSubject, dto);
+
+        eventPublisher.publishEvent(new CourseSubjectUpdateEvent(courseSubject));
+
         return courseSubjectMapper.toDTO(courseSubject);
     }
 
@@ -60,6 +71,8 @@ public class CourseSubjectService {
     public void removeCourseSubject(Long id) {
         CourseSubject courseSubject = getById(id);
         courseSubjectRepository.delete(courseSubject);
+
+        eventPublisher.publishEvent(new CourseSubjectDeleteEvent(courseSubject));
     }
 
     @Transactional(readOnly = true)
