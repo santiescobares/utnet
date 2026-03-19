@@ -1,18 +1,23 @@
 package ar.net.ut.backend.user;
 
+import ar.net.ut.backend.Global;
 import ar.net.ut.backend.auth.token.TokenException;
 import ar.net.ut.backend.auth.token.TokenService;
+import ar.net.ut.backend.config.S3Config;
 import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.service.StorageService;
 import ar.net.ut.backend.user.dto.UserCreateDTO;
 import ar.net.ut.backend.user.dto.UserDTO;
 import ar.net.ut.backend.user.dto.UserUpdateDTO;
+import ar.net.ut.backend.user.dto.profile.UserProfilePictureResponseDTO;
 import ar.net.ut.backend.user.entity.User;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.event.UserCreateEvent;
 import ar.net.ut.backend.user.event.UserDeleteEvent;
 import ar.net.ut.backend.user.event.UserUpdateEvent;
+import ar.net.ut.backend.util.ImageUtil;
 import ar.net.ut.backend.util.RandomUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +28,10 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +44,7 @@ import static ar.net.ut.backend.Global.RedisKeys.*;
 public class UserService {
 
     private final TokenService tokenService;
+    private final StorageService storageService;
 
     private final UserRepository userRepository;
 
@@ -44,6 +53,8 @@ public class UserService {
     private final StringRedisTemplate redisTemplate;
 
     private final ApplicationEventPublisher eventPublisher;
+
+    private final S3Config s3Config;
 
     @Transactional
     public UserDTO createUser(Long inviterReferralId, UserCreateDTO dto) {
@@ -116,6 +127,35 @@ public class UserService {
         userRepository.delete(user);
 
         eventPublisher.publishEvent(new UserDeleteEvent(user, request, response));
+    }
+
+    public UserProfilePictureResponseDTO updateUserProfilePicture(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File can't be null or empty");
+        }
+
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if (!extension.equalsIgnoreCase("png") && !extension.equalsIgnoreCase("jpg")) {
+            throw new IllegalArgumentException("Profile picture must be PNG or JPG");
+        }
+        if (file.getSize() > 10_485_760) {
+            throw new IllegalArgumentException("Profile picture size can't be greater than 10 MB");
+        }
+
+        MultipartFile resizedFile;
+        try {
+            resizedFile = ImageUtil.resize(file, 256, 256);
+        } catch (IOException e) {
+            throw new RuntimeException("An error ocurred while trying to resize an image");
+        }
+
+        String pictureKey = storageService.uploadFile(resizedFile, s3Config.getPublicBucket(), Global.R2.PROFILE_PICTURES_PATH.toString());
+
+        User user = getCurrentUser();
+        user.getProfile().setPictureKey(pictureKey);
+        userRepository.save(user);
+
+        return new UserProfilePictureResponseDTO(Global.R2.PUBLIC_URL + "/" + pictureKey);
     }
 
     public User getById(UUID id) {
