@@ -38,6 +38,6 @@ public class Report extends CDLoggableEntity {
     public enum Status {
         UNRESOLVED,
         RESOLVED_ACCEPTED,
-        RESOLVED_DENIED;
+        RESOLVED_DECLINED;
     }
 }

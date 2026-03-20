@@ -190,6 +190,10 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.USER, "id", id.toString()));
     }
 
+    public User getReferenceById(UUID id) {
+        return userRepository.getReferenceById(id);
+    }
+
     public User getCurrentUser() {
         RequestContextData currentSession = RequestContextHolder.getCurrentSession();
         if (currentSession == null) {

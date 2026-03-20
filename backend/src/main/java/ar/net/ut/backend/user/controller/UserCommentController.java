@@ -1,6 +1,7 @@
 package ar.net.ut.backend.user.controller;
 
 import ar.net.ut.backend.Global;
+import ar.net.ut.backend.user.UserInteraction;
 import ar.net.ut.backend.user.service.UserCommentService;
 import ar.net.ut.backend.user.dto.comment.UserCommentCreateDTO;
 import ar.net.ut.backend.user.dto.comment.UserCommentDTO;
@@ -31,17 +32,35 @@ public class UserCommentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commentService.createComment(userId, dto));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
+        commentService.deleteComment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/add-interaction")
+    public ResponseEntity<Void> addCommentInteraction(
+            @PathVariable Long id,
+            @RequestParam(name = "type") UserInteraction.Type type
+    ) {
+        commentService.addCommentInteraction(id, type);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/remove-interaction")
+    public ResponseEntity<Void> removeCommentInteraction(
+            @PathVariable Long id,
+            @RequestParam(name = "type") UserInteraction.Type type
+    ) {
+        commentService.removeCommentInteraction(id, type);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{userId}")
     public ResponseEntity<Page<UserCommentDTO>> getCommentsByUser(
             @PathVariable UUID userId,
             @PageableDefault(sort = "creationTimestamp", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(commentService.getCommentsDTOByUser(userId, pageable));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
-        commentService.deleteComment(id);
-        return ResponseEntity.noContent().build();
     }
 }

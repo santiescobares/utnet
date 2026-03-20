@@ -1,16 +1,15 @@
 package ar.net.ut.backend.report.event;
 
 import ar.net.ut.backend.report.Report;
-import ar.net.ut.backend.user.User;
 import lombok.Getter;
 
 @Getter
 public class ReportVoteEvent extends ReportEvent {
 
-    private final User voter;
+    private final boolean inFavor;
 
-    public ReportVoteEvent(Report report, User voter) {
+    public ReportVoteEvent(Report report, boolean inFavor) {
         super(report);
-        this.voter = voter;
+        this.inFavor = inFavor;
     }
 }

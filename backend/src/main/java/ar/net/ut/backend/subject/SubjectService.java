@@ -1,8 +1,6 @@
 package ar.net.ut.backend.subject;
 
-import ar.net.ut.backend.course.repository.CourseSubjectRepository;
 import ar.net.ut.backend.enums.ResourceType;
-import ar.net.ut.backend.exception.BackendException;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.subject.dto.SubjectCreateDTO;
@@ -13,7 +11,6 @@ import ar.net.ut.backend.subject.event.SubjectDeleteEvent;
 import ar.net.ut.backend.subject.event.SubjectUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +21,6 @@ import java.util.List;
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final CourseSubjectRepository courseSubjectRepository;
 
     private final SubjectMapper subjectMapper;
 
@@ -72,14 +68,6 @@ public class SubjectService {
     @Transactional
     public void deleteSubject(Long id) {
         Subject subject = getById(id);
-
-        if (courseSubjectRepository.existsBySubjectId(id)) {
-            throw new BackendException(
-                    "You must remove that subject from all courses in order to delete it",
-                    HttpStatus.CONFLICT,
-                    "SUBJECT_DELETE_COURSE_CONFLICT"
-            );
-        }
 
         subjectRepository.delete(subject);
         subjectRepository.unlinkSubjectFromCorrelatives(id);

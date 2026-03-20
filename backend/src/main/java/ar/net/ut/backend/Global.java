@@ -1,6 +1,7 @@
 package ar.net.ut.backend;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -36,5 +37,16 @@ public final class Global {
         public String toString() {
             return value;
         }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum Contributions {
+        EVENT_CREATE_EDIT(1),
+        STUDY_RECORD_UPLOAD(5),
+        CONTENT_REPORT(2),
+        REPORT_RESOLUTION(5);
+
+        final int points;
     }
 }

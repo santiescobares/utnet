@@ -12,7 +12,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Page<Report> findAllByStatus(Report.Status status, Pageable pageable);
 
-    List<Report> findAllByReporterId(UUID reporterId);
+    Page<Report> findAllByReporterId(UUID reporterId, Pageable pageable);
 
     boolean existsByReporterIdAndResourceTypeAndResourceId(UUID reporterId, ResourceType resourceType, String resourceId);
 }

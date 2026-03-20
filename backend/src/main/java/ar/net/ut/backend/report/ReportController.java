@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping(Global.API_VERSION_PATH + "/reports")
 @RequiredArgsConstructor
@@ -37,8 +35,10 @@ public class ReportController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<ReportDTO>> getMyReports() {
-        return ResponseEntity.ok(reportService.getMyReports());
+    public ResponseEntity<Page<ReportDTO>> getMyReports(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(reportService.getMyReports(pageable));
     }
 
     @GetMapping("/{id}")

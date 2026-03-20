@@ -1,9 +1,9 @@
 package ar.net.ut.backend.user.service;
 
+import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.model.Interactionable;
 import ar.net.ut.backend.user.UserInteraction;
 import ar.net.ut.backend.user.mapper.UserCommentMapper;
 import ar.net.ut.backend.user.dto.comment.UserCommentCreateDTO;
@@ -14,7 +14,6 @@ import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.event.comment.UserCommentCreateEvent;
 import ar.net.ut.backend.user.event.comment.UserCommentDeleteEvent;
 import ar.net.ut.backend.user.repository.UserCommentRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -26,20 +25,16 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserCommentService implements Interactionable {
+public class UserCommentService {
 
     private final UserService userService;
+    private final UserInteractionService userInteractionService;
 
     private final UserCommentRepository commentRepository;
 
     private final UserCommentMapper commentMapper;
 
     private final ApplicationEventPublisher eventPublisher;
-
-    @PostConstruct
-    public void setup() {
-        Interactionable.INTERACTIONABLE_RESOURCES.put(ResourceType.USER_COMMENT, this);
-    }
 
     @Transactional
     public UserCommentDTO createComment(UUID targetUserId, UserCommentCreateDTO dto) {
@@ -63,9 +58,8 @@ public class UserCommentService implements Interactionable {
     }
 
     @Transactional
-    public void deleteComment(Long commentId) {
-        UserComment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.USER_COMMENT, "id", commentId.toString()));
+    public void deleteComment(Long id) {
+        UserComment comment = getById(id);
 
         User currentUser = userService.getCurrentUser();
         boolean isAuthor = comment.getPostedBy().equals(currentUser);
@@ -85,27 +79,52 @@ public class UserCommentService implements Interactionable {
         return commentRepository.findAllByResourceId(userId, pageable).map(commentMapper::toDTO);
     }
 
-    @Override
-    public void onInteractionCreate(String resourceId, UserInteraction.Type interactionType) {
-        commentRepository.findById(Long.valueOf(resourceId)).ifPresent(comment -> {
-            if (interactionType == UserInteraction.Type.LIKE) {
-                comment.addLike();
-            } else {
-                comment.addDislike();
-            }
-            commentRepository.save(comment);
-        });
+    @Transactional
+    public void addCommentInteraction(Long id, UserInteraction.Type type) {
+        if (type != UserInteraction.Type.LIKE && type != UserInteraction.Type.DISLIKE) {
+            throw new IllegalArgumentException("Invalid interaction type for comment");
+        }
+
+        UserComment comment = getById(id);
+
+        userInteractionService.createInteraction(
+                RequestContextHolder.getCurrentSession().userId(),
+                type,
+                ResourceType.USER_COMMENT,
+                id.toString()
+        );
+
+        if (type == UserInteraction.Type.LIKE) {
+            comment.addLike();
+        } else {
+            comment.addDislike();
+        }
     }
 
-    @Override
-    public void onInteractionDelete(String resourceId, UserInteraction.Type interactionType) {
-        commentRepository.findById(Long.valueOf(resourceId)).ifPresent(comment -> {
-            if (interactionType == UserInteraction.Type.LIKE) {
-                comment.removeLike();
-            } else {
-                comment.removeDislike();
-            }
-            commentRepository.save(comment);
-        });
+    @Transactional
+    public void removeCommentInteraction(Long id, UserInteraction.Type type) {
+        if (type != UserInteraction.Type.LIKE && type != UserInteraction.Type.DISLIKE) {
+            throw new IllegalArgumentException("Invalid interaction type for comment");
+        }
+
+        UserComment comment = getById(id);
+
+        userInteractionService.deleteInteraction(
+                RequestContextHolder.getCurrentSession().userId(),
+                type,
+                ResourceType.USER_COMMENT,
+                id.toString()
+        );
+
+        if (type == UserInteraction.Type.LIKE) {
+            comment.removeLike();
+        } else {
+            comment.removeDislike();
+        }
+    }
+
+    public UserComment getById(Long id) {
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.USER_COMMENT, "id", id.toString()));
     }
 }

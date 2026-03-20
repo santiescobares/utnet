@@ -5,7 +5,6 @@ import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.model.Interactionable;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.mapper.UserInteractionMapper;
 import ar.net.ut.backend.user.dto.interaction.UserInteractionDTO;
@@ -34,10 +33,7 @@ public class UserInteractionService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void createInteraction(ResourceType resourceType, String resourceId, UserInteraction.Type type) {
-        Interactionable interactionable = Interactionable.getSafeByResource(resourceType);
-        UUID userId = RequestContextHolder.getCurrentSession().userId();
-
+    public void createInteraction(UUID userId, UserInteraction.Type type, ResourceType resourceType, String resourceId) {
         if (interactionRepository.existsByUserIdAndTypeAndResourceTypeAndResourceId(userId, type, resourceType, resourceId)) {
             throw new ResourceAlreadyExistsException(
                     ResourceType.USER_INTERACTION, "type + resourceType + resourceId", type + " + " + resourceType + " + " + resourceId
@@ -51,7 +47,7 @@ public class UserInteractionService {
             throw new InvalidOperationException("Can't add " + type + ": a " + oppositeInteraction + " already exists for that resource");
         }
 
-        User user = userService.getCurrentUser();
+        User user = userService.getById(userId);
         UserInteraction interaction = new UserInteraction();
         interaction.setUser(user);
         interaction.setType(type);
@@ -59,8 +55,6 @@ public class UserInteractionService {
         interaction.setResourceId(resourceId);
 
         interactionRepository.save(interaction);
-
-        interactionable.onInteractionCreate(resourceId, type);
 
         eventPublisher.publishEvent(new UserInteractionCreateEvent(interaction));
     }
@@ -72,12 +66,12 @@ public class UserInteractionService {
 
         interactionRepository.delete(interaction);
 
-        Interactionable interactionable = Interactionable.getByResource(interaction.getResourceType());
-        if (interactionable != null) {
-            interactionable.onInteractionDelete(Long.toString(id), interaction.getType());
-        }
-
         eventPublisher.publishEvent(new UserInteractionDeleteEvent(interaction));
+    }
+
+    @Transactional
+    public void deleteInteraction(UUID userId, UserInteraction.Type type, ResourceType resourceType, String resourceId) {
+        interactionRepository.deleteByUserIdAndTypeAndResourceTypeAndResourceId(userId, type, resourceType, resourceId);
     }
 
     @Transactional(readOnly = true)

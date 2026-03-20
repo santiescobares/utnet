@@ -1,22 +1,16 @@
 package ar.net.ut.backend.report;
 
+import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.model.Interactionable;
 import ar.net.ut.backend.report.dto.ReportCreateDTO;
 import ar.net.ut.backend.report.dto.ReportDTO;
 import ar.net.ut.backend.report.dto.ReportResolveDTO;
-import ar.net.ut.backend.report.event.ReportAcceptedEvent;
-import ar.net.ut.backend.report.event.ReportCreateEvent;
-import ar.net.ut.backend.report.event.ReportDeleteEvent;
-import ar.net.ut.backend.report.event.ReportVoteEvent;
-import ar.net.ut.backend.user.User;
-import ar.net.ut.backend.user.UserInteraction;
+import ar.net.ut.backend.report.event.*;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.repository.UserInteractionRepository;
 import ar.net.ut.backend.user.service.UserService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -24,36 +18,33 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService implements Interactionable {
+public class ReportService {
 
-    private static final int DEFAULT_REQUIRED_VOTES = 3;
+    public static final int DEFAULT_REQUIRED_VOTES = 1; // TODO make it proportional to user count with contributor lvl 2
+
+    private final UserService userService;
 
     private final ReportRepository reportRepository;
-    private final ReportMapper reportMapper;
-    private final UserService userService;
     private final UserInteractionRepository userInteractionRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
-    @PostConstruct
-    public void setup() {
-        Interactionable.INTERACTIONABLE_RESOURCES.put(ResourceType.REPORT, this);
-    }
+    private final ReportMapper reportMapper;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public ReportDTO createReport(ReportCreateDTO dto) {
-        User reporter = userService.getCurrentUser();
-
         if (reportRepository.existsByReporterIdAndResourceTypeAndResourceId(
-                reporter.getId(), dto.resourceType(), dto.resourceId())) {
-            throw new InvalidOperationException("Ya reportaste este contenido y el reporte está pendiente de resolución");
+                RequestContextHolder.getCurrentSession().userId(), dto.resourceType(), dto.resourceId())
+        ) {
+            throw new InvalidOperationException("You have already reported that resource");
         }
 
         Report report = new Report();
-        report.setReporter(reporter);
+        report.setReporter(userService.getCurrentUser());
         report.setResourceType(dto.resourceType());
         report.setResourceId(dto.resourceId());
         report.setReason(dto.reason());
@@ -61,6 +52,7 @@ public class ReportService implements Interactionable {
         report.setRequiredVotes(DEFAULT_REQUIRED_VOTES);
 
         reportRepository.save(report);
+
         eventPublisher.publishEvent(new ReportCreateEvent(report));
 
         return reportMapper.toDTO(report);
@@ -68,70 +60,58 @@ public class ReportService implements Interactionable {
 
     @Transactional(readOnly = true)
     public Page<ReportDTO> getReports(Report.Status status, Pageable pageable) {
-        User currentUser = userService.getCurrentUser();
-        assertCanView(currentUser);
-
+        assertCanView();
         return reportRepository.findAllByStatus(status, pageable)
                 .map(reportMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
     public ReportDTO getReportById(Long id) {
-        User currentUser = userService.getCurrentUser();
-        assertCanView(currentUser);
-
+        assertCanView();
         return reportMapper.toDTO(getById(id));
     }
 
     @Transactional(readOnly = true)
-    public List<ReportDTO> getMyReports() {
-        User currentUser = userService.getCurrentUser();
-
-        return reportRepository.findAllByReporterId(currentUser.getId())
-                .stream()
-                .map(reportMapper::toDTO)
-                .toList();
+    public Page<ReportDTO> getMyReports(Pageable pageable) {
+        return reportRepository.findAllByReporterId(RequestContextHolder.getCurrentSession().userId(), pageable)
+                .map(reportMapper::toDTO);
     }
 
     @Transactional
     public ReportDTO voteOnReport(Long id, boolean inFavor) {
-        User voter = userService.getCurrentUser();
-        assertCanView(voter);
+        assertCanView();
 
         Report report = getById(id);
-
         if (report.getStatus() != Report.Status.UNRESOLVED) {
-            throw new InvalidOperationException("No se puede votar en un reporte que ya fue resuelto");
+            throw new InvalidOperationException("That report was already resolved");
         }
-
-        if (report.getReporter().getId().equals(voter.getId())) {
-            throw new InvalidOperationException("No podés votar tu propio reporte");
+        if (report.getReporter().getId().equals(RequestContextHolder.getCurrentSession().userId())) {
+            throw new InvalidOperationException("You can't vote on your own report");
         }
-
-        if (hasAlreadyVoted(voter, id)) {
-            throw new InvalidOperationException("Ya votaste en este reporte");
+        if (hasAlreadyVoted(id)) {
+            throw new InvalidOperationException("You have already voted on that report");
         }
-
-        UserInteraction interaction = new UserInteraction();
-        interaction.setUser(voter);
-        interaction.setType(inFavor ? UserInteraction.Type.VOTED_IN_FAVOR : UserInteraction.Type.VOTED_AGAINST);
-        interaction.setResourceType(ResourceType.REPORT);
-        interaction.setResourceId(id.toString());
-        userInteractionRepository.save(interaction);
 
         if (inFavor) {
             report.setVotesInFavor(report.getVotesInFavor() + 1);
         } else {
             report.setVotesAgainst(report.getVotesAgainst() + 1);
         }
+
         reportRepository.save(report);
 
-        eventPublisher.publishEvent(new ReportVoteEvent(report, voter));
+        eventPublisher.publishEvent(new ReportVoteEvent(report, inFavor));
 
-        if (report.getVotesInFavor() >= report.getRequiredVotes()) {
+        if (inFavor && report.getVotesInFavor() >= report.getRequiredVotes()) {
             report.setStatus(Report.Status.RESOLVED_ACCEPTED);
             reportRepository.save(report);
-            eventPublisher.publishEvent(new ReportAcceptedEvent(report));
+
+            eventPublisher.publishEvent(new ReportAcceptedEvent(report, false));
+        } else if (report.getVotesAgainst() >= report.getRequiredVotes()) {
+            report.setStatus(Report.Status.RESOLVED_DECLINED);
+            reportRepository.save(report);
+
+            eventPublisher.publishEvent(new ReportDeclinedEvent(report, false));
         }
 
         return reportMapper.toDTO(report);
@@ -139,24 +119,31 @@ public class ReportService implements Interactionable {
 
     @Transactional
     public ReportDTO resolveReport(Long id, ReportResolveDTO dto) {
-        User currentUser = userService.getCurrentUser();
-        assertCanResolve(currentUser);
+        assertCanResolve();
 
         if (dto.resolution() == Report.Status.UNRESOLVED) {
-            throw new InvalidOperationException("La resolución debe ser RESOLVED_ACCEPTED o RESOLVED_DENIED");
+            throw new InvalidOperationException("Invalid resolution type");
         }
 
         Report report = getById(id);
-
         if (report.getStatus() != Report.Status.UNRESOLVED) {
-            throw new InvalidOperationException("Este reporte ya fue resuelto");
+            throw new InvalidOperationException("That report was already resolved");
+        }
+
+        UUID userId = RequestContextHolder.getCurrentSession().userId();
+        if (report.getReporter().getId().equals(userId)) {
+            throw new InvalidOperationException("You can't resolve your own report");
         }
 
         report.setStatus(dto.resolution());
         reportRepository.save(report);
 
+        eventPublisher.publishEvent(new ReportVoteEvent(report, dto.resolution() == Report.Status.RESOLVED_ACCEPTED));
+
         if (dto.resolution() == Report.Status.RESOLVED_ACCEPTED) {
-            eventPublisher.publishEvent(new ReportAcceptedEvent(report));
+            eventPublisher.publishEvent(new ReportAcceptedEvent(report, true));
+        } else {
+            eventPublisher.publishEvent(new ReportDeclinedEvent(report, true));
         }
 
         return reportMapper.toDTO(report);
@@ -164,12 +151,11 @@ public class ReportService implements Interactionable {
 
     @Transactional
     public void deleteReport(Long id) {
-        User currentUser = userService.getCurrentUser();
-        assertCanResolve(currentUser);
+        assertCanResolve();
 
         Report report = getById(id);
-
         reportRepository.delete(report);
+
         eventPublisher.publishEvent(new ReportDeleteEvent(report));
     }
 
@@ -178,33 +164,22 @@ public class ReportService implements Interactionable {
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.REPORT, "id", Long.toString(id)));
     }
 
-    private boolean hasAlreadyVoted(User voter, Long reportId) {
-        String resourceId = reportId.toString();
-        return userInteractionRepository.existsByUserIdAndTypeAndResourceTypeAndResourceId(
-                voter.getId(), UserInteraction.Type.VOTED_IN_FAVOR, ResourceType.REPORT, resourceId)
-                || userInteractionRepository.existsByUserIdAndTypeAndResourceTypeAndResourceId(
-                voter.getId(), UserInteraction.Type.VOTED_AGAINST, ResourceType.REPORT, resourceId);
+    private boolean hasAlreadyVoted(Long reportId) {
+        return userInteractionRepository.existsByUserIdAndResourceTypeAndResourceId(
+                RequestContextHolder.getCurrentSession().userId(),
+                ResourceType.REPORT, reportId.toString()
+        );
     }
 
-    private void assertCanView(User user) {
-        if (user.getRole().ordinal() < Role.CONTRIBUTOR_2.ordinal()) {
-            throw new InvalidOperationException("Se requiere ser Contribuidor Nivel 2 para ver y votar reportes");
+    private void assertCanView() {
+        if (RequestContextHolder.getCurrentSession().role().ordinal() < Role.CONTRIBUTOR_2.ordinal()) {
+            throw new InvalidOperationException("You must be a Level 2 Contributor in order to view and vote reports");
         }
     }
 
-    private void assertCanResolve(User user) {
-        if (user.getRole().ordinal() < Role.CONTRIBUTOR_3.ordinal()) {
-            throw new InvalidOperationException("Se requiere ser Contribuidor Nivel 3 para resolver o eliminar reportes directamente");
+    private void assertCanResolve() {
+        if (RequestContextHolder.getCurrentSession().role() != Role.ADMINISTRATOR) {
+            throw new InvalidOperationException("You don't have permission to resolve reports instantly");
         }
-    }
-
-    @Override
-    public void onInteractionCreate(String resourceId, UserInteraction.Type interactionType) {
-
-    }
-
-    @Override
-    public void onInteractionDelete(String resourceId, UserInteraction.Type interactionType) {
-
     }
 }
