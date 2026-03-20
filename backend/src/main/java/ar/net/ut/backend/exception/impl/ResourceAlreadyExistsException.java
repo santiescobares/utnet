@@ -12,7 +12,7 @@ public class ResourceAlreadyExistsException extends BackendException {
 
     public ResourceAlreadyExistsException(ResourceType resourceType, String field, String input) {
         super(
-                "Resource of type=" + resourceType + " with " + field + "=" + input + " already exists",
+                "Resource of type " + resourceType + " with " + field + " = " + input + " already exists",
                 HttpStatus.CONFLICT,
                 "RESOURCE_" + resourceType + "_ALREADY_EXISTS"
         );

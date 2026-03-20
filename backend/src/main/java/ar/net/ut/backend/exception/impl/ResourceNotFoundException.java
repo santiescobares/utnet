@@ -12,7 +12,7 @@ public class ResourceNotFoundException extends BackendException {
 
     public ResourceNotFoundException(ResourceType resourceType, String field, String input) {
         super(
-                "Resource of type=" + resourceType + " with " + field + "=" + input + " not found",
+                "Resource of type " + resourceType + " with " + field + " = " + input + " not found",
                 HttpStatus.NOT_FOUND,
                 "RESOURCE_" + resourceType + "_NOT_FOUND"
         );
