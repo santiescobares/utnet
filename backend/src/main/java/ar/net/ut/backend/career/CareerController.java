@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,16 +21,19 @@ public class CareerController {
     private final CareerService careerService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<CareerDTO> createCareer(@RequestBody @Valid CareerCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(careerService.createCareer(dto));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<CareerDTO> updateCareer(@PathVariable Long id, @RequestBody @Valid CareerUpdateDTO dto) {
         return ResponseEntity.ok(careerService.updateCareer(id, dto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<Void> deleteCareer(@PathVariable Long id) {
         careerService.deleteCareer(id);
         return ResponseEntity.noContent().build();

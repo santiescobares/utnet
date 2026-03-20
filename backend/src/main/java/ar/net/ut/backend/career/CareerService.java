@@ -6,15 +6,11 @@ import ar.net.ut.backend.career.dto.CareerUpdateDTO;
 import ar.net.ut.backend.career.event.CareerCreateEvent;
 import ar.net.ut.backend.career.event.CareerDeleteEvent;
 import ar.net.ut.backend.career.event.CareerUpdateEvent;
-import ar.net.ut.backend.course.repository.CourseRepository;
 import ar.net.ut.backend.enums.ResourceType;
-import ar.net.ut.backend.exception.BackendException;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,8 +21,6 @@ import java.util.List;
 public class CareerService {
 
     private final CareerRepository careerRepository;
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
 
     private final CareerMapper careerMapper;
 
@@ -74,26 +68,14 @@ public class CareerService {
     @Transactional
     public void deleteCareer(Long id) {
         Career career = getById(id);
-        if (courseRepository.existsByCareerId(id)) {
-            throw new BackendException(
-                    "You must remove all courses within that career in order to delete it",
-                    HttpStatus.CONFLICT,
-                    "CAREER_DELETE_COURSE_CONFLICT"
-            );
-        }
-
         careerRepository.delete(career);
-        userRepository.unlinkUsersFromCareer(id);
 
         eventPublisher.publishEvent(new CareerDeleteEvent(career));
     }
 
     @Transactional(readOnly = true)
     public List<CareerDTO> getAllCareersAsDTOs() {
-        return careerRepository.findAll()
-                .stream()
-                .map(careerMapper::toDTO)
-                .toList();
+        return careerMapper.toDTOList(careerRepository.findAll());
     }
 
     public Career getById(Long id) {
