@@ -1,20 +1,18 @@
 package ar.net.ut.backend.context;
 
-import java.util.UUID;
-
 public final class RequestContextHolder {
 
-    private static final ThreadLocal<UUID> currentUser = new ThreadLocal<>();
+    private static final ThreadLocal<RequestContextData> currentSession = new ThreadLocal<>();
 
-    public static void setCurrentUser(UUID userId) {
-        currentUser.set(userId);
+    public static void setCurrentSession(RequestContextData data) {
+        currentSession.set(data);
     }
 
-    public static UUID getCurrentUser() {
-        return currentUser.get();
+    public static RequestContextData getCurrentSession() {
+        return currentSession.get();
     }
 
     public static void clear() {
-        currentUser.remove();
+        currentSession.remove();
     }
 }

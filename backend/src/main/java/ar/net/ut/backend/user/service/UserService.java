@@ -4,6 +4,7 @@ import ar.net.ut.backend.Global;
 import ar.net.ut.backend.auth.token.TokenException;
 import ar.net.ut.backend.auth.token.TokenService;
 import ar.net.ut.backend.config.S3Config;
+import ar.net.ut.backend.context.RequestContextData;
 import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InternalException;
@@ -190,11 +191,11 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        UUID currentUser = RequestContextHolder.getCurrentUser();
-        if (currentUser == null) {
+        RequestContextData currentSession = RequestContextHolder.getCurrentSession();
+        if (currentSession == null) {
             throw new IllegalStateException("No user is loaded in current context");
         }
-        return getById(currentUser);
+        return getById(currentSession.userId());
     }
 
     public Optional<User> findByEmail(String email) {

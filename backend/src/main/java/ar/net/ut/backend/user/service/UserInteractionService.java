@@ -36,7 +36,7 @@ public class UserInteractionService {
     @Transactional
     public void createInteraction(ResourceType resourceType, String resourceId, UserInteraction.Type type) {
         Interactionable interactionable = Interactionable.getSafeByResource(resourceType);
-        UUID userId = RequestContextHolder.getCurrentUser();
+        UUID userId = RequestContextHolder.getCurrentSession().userId();
 
         if (interactionRepository.existsByUserIdAndTypeAndResourceTypeAndResourceId(userId, type, resourceType, resourceId)) {
             throw new ResourceAlreadyExistsException(
@@ -67,7 +67,7 @@ public class UserInteractionService {
 
     @Transactional
     public void deleteInteraction(Long id) {
-        UserInteraction interaction = interactionRepository.findByIdAndUserId(id, RequestContextHolder.getCurrentUser())
+        UserInteraction interaction = interactionRepository.findByIdAndUserId(id, RequestContextHolder.getCurrentSession().userId())
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.USER_INTERACTION, "id", Long.toString(id)));
 
         interactionRepository.delete(interaction);
@@ -82,7 +82,7 @@ public class UserInteractionService {
 
     @Transactional(readOnly = true)
     public List<UserInteractionDTO> getMyInteractions(ResourceType resourceType, String resourceId) {
-        UUID userId = RequestContextHolder.getCurrentUser();
+        UUID userId = RequestContextHolder.getCurrentSession().userId();
         List<UserInteraction> interactions;
 
         if (resourceId != null) {
