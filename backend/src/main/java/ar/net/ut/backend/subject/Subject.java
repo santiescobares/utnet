@@ -52,8 +52,8 @@ public class Subject {
                     throw new IllegalArgumentException("Subject can't be correlative of its own");
                 }
                 if (correlative.checkCorrelativeRecursion(this)) {
-                    throw new IllegalArgumentException("Subject with id=" + correlative.getId() + " is generating a circular " +
-                            "dependency on subject with id=" + id);
+                    throw new IllegalArgumentException("Subject with id = " + correlative.getId() + " is generating a circular " +
+                            "dependency on subject with id = " + id);
                 }
             }
         }

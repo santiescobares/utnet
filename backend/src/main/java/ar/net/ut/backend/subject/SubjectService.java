@@ -1,6 +1,8 @@
 package ar.net.ut.backend.subject;
 
+import ar.net.ut.backend.course.repository.CourseSubjectRepository;
 import ar.net.ut.backend.enums.ResourceType;
+import ar.net.ut.backend.exception.BackendException;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.subject.dto.SubjectCreateDTO;
@@ -11,6 +13,7 @@ import ar.net.ut.backend.subject.event.SubjectDeleteEvent;
 import ar.net.ut.backend.subject.event.SubjectUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ import java.util.List;
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
+    private final CourseSubjectRepository courseSubjectRepository;
 
     private final SubjectMapper subjectMapper;
 
@@ -50,11 +54,11 @@ public class SubjectService {
         Subject subject = getById(id);
 
         String name = dto.name();
-        if (subjectRepository.existsByNameIgnoreCase(name)) {
+        if (subjectRepository.existsByNameIgnoreCase(name) && !subject.getName().equalsIgnoreCase(name)) {
             throw new ResourceAlreadyExistsException(ResourceType.SUBJECT, "name", name);
         }
         String shortName = dto.shortName();
-        if (subjectRepository.existsByShortNameIgnoreCase(shortName)) {
+        if (subjectRepository.existsByShortNameIgnoreCase(shortName) && !subject.getShortName().equalsIgnoreCase(shortName)) {
             throw new ResourceAlreadyExistsException(ResourceType.SUBJECT, "shortName", shortName);
         }
 
@@ -69,19 +73,23 @@ public class SubjectService {
     public void deleteSubject(Long id) {
         Subject subject = getById(id);
 
-        // TODO set subject field to null on course subjects and study records over it
+        if (courseSubjectRepository.existsBySubjectId(id)) {
+            throw new BackendException(
+                    "You must remove that subject from all courses in order to delete it",
+                    HttpStatus.CONFLICT,
+                    "SUBJECT_DELETE_COURSE_CONFLICT"
+            );
+        }
 
         subjectRepository.delete(subject);
+        subjectRepository.unlinkSubjectFromCorrelatives(id);
 
         eventPublisher.publishEvent(new SubjectDeleteEvent(subject));
     }
 
     @Transactional(readOnly = true)
-    public List<SubjectDTO> getAllSubjectsAsDTOs() {
-        return subjectRepository.findAll()
-                .stream()
-                .map(subjectMapper::toDTO)
-                .toList();
+    public List<SubjectDTO> getAllSubjectsDTO() {
+        return subjectMapper.toDTOList(subjectRepository.findAll());
     }
 
     public Subject getById(Long id) {

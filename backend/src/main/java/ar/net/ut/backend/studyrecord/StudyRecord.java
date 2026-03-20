@@ -29,7 +29,7 @@ public class StudyRecord extends CUDLoggableEntity {
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subject_id", nullable = false)
+    @JoinColumn(name = "subject_id")
     private Subject subject;
 
     @Column(length = 100)

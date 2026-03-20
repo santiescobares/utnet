@@ -24,6 +24,8 @@ public abstract class SubjectMapper {
 
     public abstract SubjectDTO toDTO(Subject subject);
 
+    public abstract List<SubjectDTO> toDTOList(List<Subject> subjects);
+
     @Mapping(target = "careers", ignore = true)
     @Mapping(target = "correlatives", ignore = true)
     public abstract void updateFromDTO(@MappingTarget Subject subject, SubjectUpdateDTO dto);

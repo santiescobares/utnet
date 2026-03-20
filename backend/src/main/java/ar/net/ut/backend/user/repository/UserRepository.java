@@ -21,7 +21,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.career = null WHERE u.career.id = :careerId")
+    @Query("UPDATE User u SET u.profile.career = null WHERE u.profile.career.id = :careerId")
     void unlinkUsersFromCareer(Long careerId);
 
     @Modifying
