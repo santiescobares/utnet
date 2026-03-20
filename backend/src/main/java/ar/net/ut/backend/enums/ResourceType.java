@@ -16,5 +16,6 @@ public enum ResourceType {
     FORUM_THREAD,
     STUDY_RECORD,
     REPORT,
-    PUNISHMENT;
+    PUNISHMENT,
+    LOG;
 }
