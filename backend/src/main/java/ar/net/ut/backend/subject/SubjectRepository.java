@@ -11,6 +11,10 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
 
     boolean existsByShortNameIgnoreCase(String shortName);
 
+    boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
+
+    boolean existsByShortNameIgnoreCaseAndIdNot(String shortName, Long id);
+
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM subject_correlatives WHERE subject_id = :subjectId OR correlative_id = :subjectId", nativeQuery = true)

@@ -79,16 +79,16 @@ public class AuthService {
         LoginResponseDTO responseDTO;
         if (userOp.isPresent()) {
             User user = userOp.get();
+            if (user.isBanned()) {
+                throw new BannedUserException("User with id=" + user.getId() + " is banned");
+            }
+
             CookieUtil.setHttpOnlyCookie(
                     response,
                     ACCESS_TOKEN_COOKIE,
                     tokenService.generateAccessToken(user),
                     jwtConfig.getAccessExpiration()
             );
-
-            if (user.isBanned()) {
-                throw new BannedUserException("User with id=" + user.getId() + " is banned");
-            }
 
             responseDTO = new LoginResponseDTO(null, userMapper.toDTO(user));
 

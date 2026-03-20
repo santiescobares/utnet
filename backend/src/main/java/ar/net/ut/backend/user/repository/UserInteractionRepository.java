@@ -26,7 +26,7 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
             String resourceId
     );
 
-    void deleteByUserIdAndTypeAndResourceTypeAndResourceId(
+    UserInteraction deleteByUserIdAndTypeAndResourceTypeAndResourceId(
             UUID userId,
             UserInteraction.Type type,
             ResourceType resourceType,

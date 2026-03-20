@@ -50,11 +50,11 @@ public class SubjectService {
         Subject subject = getById(id);
 
         String name = dto.name();
-        if (subjectRepository.existsByNameIgnoreCase(name) && !subject.getName().equalsIgnoreCase(name)) {
+        if (name != null && subjectRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
             throw new ResourceAlreadyExistsException(ResourceType.SUBJECT, "name", name);
         }
         String shortName = dto.shortName();
-        if (subjectRepository.existsByShortNameIgnoreCase(shortName) && !subject.getShortName().equalsIgnoreCase(shortName)) {
+        if (shortName != null && subjectRepository.existsByShortNameIgnoreCaseAndIdNot(shortName, id)) {
             throw new ResourceAlreadyExistsException(ResourceType.SUBJECT, "shortName", shortName);
         }
 

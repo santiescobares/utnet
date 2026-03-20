@@ -71,7 +71,10 @@ public class UserInteractionService {
 
     @Transactional
     public void deleteInteraction(UUID userId, UserInteraction.Type type, ResourceType resourceType, String resourceId) {
-        interactionRepository.deleteByUserIdAndTypeAndResourceTypeAndResourceId(userId, type, resourceType, resourceId);
+        UserInteraction interaction = interactionRepository.deleteByUserIdAndTypeAndResourceTypeAndResourceId(userId, type, resourceType, resourceId);
+        if (interaction != null) {
+            eventPublisher.publishEvent(new UserInteractionDeleteEvent(interaction));
+        }
     }
 
     @Transactional(readOnly = true)

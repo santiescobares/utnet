@@ -60,14 +60,12 @@ public class ReportService {
 
     @Transactional(readOnly = true)
     public Page<ReportDTO> getReports(Report.Status status, Pageable pageable) {
-        assertCanView();
         return reportRepository.findAllByStatus(status, pageable)
                 .map(reportMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
     public ReportDTO getReportById(Long id) {
-        assertCanView();
         return reportMapper.toDTO(getById(id));
     }
 
@@ -79,8 +77,6 @@ public class ReportService {
 
     @Transactional
     public ReportDTO voteOnReport(Long id, boolean inFavor) {
-        assertCanView();
-
         Report report = getById(id);
         if (report.getStatus() != Report.Status.UNRESOLVED) {
             throw new InvalidOperationException("That report was already resolved");
@@ -119,8 +115,6 @@ public class ReportService {
 
     @Transactional
     public ReportDTO resolveReport(Long id, ReportResolveDTO dto) {
-        assertCanResolve();
-
         if (dto.resolution() == Report.Status.UNRESOLVED) {
             throw new InvalidOperationException("Invalid resolution type");
         }
@@ -151,8 +145,6 @@ public class ReportService {
 
     @Transactional
     public void deleteReport(Long id) {
-        assertCanResolve();
-
         Report report = getById(id);
         reportRepository.delete(report);
 
@@ -169,17 +161,5 @@ public class ReportService {
                 RequestContextHolder.getCurrentSession().userId(),
                 ResourceType.REPORT, reportId.toString()
         );
-    }
-
-    private void assertCanView() {
-        if (RequestContextHolder.getCurrentSession().role().ordinal() < Role.CONTRIBUTOR_2.ordinal()) {
-            throw new InvalidOperationException("You must be a Level 2 Contributor in order to view and vote reports");
-        }
-    }
-
-    private void assertCanResolve() {
-        if (RequestContextHolder.getCurrentSession().role() != Role.ADMINISTRATOR) {
-            throw new InvalidOperationException("You don't have permission to resolve reports instantly");
-        }
     }
 }

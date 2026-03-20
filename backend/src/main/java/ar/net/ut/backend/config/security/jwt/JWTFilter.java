@@ -1,7 +1,6 @@
 package ar.net.ut.backend.config.security.jwt;
 
 import ar.net.ut.backend.auth.token.TokenService;
-import ar.net.ut.backend.config.JwtConfig;
 import ar.net.ut.backend.context.RequestContextData;
 import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.user.enums.Role;
@@ -35,8 +34,6 @@ public class JWTFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
 
     private final StringRedisTemplate redisTemplate;
-
-    private final JwtConfig jwtConfig;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

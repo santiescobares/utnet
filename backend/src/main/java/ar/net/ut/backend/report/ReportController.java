@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,6 +28,7 @@ public class ReportController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('CONTRIBUTOR_2', 'CONTRIBUTOR_3', 'ADMINISTRATOR')")
     public ResponseEntity<Page<ReportDTO>> getReports(
             @RequestParam(defaultValue = "UNRESOLVED") Report.Status status,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
@@ -42,21 +44,25 @@ public class ReportController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('CONTRIBUTOR_2', 'CONTRIBUTOR_3', 'ADMINISTRATOR')")
     public ResponseEntity<ReportDTO> getReportById(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.getReportById(id));
     }
 
-    @PostMapping("/{id}/vote/favor")
+    @PostMapping("/{id}/vote/in-favor")
+    @PreAuthorize("hasAnyAuthority('CONTRIBUTOR_2', 'CONTRIBUTOR_3', 'ADMINISTRATOR')")
     public ResponseEntity<ReportDTO> voteInFavor(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.voteOnReport(id, true));
     }
 
-    @PostMapping("/{id}/vote/contra")
+    @PostMapping("/{id}/vote/against")
+    @PreAuthorize("hasAnyAuthority('CONTRIBUTOR_2', 'CONTRIBUTOR_3', 'ADMINISTRATOR')")
     public ResponseEntity<ReportDTO> voteAgainst(@PathVariable Long id) {
         return ResponseEntity.ok(reportService.voteOnReport(id, false));
     }
 
     @PostMapping("/{id}/resolve")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<ReportDTO> resolveReport(
             @PathVariable Long id,
             @RequestBody @Valid ReportResolveDTO dto
@@ -65,6 +71,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<Void> deleteReport(@PathVariable Long id) {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();

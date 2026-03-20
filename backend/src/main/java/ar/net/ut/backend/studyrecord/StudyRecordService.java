@@ -20,6 +20,7 @@ import ar.net.ut.backend.subject.SubjectService;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.service.UserService;
+import ar.net.ut.backend.util.FileUtil;
 import ar.net.ut.backend.util.RandomUtil;
 import ar.net.ut.backend.util.StringUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +29,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +62,8 @@ public class StudyRecordService {
         User currentUser = userService.getCurrentUser();
         assertCanCreate(currentUser);
 
-        validateFile(file);
+        FileUtil.validateExtension(file, ALLOWED_FILE_FORMATS);
+        FileUtil.validateSize(file, MAX_FILE_SIZE);
 
         Subject subject = subjectService.getById(dto.subjectId());
 
@@ -169,20 +169,6 @@ public class StudyRecordService {
             return baseSlug;
         }
         return baseSlug + "-" + RandomUtil.randomHexString().substring(0, 6);
-    }
-
-    private void validateFile(MultipartFile file) {
-        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if (extension == null || !ALLOWED_FILE_FORMATS.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("Supported file formats: " + ALLOWED_FILE_FORMATS
-                    .stream()
-                    .map(String::toUpperCase)
-                    .collect(Collectors.joining(", "))
-            );
-        }
-        if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("File size can't be greater than " + (MAX_FILE_SIZE / 1024 / 1024) + " MB");
-        }
     }
 
     private void assertCanCreate(User user) {

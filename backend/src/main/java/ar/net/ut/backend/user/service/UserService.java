@@ -23,6 +23,7 @@ import ar.net.ut.backend.user.event.UserCreateEvent;
 import ar.net.ut.backend.user.event.UserDeleteEvent;
 import ar.net.ut.backend.user.event.UserUpdateEvent;
 import ar.net.ut.backend.user.repository.UserRepository;
+import ar.net.ut.backend.util.FileUtil;
 import ar.net.ut.backend.util.ImageUtil;
 import ar.net.ut.backend.util.RandomUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -34,7 +35,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -43,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static ar.net.ut.backend.Global.RedisKeys.*;
 
@@ -146,17 +145,8 @@ public class UserService {
             throw new IllegalArgumentException("File can't be null or empty");
         }
 
-        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if (!ALLOWED_PICTURE_FORMATS.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("Supported profile picture formats: " + ALLOWED_PICTURE_FORMATS
-                    .stream()
-                    .map(String::toUpperCase)
-                    .collect(Collectors.joining(", "))
-            );
-        }
-        if (file.getSize() > MAX_PICTURE_SIZE) {
-            throw new IllegalArgumentException("Profile picture size can't be greater than " + (MAX_PICTURE_SIZE / 1024 / 1024) + " MB");
-        }
+        FileUtil.validateExtension(file, ALLOWED_PICTURE_FORMATS);
+        FileUtil.validateSize(file, MAX_PICTURE_SIZE);
 
         MultipartFile resizedFile;
         try {
