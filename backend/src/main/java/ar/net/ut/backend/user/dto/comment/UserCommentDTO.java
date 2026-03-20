@@ -8,6 +8,8 @@ public record UserCommentDTO(
         Instant createdAt,
         UUID resourceId,
         UUID postedById,
-        String content
+        String content,
+        int likes,
+        int dislikes
 ) {
 }

@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public abstract class UserInteractionEvent {
+
     private final UserInteraction interaction;
 }

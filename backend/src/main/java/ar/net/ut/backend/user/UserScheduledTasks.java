@@ -18,4 +18,10 @@ public class UserScheduledTasks {
         int result = userRepository.anonymizeDeletedUsers();
         log.info("User anonymization performed. {} entites affected", result);
     }
+
+    @Scheduled(cron = "0 5 4 * * *")
+    public void calculateMonthlyContributionAverages() {
+        int result = userRepository.updateMonthlyAverageContributions();
+        log.info("User contribution averages updated. {} entites affected", result);
+    }
 }

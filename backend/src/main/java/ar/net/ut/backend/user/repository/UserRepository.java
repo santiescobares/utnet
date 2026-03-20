@@ -21,6 +21,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Modifying
     @Transactional
+    @Query("UPDATE User u SET u.career = null WHERE u.career.id = :careerId")
+    void unlinkUsersFromCareer(Long careerId);
+
+    @Modifying
+    @Transactional
     @Query(value = "UPDATE users " +
             "SET first_name = NULL, last_name = NULL, email = NULL, " +
             "birthday = NULL, google_id = NULL " +
@@ -32,6 +37,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE User u SET u.career = null WHERE u.career.id = :careerId")
-    void unlinkUsersFromCareer(Long careerId);
+    @Query(value = "UPDATE user_profiles " +
+            "SET average_contribution_points = COALESCE(( " +
+            "    SELECT ROUND(AVG(awarded_points)) " +
+            "    FROM user_contributions " +
+            "    WHERE user_contributions.user_id = user_profiles.user_id " +
+            "    AND created_at >= NOW() - INTERVAL '1 month' " +
+            "    AND deleted_at IS NULL" +
+            "), 0)",
+            nativeQuery = true)
+    int updateMonthlyAverageContributions();
 }

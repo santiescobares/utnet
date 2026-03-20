@@ -10,7 +10,9 @@ import java.util.UUID;
 
 public interface UserInteractionRepository extends JpaRepository<UserInteraction, Long> {
 
-    List<UserInteraction> findAllByUserId(UUID userId);
+    List<UserInteraction> findAllByUserIdAndResourceTypeAndResourceId(UUID userId, ResourceType resourceType, String resourceId);
+
+    List<UserInteraction> findAllByUserIdAndResourceType(UUID userId, ResourceType resourceType);
 
     boolean existsByUserIdAndTypeAndResourceTypeAndResourceId(
             UUID userId,

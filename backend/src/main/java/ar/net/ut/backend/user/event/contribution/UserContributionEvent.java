@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public abstract class UserContributionEvent {
+
     private final UserContribution contribution;
 }

@@ -3,9 +3,7 @@ package ar.net.ut.backend.user.service;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.user.mapper.UserContributionMapper;
-import ar.net.ut.backend.user.dto.contribution.UserContributionCreateDTO;
 import ar.net.ut.backend.user.dto.contribution.UserContributionDTO;
-import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.UserContribution;
 import ar.net.ut.backend.user.event.contribution.UserContributionCreateEvent;
 import ar.net.ut.backend.user.event.contribution.UserContributionDeleteEvent;
@@ -15,39 +13,31 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class UserContributionService {
 
-    private final UserContributionRepository contributionRepository;
-    private final UserContributionMapper contributionMapper;
     private final UserService userService;
+
+    private final UserContributionRepository contributionRepository;
+
+    private final UserContributionMapper contributionMapper;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public UserContributionDTO createContribution(UserContributionCreateDTO dto) {
-        User currentUser = userService.getCurrentUser();
-
+    public UserContributionDTO createContribution(ResourceType resourceType, String resourceId, int awardedPoints) {
         UserContribution contribution = new UserContribution();
-        contribution.setResourceType(dto.resourceType());
-        contribution.setResourceId(dto.resourceId());
-        contribution.setAwardedPoints(dto.awardedPoints());
-        contribution.setUser(currentUser);
+        contribution.setUser(userService.getCurrentUser());
+        contribution.setResourceType(resourceType);
+        contribution.setResourceId(resourceId);
+        contribution.setAwardedPoints(awardedPoints);
 
         contributionRepository.save(contribution);
 
         eventPublisher.publishEvent(new UserContributionCreateEvent(contribution));
 
         return contributionMapper.toDTO(contribution);
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserContributionDTO> getContributionsByUser(UUID userId) {
-        userService.getById(userId);
-        return contributionMapper.toDTOList(contributionRepository.findAllByUserId(userId));
     }
 
     @Transactional

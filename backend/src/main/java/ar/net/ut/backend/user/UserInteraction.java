@@ -32,5 +32,14 @@ public class UserInteraction extends CLoggableEntity {
         DISLIKE,
         VOTED_IN_FAVOR,
         VOTED_AGAINST;
+
+        public Type opposite() {
+            return switch (this) {
+                case LIKE -> DISLIKE;
+                case DISLIKE -> LIKE;
+                case VOTED_IN_FAVOR -> VOTED_AGAINST;
+                case VOTED_AGAINST -> VOTED_IN_FAVOR;
+            };
+        }
     }
 }

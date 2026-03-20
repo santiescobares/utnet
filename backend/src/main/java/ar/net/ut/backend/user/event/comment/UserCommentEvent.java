@@ -7,5 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public abstract class UserCommentEvent {
+
     private final UserComment comment;
 }
