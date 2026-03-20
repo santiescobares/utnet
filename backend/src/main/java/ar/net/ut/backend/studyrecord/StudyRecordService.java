@@ -1,6 +1,9 @@
 package ar.net.ut.backend.studyrecord;
 
+import ar.net.ut.backend.Global;
 import ar.net.ut.backend.config.S3Config;
+import ar.net.ut.backend.context.RequestContextData;
+import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
@@ -21,36 +24,46 @@ import ar.net.ut.backend.util.RandomUtil;
 import ar.net.ut.backend.util.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StudyRecordService {
 
-    private static final String STUDY_RECORDS_PATH = "study-records/";
-    private static final Duration DOWNLOAD_URL_EXPIRATION = Duration.ofMinutes(15);
-    private static final long MAX_FILE_SIZE = 52_428_800L; // 50 MB
-    private static final Set<String> ALLOWED_EXTENSIONS = Set.of("pdf", "doc", "docx", "png", "jpg", "jpeg");
+    private static final Set<String> ALLOWED_FILE_FORMATS = Set.of("pdf", "doc", "docx", "png", "jpg", "jpeg");
+    private static final long MAX_FILE_SIZE = 52_428_800L; // In bytes
 
     private final SubjectService subjectService;
     private final UserService userService;
-    private final StudyRecordRepository studyRecordRepository;
-    private final StudyRecordMapper studyRecordMapper;
     private final StorageService storageService;
-    private final S3Config s3Config;
+
+    private final StudyRecordRepository studyRecordRepository;
+
+    private final StudyRecordMapper studyRecordMapper;
+
     private final ApplicationEventPublisher eventPublisher;
 
-    @Transactional
+    private final S3Config s3Config;
+
     public StudyRecordDTO createStudyRecord(StudyRecordCreateDTO dto, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File can't be null or empty");
+        }
+
         User currentUser = userService.getCurrentUser();
         assertCanCreate(currentUser);
+
+        validateFile(file);
 
         Subject subject = subjectService.getById(dto.subjectId());
 
@@ -62,13 +75,11 @@ public class StudyRecordService {
         record.setDescription(dto.description());
         record.setTags(dto.tags());
 
-        if (file != null && !file.isEmpty()) {
-            validateFile(file);
-            String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), STUDY_RECORDS_PATH);
-            record.setResourceKey(resourceKey);
-        }
+        String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), Global.R2.STUDY_RECORDS_PATH.toString());
+        record.setResourceKey(resourceKey);
 
         studyRecordRepository.save(record);
+
         eventPublisher.publishEvent(new StudyRecordCreateEvent(record));
 
         return studyRecordMapper.toDTO(record);
@@ -77,15 +88,11 @@ public class StudyRecordService {
     @Transactional
     public StudyRecordDTO updateStudyRecord(Long id, StudyRecordUpdateDTO dto) {
         StudyRecord record = getById(id);
-        User currentUser = userService.getCurrentUser();
-        assertCanManage(currentUser, record);
-
-        if (dto.title() != null && !dto.title().equals(record.getTitle())) {
-            record.setSlug(generateUniqueSlug(dto.title()));
-        }
+        assertCanManage(record);
 
         studyRecordMapper.updateFromDTO(record, dto);
         studyRecordRepository.save(record);
+
         eventPublisher.publishEvent(new StudyRecordUpdateEvent(record));
 
         return studyRecordMapper.toDTO(record);
@@ -94,25 +101,19 @@ public class StudyRecordService {
     @Transactional
     public void deleteStudyRecord(Long id) {
         StudyRecord record = getById(id);
-        User currentUser = userService.getCurrentUser();
-        assertCanManage(currentUser, record);
+        assertCanManage(record);
 
         studyRecordRepository.delete(record);
+
         eventPublisher.publishEvent(new StudyRecordDeleteEvent(record));
     }
 
     @Transactional(readOnly = true)
-    public List<StudyRecordDTO> getStudyRecordsBySubject(Long subjectId) {
-        subjectService.getById(subjectId);
-        User currentUser = userService.getCurrentUser();
-
-        List<StudyRecord> records = canSeeAllRecords(currentUser)
-                ? studyRecordRepository.findBySubjectId(subjectId)
-                : studyRecordRepository.findBySubjectIdAndHiddenFalse(subjectId);
-
-        return records.stream()
-                .map(studyRecordMapper::toDTO)
-                .toList();
+    public Page<StudyRecordDTO> getStudyRecordsBySubject(Long subjectId, Pageable pageable) {
+        Page<StudyRecord> records = RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR
+                ? studyRecordRepository.findAllBySubjectId(subjectId, pageable)
+                : studyRecordRepository.findAllBySubjectIdAndHiddenFalse(subjectId, pageable);
+        return records.map(studyRecordMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -120,21 +121,33 @@ public class StudyRecordService {
         return studyRecordMapper.toDTO(getById(id));
     }
 
+    @Transactional(readOnly = true)
+    public StudyRecordDTO getStudyRecordBySlug(String slug) {
+        Optional<StudyRecord> studyRecord = RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR
+                ? studyRecordRepository.findBySlug(slug)
+                : studyRecordRepository.findBySlugAndHiddenFalse(slug);
+        if (studyRecord.isEmpty()) {
+            throw new ResourceNotFoundException(ResourceType.STUDY_RECORD, "slug", slug);
+        }
+        return studyRecordMapper.toDTO(studyRecord.get());
+    }
+
     @Transactional
     public StudyRecordDownloadResponseDTO downloadStudyRecord(Long id) {
         StudyRecord record = getById(id);
 
         if (record.getResourceKey() == null) {
-            throw new IllegalStateException("Este material no tiene archivo adjunto");
+            throw new IllegalStateException("No downloadable resource found for that study record");
         }
 
         String downloadUrl = storageService.generateDownloadPresignedUrl(
                 s3Config.getPrivateBucket(),
                 record.getResourceKey(),
-                DOWNLOAD_URL_EXPIRATION
+                Duration.ofMinutes(3)
         );
 
         record.setDownloads(record.getDownloads() + 1);
+
         studyRecordRepository.save(record);
 
         return new StudyRecordDownloadResponseDTO(downloadUrl);
@@ -143,6 +156,11 @@ public class StudyRecordService {
     public StudyRecord getById(Long id) {
         return studyRecordRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.STUDY_RECORD, "id", Long.toString(id)));
+    }
+
+    public StudyRecord getBySlug(String slug) {
+        return studyRecordRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.STUDY_RECORD, "slug", slug));
     }
 
     private String generateUniqueSlug(String title) {
@@ -155,28 +173,28 @@ public class StudyRecordService {
 
     private void validateFile(MultipartFile file) {
         String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-        if (extension == null || !ALLOWED_EXTENSIONS.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("Formato de archivo no permitido. Formatos aceptados: PDF, DOC, DOCX, PNG, JPG");
+        if (extension == null || !ALLOWED_FILE_FORMATS.contains(extension.toLowerCase())) {
+            throw new IllegalArgumentException("Supported file formats: " + ALLOWED_FILE_FORMATS
+                    .stream()
+                    .map(String::toUpperCase)
+                    .collect(Collectors.joining(", "))
+            );
         }
         if (file.getSize() > MAX_FILE_SIZE) {
-            throw new IllegalArgumentException("El archivo no puede superar los 50 MB");
+            throw new IllegalArgumentException("File size can't be greater than " + (MAX_FILE_SIZE / 1024 / 1024) + " MB");
         }
     }
 
     private void assertCanCreate(User user) {
         if (user.getRole().ordinal() < Role.CONTRIBUTOR_1.ordinal()) {
-            throw new InvalidOperationException("Se requiere ser Contribuidor Nivel 1 para subir material de estudio");
+            throw new InvalidOperationException("You must be a Level 1 Contributor in order to upload study records");
         }
     }
 
-    private void assertCanManage(User user, StudyRecord record) {
-        if (!record.getCreatedBy().getId().equals(user.getId())
-                && user.getRole().ordinal() < Role.CONTRIBUTOR_3.ordinal()) {
-            throw new InvalidOperationException("No tenés permiso para modificar este material");
+    private void assertCanManage(StudyRecord record) {
+        RequestContextData session = RequestContextHolder.getCurrentSession();
+        if (!record.getCreatedBy().getId().equals(session.userId()) && session.role().ordinal() < Role.CONTRIBUTOR_3.ordinal()) {
+            throw new InvalidOperationException("You don't have permission to edit that study record");
         }
-    }
-
-    private boolean canSeeAllRecords(User user) {
-        return user.getRole() == Role.CONTRIBUTOR_3 || user.getRole() == Role.ADMINISTRATOR;
     }
 }

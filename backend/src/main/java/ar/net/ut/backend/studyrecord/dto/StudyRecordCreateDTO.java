@@ -7,16 +7,17 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record StudyRecordCreateDTO(
-        @NotNull(message = "El ID de la materia es obligatorio")
+        @NotNull(message = "Subject ID is required")
         Long subjectId,
 
-        @NotBlank(message = "El título es obligatorio")
-        @Size(max = 100, message = "El título no puede superar los 100 caracteres")
+        @NotBlank(message = "Title is required")
+        @Size(max = 100, message = "Title is too long")
         String title,
 
-        @Size(max = 1000, message = "La descripción no puede superar los 1000 caracteres")
+        @NotBlank(message = "Description is required")
+        @Size(max = 1000, message = "Description is too long")
         String description,
 
-        List<@NotBlank(message = "Los tags no pueden estar vacíos") String> tags
+        List<String> tags
 ) {
 }

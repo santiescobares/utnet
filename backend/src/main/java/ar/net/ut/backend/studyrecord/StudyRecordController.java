@@ -7,13 +7,16 @@ import ar.net.ut.backend.studyrecord.dto.StudyRecordDTO;
 import ar.net.ut.backend.studyrecord.dto.StudyRecordUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(Global.API_VERSION_PATH + "/study-records")
@@ -25,17 +28,21 @@ public class StudyRecordController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<StudyRecordDTO> createStudyRecord(
             @RequestPart("dto") @Valid StudyRecordCreateDTO dto,
-            @RequestPart(value = "file", required = false) MultipartFile file
+            @RequestPart(value = "file") MultipartFile file
     ) {
         return ResponseEntity.status(HttpStatus.CREATED).body(studyRecordService.createStudyRecord(dto, file));
     }
 
     @GetMapping
-    public ResponseEntity<List<StudyRecordDTO>> getStudyRecordsBySubject(@RequestParam Long subjectId) {
-        return ResponseEntity.ok(studyRecordService.getStudyRecordsBySubject(subjectId));
+    public ResponseEntity<Page<StudyRecordDTO>> getStudyRecordsBySubject(
+            @RequestParam Long subjectId,
+            @PageableDefault(sort = "downloads", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(studyRecordService.getStudyRecordsBySubject(subjectId, pageable));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<StudyRecordDTO> getStudyRecordById(@PathVariable Long id) {
         return ResponseEntity.ok(studyRecordService.getStudyRecordById(id));
     }

@@ -3,6 +3,7 @@ package ar.net.ut.backend.report;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.model.Interactionable;
 import ar.net.ut.backend.report.dto.ReportCreateDTO;
 import ar.net.ut.backend.report.dto.ReportDTO;
 import ar.net.ut.backend.report.dto.ReportResolveDTO;
@@ -15,6 +16,7 @@ import ar.net.ut.backend.user.UserInteraction;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.repository.UserInteractionRepository;
 import ar.net.ut.backend.user.service.UserService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -26,7 +28,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReportService {
+public class ReportService implements Interactionable {
 
     private static final int DEFAULT_REQUIRED_VOTES = 3;
 
@@ -35,6 +37,11 @@ public class ReportService {
     private final UserService userService;
     private final UserInteractionRepository userInteractionRepository;
     private final ApplicationEventPublisher eventPublisher;
+
+    @PostConstruct
+    public void setup() {
+        Interactionable.INTERACTIONABLE_RESOURCES.put(ResourceType.REPORT, this);
+    }
 
     @Transactional
     public ReportDTO createReport(ReportCreateDTO dto) {
@@ -189,5 +196,15 @@ public class ReportService {
         if (user.getRole().ordinal() < Role.CONTRIBUTOR_3.ordinal()) {
             throw new InvalidOperationException("Se requiere ser Contribuidor Nivel 3 para resolver o eliminar reportes directamente");
         }
+    }
+
+    @Override
+    public void onInteractionCreate(String resourceId, UserInteraction.Type interactionType) {
+
+    }
+
+    @Override
+    public void onInteractionDelete(String resourceId, UserInteraction.Type interactionType) {
+
     }
 }

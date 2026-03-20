@@ -1,18 +1,17 @@
 package ar.net.ut.backend.studyrecord.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public record StudyRecordUpdateDTO(
-        @Size(max = 100, message = "El título no puede superar los 100 caracteres")
+        @Size(max = 100, message = "Title is too long")
         String title,
 
-        @Size(max = 1000, message = "La descripción no puede superar los 1000 caracteres")
+        @Size(max = 1000, message = "Description is too long")
         String description,
 
-        List<@NotBlank(message = "Los tags no pueden estar vacíos") String> tags,
+        List<String> tags,
 
         Boolean hidden
 ) {
