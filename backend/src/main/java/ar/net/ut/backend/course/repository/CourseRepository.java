@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
+    boolean existsByCareerId(Long careerId);
+
     boolean existsByCareerIdAndYearAndDivision(Long careerId, int year, int division);
 
     boolean existsByCareerIdAndYearAndDivisionAndIdNot(Long careerId, int year, int division, Long id);

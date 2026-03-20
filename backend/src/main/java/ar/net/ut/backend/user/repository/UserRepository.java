@@ -29,4 +29,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             "AND email IS NOT NULL",
             nativeQuery = true)
     int anonymizeDeletedUsers();
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.career = null WHERE u.career.id = :careerId")
+    void unlinkUsersFromCareer(Long careerId);
 }
