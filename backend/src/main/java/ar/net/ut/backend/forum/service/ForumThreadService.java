@@ -80,8 +80,8 @@ public class ForumThreadService {
         if (dto.rootId() != null) {
             ForumThread root = getById(dto.rootId());
 
-            if (forumDiscussion.getId().equals(dto.rootId())) {
-                throw new InvalidOperationException("What are you trying to do?...");
+            if (root.getRoot() != null) {
+                throw new InvalidOperationException("Invalid thread root");
             }
             if (!root.getDiscussion().getId().equals(forumDiscussion.getId())) {
                 throw new InvalidOperationException("Root thread doesn't belong to the specified forum");
