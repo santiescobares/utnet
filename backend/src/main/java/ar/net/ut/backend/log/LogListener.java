@@ -7,8 +7,8 @@ import ar.net.ut.backend.model.event.LoggableEvent;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class LogListener {
     private final UserService userService;
     private final LogService logService;
 
-    @TransactionalEventListener
+    @EventListener
     public void onLoggableEvent(LoggableEvent<?> event) {
         logService.createLog(
                 event.getUser(),
@@ -28,12 +28,12 @@ public class LogListener {
         );
     }
 
-    @TransactionalEventListener
+    @EventListener
     public void onUserLogIn(PostLoginEvent event) {
         logService.createLog(event.getUser(), ResourceType.USER, event.getUser().getId().toString(), Log.Action.LOG_IN, null);
     }
 
-    @TransactionalEventListener
+    @EventListener
     public void onUserLogOut(PostLogoutEvent event) {
         User user = userService.getCurrentUser();
         logService.createLog(user, ResourceType.USER, user.getId().toString(), Log.Action.LOG_OUT, null);
