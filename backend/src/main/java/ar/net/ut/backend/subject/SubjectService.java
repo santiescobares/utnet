@@ -9,7 +9,6 @@ import ar.net.ut.backend.subject.dto.SubjectUpdateDTO;
 import ar.net.ut.backend.subject.event.SubjectCreateEvent;
 import ar.net.ut.backend.subject.event.SubjectDeleteEvent;
 import ar.net.ut.backend.subject.event.SubjectUpdateEvent;
-import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -44,8 +43,7 @@ public class SubjectService {
         Subject subject = subjectMapper.createEntity(dto);
         subjectRepository.save(subject);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new SubjectCreateEvent(currentUser, subject));
+        eventPublisher.publishEvent(new SubjectCreateEvent(userService.getCurrentUser(), subject));
 
         return subjectMapper.toDTO(subject);
     }
@@ -65,8 +63,7 @@ public class SubjectService {
 
         subjectMapper.updateFromDTO(subject, dto);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new SubjectUpdateEvent(currentUser, subject));
+        eventPublisher.publishEvent(new SubjectUpdateEvent(userService.getCurrentUser(), subject));
 
         return subjectMapper.toDTO(subject);
     }
@@ -78,8 +75,7 @@ public class SubjectService {
         subjectRepository.delete(subject);
         subjectRepository.unlinkSubjectFromCorrelatives(id);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new SubjectDeleteEvent(currentUser, subject));
+        eventPublisher.publishEvent(new SubjectDeleteEvent(userService.getCurrentUser(), subject));
     }
 
     @Transactional(readOnly = true)

@@ -12,7 +12,6 @@ import ar.net.ut.backend.course.event.subject.CourseSubjectUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -48,8 +47,7 @@ public class CourseSubjectService {
         CourseSubject courseSubject = courseSubjectMapper.createEntity(dto);
         courseSubjectRepository.save(courseSubject);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new CourseSubjectCreateEvent(currentUser, courseSubject));
+        eventPublisher.publishEvent(new CourseSubjectCreateEvent(userService.getCurrentUser(), courseSubject));
 
         return courseSubjectMapper.toDTO(courseSubject);
     }
@@ -59,8 +57,7 @@ public class CourseSubjectService {
         CourseSubject courseSubject = getById(id);
         courseSubjectMapper.updateFromDTO(courseSubject, dto);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new CourseSubjectUpdateEvent(currentUser, courseSubject));
+        eventPublisher.publishEvent(new CourseSubjectUpdateEvent(userService.getCurrentUser(), courseSubject));
 
         return courseSubjectMapper.toDTO(courseSubject);
     }
@@ -70,8 +67,7 @@ public class CourseSubjectService {
         CourseSubject courseSubject = getById(id);
         courseSubjectRepository.delete(courseSubject);
 
-        User currentUser = userService.getCurrentUser();
-        eventPublisher.publishEvent(new CourseSubjectDeleteEvent(currentUser, courseSubject));
+        eventPublisher.publishEvent(new CourseSubjectDeleteEvent(userService.getCurrentUser(), courseSubject));
     }
 
     @Transactional(readOnly = true)
