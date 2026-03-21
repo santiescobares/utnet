@@ -68,4 +68,23 @@ public class StudyRecord extends CUDLoggableEntity {
     public List<String> getTags() {
         return tags != null ? Collections.unmodifiableList(tags) : Collections.emptyList();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"createdById\":\"" + (createdBy != null ? createdBy.getId() : null) + "\"" +
+                ", \"subjectId\":" + (subject != null ? subject.getId() : null) +
+                ", \"title\":\"" + (title != null ? title.replace("\"", "\\\"") : null) + "\"" +
+                ", \"slug\":\"" + (slug != null ? slug.replace("\"", "\\\"") : null) + "\"" +
+                ", \"description\":\"" + (description != null ? description.replace("\"", "\\\"") : null) + "\"" +
+                ", \"tags\":" + tags +
+                ", \"resourceKey\":\"" + resourceKey + "\"" +
+                ", \"downloads\":" + downloads +
+                ", \"hidden\":" + hidden +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

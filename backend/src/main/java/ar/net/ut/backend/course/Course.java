@@ -89,4 +89,18 @@ public class Course extends CUDLoggableEntity {
     public List<CourseReview> getReviews() {
         return reviews != null ? Collections.unmodifiableList(reviews) : Collections.emptyList();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"careerId\":" + (career != null ? career.getId() : null) +
+                ", \"year\":" + year +
+                ", \"division\":" + division +
+                ", \"name\":\"" + (name != null ? name.replace("\"", "\\\"") : null) + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

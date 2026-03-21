@@ -29,4 +29,16 @@ public class Punishment extends CLoggableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "punished_by_id", nullable = false)
     private User punishedBy;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"userId\":\"" + (user != null ? user.getId() : null) + "\"" +
+                ", \"reason\":\"" + (reason != null ? reason.replace("\"", "\\\"") : null) + "\"" +
+                ", \"expirationDate\":\"" + expirationDate + "\"" +
+                ", \"punishedById\":\"" + (punishedBy != null ? punishedBy.getId() : null) + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                "}";
+    }
 }

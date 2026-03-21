@@ -12,6 +12,7 @@ import ar.net.ut.backend.forum.event.topic.ForumTopicCreateEvent;
 import ar.net.ut.backend.forum.event.topic.ForumTopicDeleteEvent;
 import ar.net.ut.backend.forum.event.topic.ForumTopicUpdateEvent;
 import ar.net.ut.backend.forum.mapper.ForumTopicMapper;
+import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,8 @@ public class ForumTopicService {
 
     private final ForumTopicMapper forumTopicMapper;
 
+    private final UserService userService;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -39,7 +42,7 @@ public class ForumTopicService {
         ForumTopic forumTopic = forumTopicMapper.createEntity(dto);
         forumTopicRepository.save(forumTopic);
 
-        eventPublisher.publishEvent(new ForumTopicCreateEvent(forumTopic));
+        eventPublisher.publishEvent(new ForumTopicCreateEvent(userService.getCurrentUser(), forumTopic));
 
         return forumTopicMapper.toDTO(forumTopic);
     }
@@ -55,7 +58,7 @@ public class ForumTopicService {
 
         forumTopicMapper.updateFromDTO(forumTopic, dto);
 
-        eventPublisher.publishEvent(new ForumTopicUpdateEvent(forumTopic));
+        eventPublisher.publishEvent(new ForumTopicUpdateEvent(userService.getCurrentUser(), forumTopic));
 
         return forumTopicMapper.toDTO(forumTopic);
     }
@@ -65,7 +68,7 @@ public class ForumTopicService {
         ForumTopic forumTopic = getById(id);
         forumTopicRepository.delete(forumTopic);
 
-        eventPublisher.publishEvent(new ForumTopicDeleteEvent(forumTopic));
+        eventPublisher.publishEvent(new ForumTopicDeleteEvent(userService.getCurrentUser(), forumTopic));
     }
 
     @Transactional(readOnly = true)

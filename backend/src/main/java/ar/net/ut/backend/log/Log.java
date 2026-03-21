@@ -30,6 +30,19 @@ public class Log extends CLoggableEntity {
     @Column(columnDefinition = "TEXT")
     private String details;
 
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"userId\":\"" + (user != null ? user.getId() : null) + "\"" +
+                ", \"resourceType\":\"" + resourceType + "\"" +
+                ", \"resourceId\":\"" + resourceId + "\"" +
+                ", \"action\":\"" + action + "\"" +
+                ", \"details\":\"" + (details != null ? details.replace("\"", "\\\"") : null) + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                "}";
+    }
+
     public enum Action {
         CREATE,
         EDIT,

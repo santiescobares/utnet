@@ -9,6 +9,7 @@ import ar.net.ut.backend.career.event.CareerUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class CareerService {
     private final CareerRepository careerRepository;
 
     private final CareerMapper careerMapper;
+
+    private final UserService userService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -40,7 +43,7 @@ public class CareerService {
         Career career = careerMapper.createEntity(dto);
         careerRepository.save(career);
 
-        eventPublisher.publishEvent(new CareerCreateEvent(career));
+        eventPublisher.publishEvent(new CareerCreateEvent(userService.getCurrentUser(), career));
 
         return careerMapper.toDTO(career);
     }
@@ -60,7 +63,7 @@ public class CareerService {
 
         careerMapper.updateFromDTO(career, dto);
 
-        eventPublisher.publishEvent(new CareerUpdateEvent(career));
+        eventPublisher.publishEvent(new CareerUpdateEvent(userService.getCurrentUser(), career));
 
         return careerMapper.toDTO(career);
     }
@@ -70,7 +73,7 @@ public class CareerService {
         Career career = getById(id);
         careerRepository.delete(career);
 
-        eventPublisher.publishEvent(new CareerDeleteEvent(career));
+        eventPublisher.publishEvent(new CareerDeleteEvent(userService.getCurrentUser(), career));
     }
 
     @Transactional(readOnly = true)

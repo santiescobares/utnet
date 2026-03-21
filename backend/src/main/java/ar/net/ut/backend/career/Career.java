@@ -19,4 +19,14 @@ public class Career {
     @Column(unique = true)
     private char idCharacter;
     private int sortPosition;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"name\":\"" + (name != null ? name.replace("\"", "\\\"") : null) + "\"" +
+                ", \"idCharacter\":\"" + idCharacter + "\"" +
+                ", \"sortPosition\":" + sortPosition +
+                "}";
+    }
 }

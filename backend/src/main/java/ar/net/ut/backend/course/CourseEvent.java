@@ -37,4 +37,21 @@ public class CourseEvent extends CUDLoggableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_editor_id")
     private User lastEditor;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"courseId\":" + (course != null ? course.getId() : null) +
+                ", \"date\":\"" + date + "\"" +
+                ", \"startTime\":\"" + startTime + "\"" +
+                ", \"endTime\":\"" + endTime + "\"" +
+                ", \"description\":\"" + (description != null ? description.replace("\"", "\\\"") : null) + "\"" +
+                ", \"createdById\":\"" + (createdBy != null ? createdBy.getId() : null) + "\"" +
+                ", \"lastEditorId\":\"" + (lastEditor != null ? lastEditor.getId() : null) + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

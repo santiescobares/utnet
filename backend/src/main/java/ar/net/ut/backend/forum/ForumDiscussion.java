@@ -58,4 +58,21 @@ public class ForumDiscussion extends CUDLoggableEntity {
     public List<ForumThread> getThreads() {
         return threads != null ? Collections.unmodifiableList(threads) : Collections.emptyList();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"topicId\":" + (topic != null ? topic.getId() : null) +
+                ", \"sortPosition\":" + sortPosition +
+                ", \"createdById\":\"" + (createdBy != null ? createdBy.getId() : null) + "\"" +
+                ", \"title\":\"" + (title != null ? title.replace("\"", "\\\"") : null) + "\"" +
+                ", \"slug\":\"" + (slug != null ? slug.replace("\"", "\\\"") : null) + "\"" +
+                ", \"open\":" + open +
+                ", \"permanent\":" + permanent +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

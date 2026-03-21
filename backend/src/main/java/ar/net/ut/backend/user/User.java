@@ -125,4 +125,23 @@ public class User extends CUDLoggableEntity {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":\"" + id + "\"" +
+                ", \"firstName\":\"" + firstName + "\"" +
+                ", \"lastName\":\"" + lastName + "\"" +
+                ", \"birthday\":\"" + birthday + "\"" +
+                ", \"email\":\"" + email + "\"" +
+                ", \"role\":\"" + role + "\"" +
+                ", \"googleId\":\"" + googleId + "\"" +
+                ", \"referralId\":" + referralId +
+                ", \"referredById\":\"" + (referredBy != null ? referredBy.getId() : null) + "\"" +
+                ", \"bannedUntil\":\"" + bannedUntil + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

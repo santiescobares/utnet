@@ -27,4 +27,17 @@ public class UserContribution extends CDLoggableEntity {
     private String resourceId;
 
     private int awardedPoints;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"userId\":\"" + (user != null ? user.getId() : null) + "\"" +
+                ", \"resourceType\":\"" + resourceType + "\"" +
+                ", \"resourceId\":\"" + resourceId + "\"" +
+                ", \"awardedPoints\":" + awardedPoints +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

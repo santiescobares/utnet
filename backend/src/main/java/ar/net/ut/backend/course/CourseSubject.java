@@ -47,4 +47,18 @@ public class CourseSubject extends CUDLoggableEntity {
     public Map<DayOfWeek, String> getClassDays() {
         return classDays != null ? Collections.unmodifiableMap(classDays) : Collections.emptyMap();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"courseId\":" + (course != null ? course.getId() : null) +
+                ", \"subjectId\":" + (subject != null ? subject.getId() : null) +
+                ", \"professors\":" + professors +
+                ", \"classDays\":" + classDays +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }
