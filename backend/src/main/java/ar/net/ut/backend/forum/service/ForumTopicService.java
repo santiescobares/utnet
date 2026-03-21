@@ -1,15 +1,17 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.service;
 
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.forum.dto.ForumTopicCreateDTO;
-import ar.net.ut.backend.forum.dto.ForumTopicDTO;
-import ar.net.ut.backend.forum.dto.ForumTopicUpdateDTO;
-import ar.net.ut.backend.forum.entity.ForumTopic;
+import ar.net.ut.backend.forum.repository.ForumTopicRepository;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicCreateDTO;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicDTO;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicUpdateDTO;
+import ar.net.ut.backend.forum.ForumTopic;
 import ar.net.ut.backend.forum.event.ForumTopicCreateEvent;
 import ar.net.ut.backend.forum.event.ForumTopicDeleteEvent;
 import ar.net.ut.backend.forum.event.ForumTopicUpdateEvent;
+import ar.net.ut.backend.forum.mapper.ForumTopicMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

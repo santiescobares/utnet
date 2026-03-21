@@ -1,4 +1,4 @@
-package ar.net.ut.backend.forum.entity;
+package ar.net.ut.backend.forum;
 
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
 import ar.net.ut.backend.user.User;

@@ -1,6 +1,6 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.repository;
 
-import ar.net.ut.backend.forum.entity.Forum;
+import ar.net.ut.backend.forum.Forum;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

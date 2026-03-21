@@ -1,6 +1,6 @@
 package ar.net.ut.backend.forum.event;
 
-import ar.net.ut.backend.forum.entity.ForumThread;
+import ar.net.ut.backend.forum.ForumThread;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

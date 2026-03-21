@@ -1,6 +1,6 @@
 package ar.net.ut.backend.forum.event;
 
-import ar.net.ut.backend.forum.entity.Forum;
+import ar.net.ut.backend.forum.Forum;
 
 public class ForumDeleteEvent extends ForumEvent {
 

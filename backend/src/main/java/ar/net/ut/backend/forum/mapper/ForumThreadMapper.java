@@ -1,8 +1,8 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.mapper;
 
-import ar.net.ut.backend.forum.dto.ForumThreadDTO;
-import ar.net.ut.backend.forum.dto.ForumThreadUpdateDTO;
-import ar.net.ut.backend.forum.entity.ForumThread;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadDTO;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadUpdateDTO;
+import ar.net.ut.backend.forum.ForumThread;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

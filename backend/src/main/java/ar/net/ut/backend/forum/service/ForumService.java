@@ -1,16 +1,18 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.service;
 
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.forum.repository.ForumRepository;
 import ar.net.ut.backend.forum.dto.ForumCreateDTO;
 import ar.net.ut.backend.forum.dto.ForumDTO;
 import ar.net.ut.backend.forum.dto.ForumUpdateDTO;
-import ar.net.ut.backend.forum.entity.Forum;
-import ar.net.ut.backend.forum.entity.ForumTopic;
+import ar.net.ut.backend.forum.Forum;
+import ar.net.ut.backend.forum.ForumTopic;
 import ar.net.ut.backend.forum.event.ForumCreateEvent;
 import ar.net.ut.backend.forum.event.ForumDeleteEvent;
 import ar.net.ut.backend.forum.event.ForumUpdateEvent;
+import ar.net.ut.backend.forum.mapper.ForumMapper;
 import ar.net.ut.backend.user.service.UserService;
 import ar.net.ut.backend.user.User;
 import lombok.RequiredArgsConstructor;

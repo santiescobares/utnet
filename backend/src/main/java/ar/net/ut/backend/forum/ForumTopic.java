@@ -1,4 +1,4 @@
-package ar.net.ut.backend.forum.entity;
+package ar.net.ut.backend.forum;
 
 import jakarta.persistence.*;
 import lombok.Getter;

@@ -1,6 +1,7 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.controller;
 
 import ar.net.ut.backend.Global;
+import ar.net.ut.backend.forum.service.ForumService;
 import ar.net.ut.backend.forum.dto.ForumCreateDTO;
 import ar.net.ut.backend.forum.dto.ForumDTO;
 import ar.net.ut.backend.forum.dto.ForumUpdateDTO;

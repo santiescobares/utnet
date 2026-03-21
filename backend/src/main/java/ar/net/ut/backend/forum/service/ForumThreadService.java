@@ -1,16 +1,18 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.service;
 
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.forum.dto.ForumThreadCreateDTO;
-import ar.net.ut.backend.forum.dto.ForumThreadDTO;
-import ar.net.ut.backend.forum.dto.ForumThreadUpdateDTO;
-import ar.net.ut.backend.forum.entity.Forum;
-import ar.net.ut.backend.forum.entity.ForumThread;
+import ar.net.ut.backend.forum.repository.ForumThreadRepository;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadCreateDTO;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadDTO;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadUpdateDTO;
+import ar.net.ut.backend.forum.Forum;
+import ar.net.ut.backend.forum.ForumThread;
 import ar.net.ut.backend.forum.event.ForumThreadCreateEvent;
 import ar.net.ut.backend.forum.event.ForumThreadDeleteEvent;
 import ar.net.ut.backend.forum.event.ForumThreadUpdateEvent;
+import ar.net.ut.backend.forum.mapper.ForumThreadMapper;
 import ar.net.ut.backend.user.service.UserService;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.enums.Role;

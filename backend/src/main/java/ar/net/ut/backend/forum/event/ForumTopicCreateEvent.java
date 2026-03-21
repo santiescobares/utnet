@@ -1,6 +1,6 @@
 package ar.net.ut.backend.forum.event;
 
-import ar.net.ut.backend.forum.entity.ForumTopic;
+import ar.net.ut.backend.forum.ForumTopic;
 
 public class ForumTopicCreateEvent extends ForumTopicEvent {
 

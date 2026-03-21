@@ -1,4 +1,4 @@
-package ar.net.ut.backend.forum.dto;
+package ar.net.ut.backend.forum.dto.thread;
 
 import jakarta.validation.constraints.Size;
 

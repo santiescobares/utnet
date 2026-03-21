@@ -1,9 +1,10 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.controller;
 
 import ar.net.ut.backend.Global;
-import ar.net.ut.backend.forum.dto.ForumThreadCreateDTO;
-import ar.net.ut.backend.forum.dto.ForumThreadDTO;
-import ar.net.ut.backend.forum.dto.ForumThreadUpdateDTO;
+import ar.net.ut.backend.forum.service.ForumThreadService;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadCreateDTO;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadDTO;
+import ar.net.ut.backend.forum.dto.thread.ForumThreadUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
-package ar.net.ut.backend.forum;
+package ar.net.ut.backend.forum.mapper;
 
-import ar.net.ut.backend.forum.dto.ForumTopicCreateDTO;
-import ar.net.ut.backend.forum.dto.ForumTopicDTO;
-import ar.net.ut.backend.forum.dto.ForumTopicUpdateDTO;
-import ar.net.ut.backend.forum.entity.ForumTopic;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicCreateDTO;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicDTO;
+import ar.net.ut.backend.forum.dto.topic.ForumTopicUpdateDTO;
+import ar.net.ut.backend.forum.ForumTopic;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
