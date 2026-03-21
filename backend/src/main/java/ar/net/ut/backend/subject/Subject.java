@@ -89,4 +89,14 @@ public class Subject {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"name\":\"" + (name != null ? name.replace("\"", "\\\"") : null) + "\"" +
+                ", \"shortName\":\"" + shortName + "\"" +
+                ", \"sortPosition\":" + sortPosition +
+                "}";
+    }
 }

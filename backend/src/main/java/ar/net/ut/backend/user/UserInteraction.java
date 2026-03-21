@@ -27,6 +27,18 @@ public class UserInteraction extends CLoggableEntity {
     private ResourceType resourceType;
     private String resourceId;
 
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"userId\":\"" + (user != null ? user.getId() : null) + "\"" +
+                ", \"type\":\"" + type + "\"" +
+                ", \"resourceType\":\"" + resourceType + "\"" +
+                ", \"resourceId\":\"" + resourceId + "\"" +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                "}";
+    }
+
     public enum Type {
         LIKE,
         DISLIKE,

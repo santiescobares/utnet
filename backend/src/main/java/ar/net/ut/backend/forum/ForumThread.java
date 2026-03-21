@@ -85,4 +85,21 @@ public class ForumThread extends CUDLoggableEntity {
     public void removeDislike() {
         dislikes = Math.max(dislikes - 1, 0);
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"discussionId\":" + (discussion != null ? discussion.getId() : null) +
+                ", \"postedById\":\"" + (postedBy != null ? postedBy.getId() : null) + "\"" +
+                ", \"rootId\":" + (root != null ? root.getId() : null) +
+                ", \"content\":\"" + (content != null ? content.replace("\"", "\\\"") : null) + "\"" +
+                ", \"imageKeys\":" + imageKeys +
+                ", \"likes\":" + likes +
+                ", \"dislikes\":" + dislikes +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

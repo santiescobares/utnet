@@ -17,4 +17,13 @@ public class ForumTopic {
     @Column(length = 30, unique = true)
     private String name;
     private int sortPosition;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"name\":\"" + (name != null ? name.replace("\"", "\\\"") : null) + "\"" +
+                ", \"sortPosition\":" + sortPosition +
+                "}";
+    }
 }

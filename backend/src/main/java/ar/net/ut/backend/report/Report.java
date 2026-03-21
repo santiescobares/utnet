@@ -35,6 +35,23 @@ public class Report extends CDLoggableEntity {
 
     private int votesInFavor, votesAgainst, requiredVotes;
 
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"reporterId\":\"" + (reporter != null ? reporter.getId() : null) + "\"" +
+                ", \"resourceType\":\"" + resourceType + "\"" +
+                ", \"resourceId\":\"" + resourceId + "\"" +
+                ", \"reason\":\"" + (reason != null ? reason.replace("\"", "\\\"") : null) + "\"" +
+                ", \"status\":\"" + status + "\"" +
+                ", \"votesInFavor\":" + votesInFavor +
+                ", \"votesAgainst\":" + votesAgainst +
+                ", \"requiredVotes\":" + requiredVotes +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
+
     public enum Status {
         UNRESOLVED,
         RESOLVED_ACCEPTED,

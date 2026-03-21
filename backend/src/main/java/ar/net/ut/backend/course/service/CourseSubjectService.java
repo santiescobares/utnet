@@ -12,6 +12,8 @@ import ar.net.ut.backend.course.event.subject.CourseSubjectUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.user.User;
+import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class CourseSubjectService {
 
     private final CourseSubjectMapper courseSubjectMapper;
 
+    private final UserService userService;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -44,7 +48,8 @@ public class CourseSubjectService {
         CourseSubject courseSubject = courseSubjectMapper.createEntity(dto);
         courseSubjectRepository.save(courseSubject);
 
-        eventPublisher.publishEvent(new CourseSubjectCreateEvent(courseSubject));
+        User currentUser = userService.getCurrentUser();
+        eventPublisher.publishEvent(new CourseSubjectCreateEvent(currentUser, courseSubject));
 
         return courseSubjectMapper.toDTO(courseSubject);
     }
@@ -54,7 +59,8 @@ public class CourseSubjectService {
         CourseSubject courseSubject = getById(id);
         courseSubjectMapper.updateFromDTO(courseSubject, dto);
 
-        eventPublisher.publishEvent(new CourseSubjectUpdateEvent(courseSubject));
+        User currentUser = userService.getCurrentUser();
+        eventPublisher.publishEvent(new CourseSubjectUpdateEvent(currentUser, courseSubject));
 
         return courseSubjectMapper.toDTO(courseSubject);
     }
@@ -64,7 +70,8 @@ public class CourseSubjectService {
         CourseSubject courseSubject = getById(id);
         courseSubjectRepository.delete(courseSubject);
 
-        eventPublisher.publishEvent(new CourseSubjectDeleteEvent(courseSubject));
+        User currentUser = userService.getCurrentUser();
+        eventPublisher.publishEvent(new CourseSubjectDeleteEvent(currentUser, courseSubject));
     }
 
     @Transactional(readOnly = true)

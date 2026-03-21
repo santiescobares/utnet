@@ -18,4 +18,19 @@ public class CourseReview extends CommentEntity<Course> {
     private Long id;
 
     private double rating;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"resourceId\":" + (getResource() != null ? getResource().getId() : null) +
+                ", \"postedById\":\"" + (getPostedBy() != null ? getPostedBy().getId() : null) + "\"" +
+                ", \"content\":\"" + (getContent() != null ? getContent().replace("\"", "\\\"") : null) + "\"" +
+                ", \"likes\":" + getLikes() +
+                ", \"dislikes\":" + getDislikes() +
+                ", \"rating\":" + rating +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

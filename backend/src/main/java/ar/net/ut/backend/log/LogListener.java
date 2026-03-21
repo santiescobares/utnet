@@ -3,6 +3,7 @@ package ar.net.ut.backend.log;
 import ar.net.ut.backend.auth.event.login.PostLoginEvent;
 import ar.net.ut.backend.auth.event.logout.PostLogoutEvent;
 import ar.net.ut.backend.enums.ResourceType;
+import ar.net.ut.backend.model.event.LoggableEvent;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +12,21 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
-// TODO add details
 public class LogListener {
 
     private final UserService userService;
     private final LogService logService;
+
+    @TransactionalEventListener
+    public void onLoggableEvent(LoggableEvent<?> event) {
+        logService.createLog(
+                event.getUser(),
+                event.getResourceType(),
+                event.getResourceId(),
+                event.getAction(),
+                event.getEntity().toString()
+        );
+    }
 
     @TransactionalEventListener
     public void onUserLogIn(PostLoginEvent event) {

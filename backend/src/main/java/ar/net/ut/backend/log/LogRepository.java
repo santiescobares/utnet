@@ -4,7 +4,11 @@ import ar.net.ut.backend.enums.ResourceType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -17,4 +21,8 @@ public interface LogRepository extends JpaRepository<Log, Long> {
     Page<Log> findAllByResourceTypeAndAction(ResourceType resourceType, Log.Action action, Pageable pageable);
 
     Page<Log> findAllByUserIdAndActionNotIn(UUID userId, Collection<Log.Action> actions, Pageable pageable);
+
+    @Modifying
+    @Query("DELETE FROM Log l WHERE l.createdAt < :cutoff")
+    int deleteByCreatedAtBefore(@Param("cutoff") Instant cutoff);
 }

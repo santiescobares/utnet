@@ -16,4 +16,18 @@ public class UserComment extends CommentEntity<User> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":" + id +
+                ", \"resourceId\":\"" + (getResource() != null ? getResource().getId() : null) + "\"" +
+                ", \"postedById\":\"" + (getPostedBy() != null ? getPostedBy().getId() : null) + "\"" +
+                ", \"content\":\"" + (getContent() != null ? getContent().replace("\"", "\\\"") : null) + "\"" +
+                ", \"likes\":" + getLikes() +
+                ", \"dislikes\":" + getDislikes() +
+                ", \"createdAt\":\"" + getCreatedAt() + "\"" +
+                ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
+                "}";
+    }
 }

@@ -42,4 +42,17 @@ public class UserProfile {
     public Map<Preference, String> getPreferences() {
         return preferences != null ? Collections.unmodifiableMap(preferences) : Collections.emptyMap();
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"id\":\"" + id + "\"" +
+                ", \"userId\":\"" + (user != null ? user.getId() : null) + "\"" +
+                ", \"careerId\":" + (career != null ? career.getId() : null) +
+                ", \"pictureKey\":\"" + pictureKey + "\"" +
+                ", \"biography\":\"" + (biography != null ? biography.replace("\"", "\\\"") : null) + "\"" +
+                ", \"preferences\":" + preferences +
+                ", \"averageContributionPoints\":" + averageContributionPoints +
+                "}";
+    }
 }
