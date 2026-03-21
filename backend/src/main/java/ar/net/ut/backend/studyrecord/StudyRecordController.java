@@ -42,10 +42,15 @@ public class StudyRecordController {
         return ResponseEntity.ok(studyRecordService.getStudyRecordsBySubject(subjectId, pageable));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<StudyRecordDTO> getStudyRecordById(@PathVariable Long id) {
         return ResponseEntity.ok(studyRecordService.getStudyRecordById(id));
+    }
+
+    @GetMapping("/{slug}")
+    public ResponseEntity<StudyRecordDTO> getStudyRecordBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(studyRecordService.getStudyRecordBySlug(slug));
     }
 
     @PutMapping("/{id}")

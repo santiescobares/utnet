@@ -54,7 +54,7 @@ public class CourseReviewController {
     @GetMapping
     public ResponseEntity<Page<CourseReviewDTO>> getReviewsByCourse(
             @RequestParam Long courseId,
-            @PageableDefault(sort = "creationTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(courseReviewService.getReviewsByCourse(courseId, pageable));
     }

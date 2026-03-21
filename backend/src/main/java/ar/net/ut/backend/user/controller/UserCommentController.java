@@ -59,7 +59,7 @@ public class UserCommentController {
     @GetMapping("/{userId}")
     public ResponseEntity<Page<UserCommentDTO>> getCommentsByUser(
             @PathVariable UUID userId,
-            @PageableDefault(sort = "creationTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(commentService.getCommentsDTOByUser(userId, pageable));
     }

@@ -70,7 +70,7 @@ public class ForumThreadController {
     @GetMapping
     public ResponseEntity<Page<ForumThreadDTO>> getThreadsByForum(
             @RequestParam Long forumId,
-            @PageableDefault(sort = "updateTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(forumThreadService.getThreadsByForum(forumId, pageable));
     }
@@ -78,7 +78,7 @@ public class ForumThreadController {
     @GetMapping("/{id}/replies")
     public ResponseEntity<Page<ForumThreadDTO>> getRepliesByThread(
             @PathVariable Long id,
-            @PageableDefault(sort = "updateTimestamp", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(forumThreadService.getRepliesByThread(id, pageable));
     }
