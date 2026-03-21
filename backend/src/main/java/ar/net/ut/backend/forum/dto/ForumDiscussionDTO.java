@@ -3,7 +3,7 @@ package ar.net.ut.backend.forum.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-public record ForumDTO(
+public record ForumDiscussionDTO(
         Long id,
         Instant createdAt,
         Instant updatedAt,

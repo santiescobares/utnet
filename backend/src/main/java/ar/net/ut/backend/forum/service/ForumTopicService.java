@@ -8,9 +8,9 @@ import ar.net.ut.backend.forum.dto.topic.ForumTopicCreateDTO;
 import ar.net.ut.backend.forum.dto.topic.ForumTopicDTO;
 import ar.net.ut.backend.forum.dto.topic.ForumTopicUpdateDTO;
 import ar.net.ut.backend.forum.ForumTopic;
-import ar.net.ut.backend.forum.event.ForumTopicCreateEvent;
-import ar.net.ut.backend.forum.event.ForumTopicDeleteEvent;
-import ar.net.ut.backend.forum.event.ForumTopicUpdateEvent;
+import ar.net.ut.backend.forum.event.topic.ForumTopicCreateEvent;
+import ar.net.ut.backend.forum.event.topic.ForumTopicDeleteEvent;
+import ar.net.ut.backend.forum.event.topic.ForumTopicUpdateEvent;
 import ar.net.ut.backend.forum.mapper.ForumTopicMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,7 +24,9 @@ import java.util.List;
 public class ForumTopicService {
 
     private final ForumTopicRepository forumTopicRepository;
+
     private final ForumTopicMapper forumTopicMapper;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -68,10 +70,7 @@ public class ForumTopicService {
 
     @Transactional(readOnly = true)
     public List<ForumTopicDTO> getAllForumTopics() {
-        return forumTopicRepository.findAllByOrderBySortPositionAsc()
-                .stream()
-                .map(forumTopicMapper::toDTO)
-                .toList();
+        return forumTopicMapper.toDTOList(forumTopicRepository.findAllByOrderBySortPositionDesc());
     }
 
     public ForumTopic getById(Long id) {

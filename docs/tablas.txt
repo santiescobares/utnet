@@ -14,8 +14,8 @@ tablas
 - course_reviews(id, created_at, deleted_at, resource_id, posted_by_id, content, rating)
 
 - forum_topics(id, name, sort_position)
-- forums(id, created_at, updated_at, deleted_at, topic_id, sort_position, created_by_id, title, slug, open, permanent)
-- forum_threads(id, created_at, updated_at, deleted_at, forum_id, posted_by_id, root_id, content, image_keys)
+- forum_discussions(id, created_at, updated_at, deleted_at, topic_id, sort_position, created_by_id, title, slug, open, permanent)
+- forum_threads(id, created_at, updated_at, deleted_at, discussion_id, posted_by_id, root_id, content, image_keys)
 
 - study_records(id, created_at, updated_at, deleted_at, created_by_id, subject_id, title, slug, description, tags, resource_key, downloads, hidden)
 

@@ -26,8 +26,8 @@ public class ForumThread extends CUDLoggableEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "forum_id", nullable = false)
-    private Forum forum;
+    @JoinColumn(name = "discussion_id", nullable = false)
+    private ForumDiscussion discussion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "posted_by_id", nullable = false)
@@ -47,6 +47,8 @@ public class ForumThread extends CUDLoggableEntity {
     @Setter(AccessLevel.NONE)
     private List<ForumThread> replies;
 
+    private int likes, dislikes;
+
     public List<String> getImageKeys() {
         return imageKeys != null ? Collections.unmodifiableList(imageKeys) : Collections.emptyList();
     }
@@ -55,7 +57,7 @@ public class ForumThread extends CUDLoggableEntity {
         if (replies == null) {
             replies = new ArrayList<>();
         }
-        reply.setForum(forum);
+        reply.setDiscussion(discussion);
         reply.setRoot(this);
         return replies.add(reply);
     }
@@ -66,5 +68,21 @@ public class ForumThread extends CUDLoggableEntity {
 
     public List<ForumThread> getReplies() {
         return replies != null ? Collections.unmodifiableList(replies) : Collections.emptyList();
+    }
+
+    public void addLike() {
+        likes++;
+    }
+
+    public void removeLike() {
+        likes = Math.max(likes - 1, 0);
+    }
+
+    public void addDislike() {
+        dislikes++;
+    }
+
+    public void removeDislike() {
+        dislikes = Math.max(dislikes - 1, 0);
     }
 }

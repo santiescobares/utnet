@@ -1,4 +1,4 @@
-package ar.net.ut.backend.forum.event;
+package ar.net.ut.backend.forum.event.topic;
 
 import ar.net.ut.backend.forum.ForumTopic;
 import lombok.AllArgsConstructor;

@@ -8,10 +8,12 @@ public record ForumThreadDTO(
         Long id,
         Instant createdAt,
         Instant updatedAt,
-        Long forumId,
+        Long discussionId,
         UUID postedById,
         Long rootId,
         String content,
-        List<String> imageKeys
+        List<String> imageURLs,
+        int likes,
+        int dislikes
 ) {
 }

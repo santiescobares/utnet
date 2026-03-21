@@ -9,5 +9,5 @@ public interface ForumTopicRepository extends JpaRepository<ForumTopic, Long> {
 
     boolean existsByNameIgnoreCase(String name);
 
-    List<ForumTopic> findAllByOrderBySortPositionAsc();
+    List<ForumTopic> findAllByOrderBySortPositionDesc();
 }

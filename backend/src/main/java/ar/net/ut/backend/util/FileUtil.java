@@ -24,9 +24,13 @@ public final class FileUtil {
         }
     }
 
-    public void validateSize(MultipartFile file, long maxSize) {
-        if (file.getSize() > maxSize) {
+    public void validateSize(long size, long maxSize) {
+        if (size > maxSize) {
             throw new IllegalArgumentException("File size can't be greater than " + (maxSize / 1024 / 1024) + " MB");
         }
+    }
+
+    public void validateSize(MultipartFile file, long maxSize) {
+        validateSize(file.getSize(), maxSize);
     }
 }

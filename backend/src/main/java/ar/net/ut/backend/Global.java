@@ -16,7 +16,8 @@ public final class Global {
     public enum R2 {
         PUBLIC_URL("https://pub-fa1fe6bf17ea4df8be4a643dc20d8669.r2.dev"),
         PROFILE_PICTURES_PATH("profile-pictures/"),
-        STUDY_RECORDS_PATH("study-records/");
+        STUDY_RECORDS_PATH("study-records/"),
+        FORUM_THREAD_IMAGES_PATH("forum-thread-images/");
 
         final String value;
 

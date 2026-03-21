@@ -13,11 +13,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@Table(name = "forums")
+@Table(name = "forum_discussions")
 @Getter
 @Setter
 @SQLDelete(sql = "UPDATE forums SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
-public class Forum extends CUDLoggableEntity {
+public class ForumDiscussion extends CUDLoggableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Forum extends CUDLoggableEntity {
 
     private boolean open, permanent;
 
-    @OneToMany(mappedBy = "forum", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "discussion", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private List<ForumThread> threads;
 
@@ -47,7 +47,7 @@ public class Forum extends CUDLoggableEntity {
         if (threads == null) {
             threads = new ArrayList<>();
         }
-        thread.setForum(this);
+        thread.setDiscussion(this);
         return threads.add(thread);
     }
 

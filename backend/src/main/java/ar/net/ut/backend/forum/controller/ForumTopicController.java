@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +22,13 @@ public class ForumTopicController {
     private final ForumTopicService forumTopicService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<ForumTopicDTO> createForumTopic(@RequestBody @Valid ForumTopicCreateDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(forumTopicService.createForumTopic(dto));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<ForumTopicDTO> updateForumTopic(
             @PathVariable Long id,
             @RequestBody @Valid ForumTopicUpdateDTO dto
@@ -34,6 +37,7 @@ public class ForumTopicController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<Void> deleteForumTopic(@PathVariable Long id) {
         forumTopicService.deleteForumTopic(id);
         return ResponseEntity.noContent().build();

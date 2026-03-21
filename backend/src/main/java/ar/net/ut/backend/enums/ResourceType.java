@@ -12,7 +12,7 @@ public enum ResourceType {
     COURSE_EVENT,
     COURSE_REVIEW,
     FORUM_TOPIC,
-    FORUM,
+    FORUM_DISCUSSION,
     FORUM_THREAD,
     STUDY_RECORD,
     REPORT,

@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -49,6 +50,15 @@ public class StorageService {
 
     public String uploadFile(MultipartFile file, String bucket, String path) {
         return uploadFile(file, bucket, path, RandomUtil.randomHexString());
+    }
+
+    public List<String> uploadFilesInParallel(List<MultipartFile> files, String bucket, String path) {
+        if (files == null || files.isEmpty()) {
+            return List.of();
+        }
+        return files.parallelStream()
+                .map(file -> uploadFile(file, bucket, path))
+                .toList();
     }
 
     public String generateDownloadPresignedUrl(String bucket, String fileKey, Duration expiration) {
