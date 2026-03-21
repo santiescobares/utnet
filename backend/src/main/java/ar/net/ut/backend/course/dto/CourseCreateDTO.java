@@ -8,10 +8,10 @@ public record CourseCreateDTO(
         @NotNull(message = "Career ID is required")
         Long careerId,
 
-        @Positive(message = "Year must be a positive number")
+        @Positive(message = "Year must be positive")
         int year,
 
-        @PositiveOrZero(message = "Division must be zero or a positive number")
+        @PositiveOrZero(message = "Division must be positive or zero")
         int division
 ) {
 }

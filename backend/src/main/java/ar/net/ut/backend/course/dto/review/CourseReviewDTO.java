@@ -4,13 +4,11 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record CourseReviewDTO(
-
         Long id,
+        Instant createdAt,
         Long courseId,
         UUID postedById,
         String content,
-        double rating,
-        Instant createdAt
-
+        double rating
 ) {
 }

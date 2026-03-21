@@ -7,11 +7,14 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {CourseMapper.class}
+)
 public interface CourseReviewMapper {
 
-    @Mapping(target = "resource", ignore = true)
-    @Mapping(target = "postedBy", ignore = true)
+    @Mapping(source = "courseId", target = "resource", qualifiedByName = "courseIdToCourse")
     CourseReview createEntity(CourseReviewCreateDTO dto);
 
     @Mapping(source = "resource.id", target = "courseId")

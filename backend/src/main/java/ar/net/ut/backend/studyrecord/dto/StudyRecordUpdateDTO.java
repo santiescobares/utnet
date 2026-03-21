@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public record StudyRecordUpdateDTO(
-        @Size(max = 100, message = "Title is too long")
+        @Size(min = 5, max = 100, message = "Title is either too short or too long")
         String title,
 
         @Size(max = 1000, message = "Description is too long")

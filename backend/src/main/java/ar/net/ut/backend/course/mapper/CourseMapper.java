@@ -1,24 +1,44 @@
 package ar.net.ut.backend.course.mapper;
 
+import ar.net.ut.backend.career.CareerMapper;
 import ar.net.ut.backend.course.Course;
 import ar.net.ut.backend.course.dto.CourseCreateDTO;
 import ar.net.ut.backend.course.dto.CourseDTO;
 import ar.net.ut.backend.course.dto.CourseUpdateDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import ar.net.ut.backend.course.repository.CourseRepository;
+import ar.net.ut.backend.enums.ResourceType;
+import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface CourseMapper {
+import java.util.List;
+
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {CareerMapper.class}
+)
+public abstract class CourseMapper {
+
+    @Autowired
+    protected CourseRepository courseRepository;
 
     @Mapping(target = "career", ignore = true)
-    Course createEntity(CourseCreateDTO dto);
+    public abstract Course createEntity(CourseCreateDTO dto);
 
     @Mapping(source = "career.id", target = "careerId")
-    CourseDTO toDTO(Course course);
+    public abstract CourseDTO toDTO(Course course);
 
-    @Mapping(target = "career", ignore = true)
-    @Mapping(target = "name", ignore = true)
-    void updateFromDTO(@MappingTarget Course course, CourseUpdateDTO dto);
+    @Mapping(source = "career.id", target = "careerId")
+    public abstract List<CourseDTO> toDTOList(List<Course> courses);
+
+    @Mapping(source = "careerId", target = "career", qualifiedByName = "careerIdToCareer")
+    public abstract void updateFromDTO(@MappingTarget Course course, CourseUpdateDTO dto);
+
+    @Named("courseIdToCourse")
+    public Course mapCourseIdToCourse(Long courseId) {
+        if (courseId == null) return null;
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "id", courseId.toString()));
+    }
 }

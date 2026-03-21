@@ -26,6 +26,7 @@ public class StudyRecordController {
     private final StudyRecordService studyRecordService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyAuthority('CONTRIBUTOR_1', 'CONTRIBUTOR_2', 'CONTRIBUTOR_3', 'ADMINISTRATOR')")
     public ResponseEntity<StudyRecordDTO> createStudyRecord(
             @RequestPart("dto") @Valid StudyRecordCreateDTO dto,
             @RequestPart(value = "file") MultipartFile file

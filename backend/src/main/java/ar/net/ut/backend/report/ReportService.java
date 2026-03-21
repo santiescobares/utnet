@@ -8,7 +8,6 @@ import ar.net.ut.backend.report.dto.ReportCreateDTO;
 import ar.net.ut.backend.report.dto.ReportDTO;
 import ar.net.ut.backend.report.dto.ReportResolveDTO;
 import ar.net.ut.backend.report.event.*;
-import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.repository.UserInteractionRepository;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;

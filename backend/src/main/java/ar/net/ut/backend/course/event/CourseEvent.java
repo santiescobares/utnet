@@ -1,4 +1,4 @@
-package ar.net.ut.backend.course.event.event;
+package ar.net.ut.backend.course.event;
 
 import ar.net.ut.backend.course.Course;
 import lombok.AllArgsConstructor;

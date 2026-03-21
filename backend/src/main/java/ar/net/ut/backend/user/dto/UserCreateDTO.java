@@ -9,11 +9,11 @@ public record UserCreateDTO(
         String registrationToken,
 
         @NotBlank(message = "First name is required")
-        @Size(max = 20, message = "First name is too long")
+        @Size(min = 3, max = 20, message = "First name is either too short or too long")
         String firstName,
 
         @NotBlank(message = "Last name is required")
-        @Size(max = 20, message = "Last name is too long")
+        @Size(min = 3, max = 20, message = "Last name is either too short or too long")
         String lastName,
 
         @NotNull(message = "Birthday is required")

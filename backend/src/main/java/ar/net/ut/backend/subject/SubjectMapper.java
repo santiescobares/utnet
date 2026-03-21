@@ -2,6 +2,8 @@ package ar.net.ut.backend.subject;
 
 import ar.net.ut.backend.career.Career;
 import ar.net.ut.backend.career.CareerRepository;
+import ar.net.ut.backend.enums.ResourceType;
+import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.subject.dto.SubjectCreateDTO;
 import ar.net.ut.backend.subject.dto.SubjectDTO;
 import ar.net.ut.backend.subject.dto.SubjectUpdateDTO;
@@ -14,9 +16,9 @@ import java.util.List;
 public abstract class SubjectMapper {
 
     @Autowired
-    protected CareerRepository careerRepository;
-    @Autowired
     protected SubjectRepository subjectRepository;
+    @Autowired
+    protected CareerRepository careerRepository;
 
     @Mapping(source = "careerIds", target = "careers", qualifiedByName = "careerIdsToCareers")
     @Mapping(source = "correlativeIds", target = "correlatives", qualifiedByName = "subjectIdsToSubjects")
@@ -31,13 +33,26 @@ public abstract class SubjectMapper {
     public abstract void updateFromDTO(@MappingTarget Subject subject, SubjectUpdateDTO dto);
 
     @AfterMapping
-    protected void updateCollections(@MappingTarget Subject subject, SubjectUpdateDTO dto) {
+    public void updateCollections(@MappingTarget Subject subject, SubjectUpdateDTO dto) {
         if (dto.careerIds() != null) {
             subject.setCareers(mapCareerIdsToCareers(dto.careerIds()));
         }
         if (dto.correlativeIds() != null) {
             subject.setCorrelatives(mapSubjectIdsToSubjects(dto.correlativeIds()));
         }
+    }
+
+    @Named("subjectIdToSubject")
+    public Subject mapSubjectIdToSubject(Long subjectId) {
+        if (subjectId == null) return null;
+        return subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.SUBJECT, "id", subjectId.toString()));
+    }
+
+    @Named("subjectIdsToSubjects")
+    public List<Subject> mapSubjectIdsToSubjects(List<Long> subjectIds) {
+        if (subjectIds == null) return null;
+        return subjectRepository.findAllById(subjectIds);
     }
 
     @Named("careerIdsToCareers")
@@ -47,11 +62,5 @@ public abstract class SubjectMapper {
             throw new IllegalArgumentException("Careers can't be null or empty");
         }
         return careers;
-    }
-
-    @Named("subjectIdsToSubjects")
-    protected List<Subject> mapSubjectIdsToSubjects(List<Long> subjectIds) {
-        if (subjectIds == null) return null;
-        return subjectRepository.findAllById(subjectIds);
     }
 }

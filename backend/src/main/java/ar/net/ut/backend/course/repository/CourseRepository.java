@@ -13,5 +13,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     boolean existsByCareerIdAndYearAndDivisionAndIdNot(Long careerId, int year, int division, Long id);
 
-    List<Course> findByCareerId(Long careerId);
+    List<Course> findAllByCareerId(Long careerId);
 }

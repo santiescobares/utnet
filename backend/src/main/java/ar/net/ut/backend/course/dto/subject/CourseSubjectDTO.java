@@ -7,14 +7,12 @@ import java.time.Instant;
 import java.util.Map;
 
 public record CourseSubjectDTO(
-
         Long id,
+        Instant createdAt,
+        Instant updatedAt,
         Long courseId,
         Long subjectId,
         Map<ProfessorPosition, String> professors,
-        Map<DayOfWeek, String> classDays,
-        Instant createdAt,
-        Instant updatedAt
-
+        Map<DayOfWeek, String> classDays
 ) {
 }

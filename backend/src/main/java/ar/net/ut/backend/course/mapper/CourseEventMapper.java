@@ -9,12 +9,16 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+import java.util.List;
+
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {CourseMapper.class}
+)
 public interface CourseEventMapper {
 
-    @Mapping(target = "course", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "lastEditor", ignore = true)
+    @Mapping(source = "courseId", target = "course", qualifiedByName = "courseIdToCourse")
     CourseEvent createEntity(CourseEventCreateDTO dto);
 
     @Mapping(source = "course.id", target = "courseId")
@@ -22,8 +26,10 @@ public interface CourseEventMapper {
     @Mapping(source = "lastEditor.id", target = "lastEditorId")
     CourseEventDTO toDTO(CourseEvent courseEvent);
 
-    @Mapping(target = "course", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "lastEditor", ignore = true)
+    @Mapping(source = "course.id", target = "courseId")
+    @Mapping(source = "createdBy.id", target = "createdById")
+    @Mapping(source = "lastEditor.id", target = "lastEditorId")
+    List<CourseEventDTO> toDTOList(List<CourseEvent> courseEvents);
+
     void updateFromDTO(@MappingTarget CourseEvent courseEvent, CourseEventUpdateDTO dto);
 }

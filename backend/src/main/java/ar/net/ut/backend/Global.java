@@ -29,7 +29,8 @@ public final class Global {
     @AllArgsConstructor
     public enum RedisKeys {
         TOKEN_BLACKLIST("token_blacklist:"),
-        FORCED_LOGOUT("forced_logout:");
+        FORCED_LOGOUT("forced_logout:"),
+        COURSE_EVENT_COOLDOWN("course_event_cooldown:");
 
         final String value;
 

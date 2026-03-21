@@ -36,15 +36,16 @@ public class CourseService {
     @Transactional
     public CourseDTO createCourse(CourseCreateDTO dto) {
         Long careerId = dto.careerId();
+        Career career = careerService.getById(careerId);
+
         int year = dto.year();
         int division = dto.division();
 
         if (courseRepository.existsByCareerIdAndYearAndDivision(careerId, year, division)) {
-            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "careerId+year+division",
-                    careerId + "+" + year + "+" + division);
+            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "careerId + year + division",
+                    careerId + " + " + year + " + " + division);
         }
 
-        Career career = careerService.getById(careerId);
         Course course = courseMapper.createEntity(dto);
         course.setCareer(career);
         course.setName();
@@ -65,21 +66,12 @@ public class CourseService {
         int division = dto.division() != null ? dto.division() : course.getDivision();
 
         if (courseRepository.existsByCareerIdAndYearAndDivisionAndIdNot(careerId, year, division, id)) {
-            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "careerId+year+division",
-                    careerId + "+" + year + "+" + division);
-        }
-
-        if (dto.careerId() != null) {
-            Career career = careerService.getById(dto.careerId());
-            course.setCareer(career);
+            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "careerId + year + division",
+                    careerId + " + " + year + " + " + division);
         }
 
         courseMapper.updateFromDTO(course, dto);
-        course.setYear(year);
-        course.setDivision(division);
         course.setName();
-
-        courseRepository.save(course);
 
         eventPublisher.publishEvent(new CourseUpdateEvent(course));
 
@@ -97,10 +89,7 @@ public class CourseService {
     @Transactional(readOnly = true)
     public List<CourseDTO> getCoursesByCareer(Long careerId) {
         careerService.getById(careerId);
-        return courseRepository.findByCareerId(careerId)
-                .stream()
-                .map(courseMapper::toDTO)
-                .toList();
+        return courseMapper.toDTOList(courseRepository.findAllByCareerId(careerId));
     }
 
     @Transactional(readOnly = true)
@@ -110,6 +99,6 @@ public class CourseService {
 
     public Course getById(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "id", Long.toString(id)));
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "id", id.toString()));
     }
 }

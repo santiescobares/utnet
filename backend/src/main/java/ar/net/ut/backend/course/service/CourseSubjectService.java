@@ -12,8 +12,6 @@ import ar.net.ut.backend.course.event.subject.CourseSubjectUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
-import ar.net.ut.backend.subject.Subject;
-import ar.net.ut.backend.subject.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,13 +23,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseSubjectService {
 
+    private final CourseService courseService;
+
     private final CourseSubjectRepository courseSubjectRepository;
 
     private final CourseSubjectMapper courseSubjectMapper;
-
-    private final CourseService courseService;
-
-    private final SubjectService subjectService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -41,15 +37,11 @@ public class CourseSubjectService {
         Long subjectId = dto.subjectId();
 
         if (courseSubjectRepository.existsByCourseIdAndSubjectId(courseId, subjectId)) {
-            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "courseId+subjectId",
-                    courseId + "+" + subjectId);
+            throw new ResourceAlreadyExistsException(ResourceType.COURSE, "courseId + subjectId",
+                    courseId + " + " + subjectId);
         }
 
-        Subject subject = subjectService.getById(subjectId);
         CourseSubject courseSubject = courseSubjectMapper.createEntity(dto);
-        courseSubject.setCourse(courseService.getById(courseId));
-        courseSubject.setSubject(subject);
-
         courseSubjectRepository.save(courseSubject);
 
         eventPublisher.publishEvent(new CourseSubjectCreateEvent(courseSubject));
@@ -78,10 +70,7 @@ public class CourseSubjectService {
     @Transactional(readOnly = true)
     public List<CourseSubjectDTO> getSubjectsByCourse(Long courseId) {
         courseService.getById(courseId);
-        return courseSubjectRepository.findByCourseId(courseId)
-                .stream()
-                .map(courseSubjectMapper::toDTO)
-                .toList();
+        return courseSubjectMapper.toDTOList(courseSubjectRepository.findByCourseId(courseId));
     }
 
     public CourseSubject getById(Long id) {

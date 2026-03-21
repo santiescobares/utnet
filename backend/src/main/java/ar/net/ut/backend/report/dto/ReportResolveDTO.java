@@ -4,8 +4,7 @@ import ar.net.ut.backend.report.Report;
 import jakarta.validation.constraints.NotNull;
 
 public record ReportResolveDTO(
-
-        @NotNull(message = "La resolución es obligatoria")
+        @NotNull(message = "Resolution is required")
         Report.Status resolution
 ) {
 }

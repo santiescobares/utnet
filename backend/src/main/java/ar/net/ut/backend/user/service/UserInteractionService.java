@@ -42,7 +42,10 @@ public class UserInteractionService {
 
         UserInteraction.Type oppositeInteraction = type.opposite();
         if (oppositeInteraction != null && interactionRepository.existsByUserIdAndTypeAndResourceTypeAndResourceId(
-                userId, oppositeInteraction, resourceType, resourceId
+                userId,
+                oppositeInteraction,
+                resourceType,
+                resourceId
         )) {
             throw new InvalidOperationException("Can't add " + type + ": a " + oppositeInteraction + " already exists for that resource");
         }

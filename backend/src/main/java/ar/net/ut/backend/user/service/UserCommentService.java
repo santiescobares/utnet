@@ -1,10 +1,13 @@
 package ar.net.ut.backend.user.service;
 
+import ar.net.ut.backend.context.RequestContextData;
 import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
 import ar.net.ut.backend.user.UserInteraction;
+import ar.net.ut.backend.user.event.comment.UserCommentAddInteractionEvent;
+import ar.net.ut.backend.user.event.comment.UserCommentRemoveInteractionEvent;
 import ar.net.ut.backend.user.mapper.UserCommentMapper;
 import ar.net.ut.backend.user.dto.comment.UserCommentCreateDTO;
 import ar.net.ut.backend.user.dto.comment.UserCommentDTO;
@@ -28,7 +31,6 @@ import java.util.UUID;
 public class UserCommentService {
 
     private final UserService userService;
-    private final UserInteractionService userInteractionService;
 
     private final UserCommentRepository commentRepository;
 
@@ -59,11 +61,11 @@ public class UserCommentService {
 
     @Transactional
     public void deleteComment(Long id) {
+        RequestContextData session = RequestContextHolder.getCurrentSession();
         UserComment comment = getById(id);
 
-        User currentUser = userService.getCurrentUser();
-        boolean isAuthor = comment.getPostedBy().equals(currentUser);
-        boolean isAdmin = currentUser.getRole() == Role.ADMINISTRATOR;
+        boolean isAuthor = comment.getPostedBy().getId().equals(session.userId());
+        boolean isAdmin = session.role() == Role.ADMINISTRATOR;
 
         if (!isAuthor && !isAdmin) {
             throw new InvalidOperationException("You can't delete that comment");
@@ -87,18 +89,13 @@ public class UserCommentService {
 
         UserComment comment = getById(id);
 
-        userInteractionService.createInteraction(
-                RequestContextHolder.getCurrentSession().userId(),
-                type,
-                ResourceType.USER_COMMENT,
-                id.toString()
-        );
-
         if (type == UserInteraction.Type.LIKE) {
             comment.addLike();
         } else {
             comment.addDislike();
         }
+
+        eventPublisher.publishEvent(new UserCommentAddInteractionEvent(comment, type));
     }
 
     @Transactional
@@ -109,18 +106,13 @@ public class UserCommentService {
 
         UserComment comment = getById(id);
 
-        userInteractionService.deleteInteraction(
-                RequestContextHolder.getCurrentSession().userId(),
-                type,
-                ResourceType.USER_COMMENT,
-                id.toString()
-        );
-
         if (type == UserInteraction.Type.LIKE) {
             comment.removeLike();
         } else {
             comment.removeDislike();
         }
+
+        eventPublisher.publishEvent(new UserCommentRemoveInteractionEvent(comment, type));
     }
 
     public UserComment getById(Long id) {

@@ -6,15 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ReportCreateDTO(
-
-        @NotNull(message = "El tipo de recurso es obligatorio")
+        @NotNull(message = "Resource type is required")
         ResourceType resourceType,
 
-        @NotBlank(message = "El ID del recurso es obligatorio")
+        @NotBlank(message = "Resource ID is required")
         String resourceId,
 
-        @NotBlank(message = "El motivo del reporte es obligatorio")
-        @Size(min = 10, max = 500, message = "El motivo debe tener entre 10 y 500 caracteres")
+        @NotBlank(message = "Reason is required")
+        @Size(min = 10, max = 500, message = "Reason is either too short or too long")
         String reason
 ) {
 }
