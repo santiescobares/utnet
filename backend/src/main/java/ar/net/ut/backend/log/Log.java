@@ -6,10 +6,6 @@ import ar.net.ut.backend.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-
-import java.util.Map;
 
 @Entity
 @Table(name = "logs")
@@ -31,9 +27,8 @@ public class Log extends CLoggableEntity {
 
     @Enumerated(EnumType.STRING)
     private Action action;
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private Map<String, Object> details;
+    @Column(columnDefinition = "TEXT")
+    private String details;
 
     public enum Action {
         CREATE,

@@ -15,6 +15,6 @@ public record LogDTO(
         ResourceType resourceType,
         String resourceId,
         Log.Action action,
-        Map<String, Object> details
+        String details
 ) {
 }

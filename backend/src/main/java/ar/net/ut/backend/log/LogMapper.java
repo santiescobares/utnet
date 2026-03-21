@@ -8,10 +8,18 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface LogMapper {
 
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "log.user.id", target = "userId")
     @Mapping(
             target = "userFullName",
             expression = "java(log.getUser().getFirstName() + \" \" + log.getUser().getLastName())"
     )
-    LogDTO toDTO(Log log);
+    @Mapping(source = "details", target = "details")
+    LogDTO toDTO(Log log, String details);
+
+    @Mapping(source = "log.user.id", target = "userId")
+    @Mapping(
+            target = "userFullName",
+            expression = "java(log.getUser().getFirstName() + \" \" + log.getUser().getLastName())"
+    )
+    LogDTO toFullDTO(Log log);
 }
