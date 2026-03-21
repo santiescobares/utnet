@@ -1,0 +1,1467 @@
+{
+  "info": {
+    "_postman_id": "utnet-api-collection-v1",
+    "name": "UTNet",
+    "description": "Colección completa de endpoints del backend UTNet. Importar y configurar la variable `baseUrl` si el puerto difiere del default.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/v1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"googleIdToken\": \"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Career",
+      "item": [
+        {
+          "name": "Create Career",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ingeniería en Sistemas\",\n  \"idCharacter\": \"S\",\n  \"sortPosition\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/careers",
+              "host": ["{{baseUrl}}"],
+              "path": ["careers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Career",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": null,\n  \"idCharacter\": null,\n  \"sortPosition\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/careers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["careers", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Career ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Career",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/careers/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["careers", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Career ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Careers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/careers",
+              "host": ["{{baseUrl}}"],
+              "path": ["careers"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Course",
+      "item": [
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"careerId\": 1,\n  \"year\": 2,\n  \"division\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"careerId\": null,\n  \"year\": null,\n  \"division\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/courses/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Course ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Course ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Courses by Career",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses?careerId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses"],
+              "query": [
+                { "key": "careerId", "value": "1", "description": "Career ID (Long) — requerido" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/courses/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["courses", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Course ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Event",
+          "item": [
+            {
+              "name": "Create Course Event",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": 1,\n  \"date\": \"2026-04-15\",\n  \"startTime\": \"08:00:00\",\n  \"endTime\": \"10:00:00\",\n  \"description\": \"Parcial 1er cuatrimestre\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/course-events",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-events"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Course Event",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"date\": null,\n  \"startTime\": null,\n  \"endTime\": null,\n  \"description\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/course-events/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-events", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Event ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Course Event",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-events/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-events", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Event ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Events by Course",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-events?courseId=1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-events"],
+                  "query": [
+                    { "key": "courseId", "value": "1", "description": "Course ID (Long) — requerido" },
+                    { "key": "from", "value": "2026-04-01", "description": "Fecha inicio filtro (LocalDate, ISO 8601) — opcional", "disabled": true },
+                    { "key": "to", "value": "2026-04-30", "description": "Fecha fin filtro (LocalDate, ISO 8601) — opcional", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Review",
+          "item": [
+            {
+              "name": "Create Course Review",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": 1,\n  \"content\": \"Muy buena cursada, excelente nivel de los docentes.\",\n  \"rating\": 4.5\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/course-reviews",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-reviews"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Course Review",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-reviews/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-reviews", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Review ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add Interaction to Review",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-reviews/:id/add-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-reviews", ":id", "add-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Review ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Interaction from Review",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-reviews/:id/remove-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-reviews", ":id", "remove-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Review ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Reviews by Course",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-reviews?courseId=1&page=0&size=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-reviews"],
+                  "query": [
+                    { "key": "courseId", "value": "1", "description": "Course ID (Long) — requerido" },
+                    { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                    { "key": "size", "value": "10", "description": "Tamaño de página" },
+                    { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Subject",
+          "item": [
+            {
+              "name": "Add Subject to Course",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"courseId\": 1,\n  \"subjectId\": 1,\n  \"professors\": {\n    \"FULL_PROFESSOR\": \"García, Juan\",\n    \"ASSISTANT_PROFESSOR\": \"López, María\"\n  },\n  \"classDays\": {\n    \"MONDAY\": \"08:00-12:00\",\n    \"WEDNESDAY\": \"08:00-12:00\"\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/course-subjects",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-subjects"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Course Subject",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"professors\": null,\n  \"classDays\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/course-subjects/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-subjects", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Subject ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Course Subject",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-subjects/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-subjects", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Course Subject ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Subjects by Course",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/course-subjects?courseId=1",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["course-subjects"],
+                  "query": [
+                    { "key": "courseId", "value": "1", "description": "Course ID (Long) — requerido" }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Forum",
+      "item": [
+        {
+          "name": "Topic",
+          "item": [
+            {
+              "name": "Create Forum Topic",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"General\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-topics",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-topics"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Forum Topic",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": null,\n  \"sortPosition\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-topics/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-topics", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Topic ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Forum Topic",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-topics/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-topics", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Topic ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Forum Topics",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-topics",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-topics"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Discussion",
+          "item": [
+            {
+              "name": "Create Discussion",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"topicId\": 1,\n  \"title\": \"Consulta sobre el parcial de Algoritmos\",\n  \"open\": true,\n  \"permanent\": false\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Discussion",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"topicId\": null,\n  \"title\": null,\n  \"sortPosition\": null,\n  \"open\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Discussion ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Discussion",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Discussion ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Discussions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions?page=0&size=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions"],
+                  "query": [
+                    { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                    { "key": "size", "value": "10", "description": "Tamaño de página" },
+                    { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Discussion by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/id/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", "id", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Discussion ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Discussion by Slug",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/:slug",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", ":slug"],
+                  "variable": [{ "key": "slug", "value": "consulta-sobre-el-parcial-de-algoritmos", "description": "Slug de la discusión (String)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Open Discussion",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/:id/open",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", ":id", "open"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Discussion ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Close Discussion",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-discussions/:id/close",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-discussions", ":id", "close"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Discussion ID (Long)" }]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Thread",
+          "item": [
+            {
+              "name": "Create Thread",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\"discussionId\": 1, \"rootId\": null, \"content\": \"Hola, alguien tiene los temas del parcial?\"}",
+                      "type": "text",
+                      "contentType": "application/json",
+                      "description": "ForumThreadCreateDTO en formato JSON"
+                    },
+                    {
+                      "key": "images",
+                      "type": "file",
+                      "src": [],
+                      "description": "Imágenes adjuntas (opcional, múltiples archivos)"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Thread",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": null\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Thread ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Thread",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Thread ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add Interaction to Thread",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads/:id/add-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads", ":id", "add-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Thread ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Interaction from Thread",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads/:id/remove-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads", ":id", "remove-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Thread ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Threads by Discussion",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads?forumId=1&page=0&size=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads"],
+                  "query": [
+                    { "key": "forumId", "value": "1", "description": "Forum Discussion ID (Long) — requerido" },
+                    { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                    { "key": "size", "value": "10", "description": "Tamaño de página" },
+                    { "key": "sort", "value": "createdAt,ASC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Replies by Thread",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/forum-threads/:id/replies?page=0&size=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["forum-threads", ":id", "replies"],
+                  "variable": [{ "key": "id", "value": "1", "description": "Forum Thread ID (Long) — thread raíz" }],
+                  "query": [
+                    { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                    { "key": "size", "value": "10", "description": "Tamaño de página" },
+                    { "key": "sort", "value": "createdAt,ASC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Log",
+      "item": [
+        {
+          "name": "Get Log by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Log ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs"],
+              "query": [
+                { "key": "resourceType", "value": "FORUM_THREAD", "description": "Filtrar por tipo: USER | CAREER | SUBJECT | COURSE | COURSE_EVENT | COURSE_REVIEW | FORUM_TOPIC | FORUM_DISCUSSION | FORUM_THREAD | STUDY_RECORD | REPORT | PUNISHMENT | LOG", "disabled": true },
+                { "key": "action", "value": "CREATE", "description": "Filtrar por acción: CREATE | EDIT | DELETE | ROLL_BACK | OPEN | CLOSE | LOG_IN | LOG_OUT", "disabled": true },
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "20", "description": "Tamaño de página" },
+                { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs by User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs/user/:userId?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "user", ":userId"],
+              "variable": [{ "key": "userId", "value": "550e8400-e29b-41d4-a716-446655440000", "description": "User ID (UUID)" }],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "20", "description": "Tamaño de página" },
+                { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Punishment",
+      "item": [
+        {
+          "name": "Create Punishment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"reason\": \"Reiteradas publicaciones de contenido inapropiado en el foro.\",\n  \"expirationDate\": \"2026-06-30T23:59:59\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/punishments",
+              "host": ["{{baseUrl}}"],
+              "path": ["punishments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Punishments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/punishments?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["punishments"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "20", "description": "Tamaño de página" },
+                { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Punishments by User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/punishments/user/:userId",
+              "host": ["{{baseUrl}}"],
+              "path": ["punishments", "user", ":userId"],
+              "variable": [{ "key": "userId", "value": "550e8400-e29b-41d4-a716-446655440000", "description": "User ID (UUID)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Punishment by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/punishments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["punishments", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Punishment ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Punishment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/punishments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["punishments", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Punishment ID (Long)" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Report",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resourceType\": \"FORUM_THREAD\",\n  \"resourceId\": \"42\",\n  \"reason\": \"Contenido ofensivo que viola las normas de la comunidad.\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports?status=UNRESOLVED&page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"],
+              "query": [
+                { "key": "status", "value": "UNRESOLVED", "description": "Estado del reporte: UNRESOLVED | RESOLVED_ACCEPTED | RESOLVED_DECLINED (default: UNRESOLVED)" },
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "20", "description": "Tamaño de página" },
+                { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/me?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "me"],
+              "query": [
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "20", "description": "Tamaño de página" },
+                { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Report by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Report ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vote In Favor",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id/vote/in-favor",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id", "vote", "in-favor"],
+              "variable": [{ "key": "id", "value": "1", "description": "Report ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vote Against",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id/vote/against",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id", "vote", "against"],
+              "variable": [{ "key": "id", "value": "1", "description": "Report ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resolve Report",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resolution\": \"RESOLVED_ACCEPTED\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id/resolve",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id", "resolve"],
+              "variable": [{ "key": "id", "value": "1", "description": "Report ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Report",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reports/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Report ID (Long)" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Study Record",
+      "item": [
+        {
+          "name": "Create Study Record",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "dto",
+                  "value": "{\"subjectId\": 1, \"title\": \"Resumen Álgebra - Unidad 3\", \"description\": \"Resumen completo de espacios vectoriales y transformaciones lineales.\", \"tags\": [\"algebra\", \"resumen\", \"vectores\"]}",
+                  "type": "text",
+                  "contentType": "application/json",
+                  "description": "StudyRecordCreateDTO en formato JSON"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Archivo del apunte (PDF, DOCX, etc.) — requerido"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/study-records",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Study Records by Subject",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-records?subjectId=1&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records"],
+              "query": [
+                { "key": "subjectId", "value": "1", "description": "Subject ID (Long) — requerido" },
+                { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                { "key": "size", "value": "10", "description": "Tamaño de página" },
+                { "key": "sort", "value": "downloads,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Study Record by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-records/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Study Record ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Study Record",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": null,\n  \"description\": null,\n  \"tags\": null,\n  \"hidden\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/study-records/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Study Record ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Study Record",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-records/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Study Record ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Study Record",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/study-records/:id/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["study-records", ":id", "download"],
+              "variable": [{ "key": "id", "value": "1", "description": "Study Record ID (Long)" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Subject",
+      "item": [
+        {
+          "name": "Create Subject",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Álgebra y Geometría Analítica\",\n  \"shortName\": \"AGA\",\n  \"sortPosition\": 1,\n  \"careerIds\": [1, 2],\n  \"correlativeIds\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["subjects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Subject",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": null,\n  \"shortName\": null,\n  \"sortPosition\": null,\n  \"careerIds\": null,\n  \"correlativeIds\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["subjects", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Subject ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subjects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["subjects", ":id"],
+              "variable": [{ "key": "id", "value": "1", "description": "Subject ID (Long)" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Subjects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subjects",
+              "host": ["{{baseUrl}}"],
+              "path": ["subjects"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"registrationToken\": \"reg_token_abc123\",\n  \"firstName\": \"Santiago\",\n  \"lastName\": \"González\",\n  \"birthday\": \"2000-03-15\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [
+                { "key": "referredBy", "value": "1", "description": "ID del usuario que lo refirió (Long) — opcional", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": null,\n  \"lastName\": null,\n  \"birthday\": null,\n  \"profile\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Profile",
+          "item": [
+            {
+              "name": "Update Profile Picture",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "pictureFile",
+                      "type": "file",
+                      "src": "",
+                      "description": "Imagen de perfil (JPG, PNG, etc.) — requerido"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/profile/picture",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "profile", "picture"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update User Profile",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"careerId\": 1,\n  \"biography\": \"Estudiante de Ingeniería en Sistemas, apasionado por la tecnología.\",\n  \"preferences\": {}\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/profile",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "profile"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Comment",
+          "item": [
+            {
+              "name": "Create User Comment",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"content\": \"Excelente compañero, siempre predispuesto a ayudar.\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/comments/:userId",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "comments", ":userId"],
+                  "variable": [{ "key": "userId", "value": "550e8400-e29b-41d4-a716-446655440000", "description": "User ID del destinatario (UUID)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete User Comment",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/comments/:id",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "comments", ":id"],
+                  "variable": [{ "key": "id", "value": "1", "description": "User Comment ID (Long)" }]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Add Interaction to Comment",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/comments/:id/add-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "comments", ":id", "add-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "User Comment ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Remove Interaction from Comment",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/comments/:id/remove-interaction?type=LIKE",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "comments", ":id", "remove-interaction"],
+                  "variable": [{ "key": "id", "value": "1", "description": "User Comment ID (Long)" }],
+                  "query": [
+                    { "key": "type", "value": "LIKE", "description": "Tipo de interacción: LIKE | DISLIKE | VOTED_IN_FAVOR | VOTED_AGAINST" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Comments by User",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/comments/:userId?page=0&size=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "comments", ":userId"],
+                  "variable": [{ "key": "userId", "value": "550e8400-e29b-41d4-a716-446655440000", "description": "User ID (UUID)" }],
+                  "query": [
+                    { "key": "page", "value": "0", "description": "Número de página (0-based)" },
+                    { "key": "size", "value": "10", "description": "Tamaño de página" },
+                    { "key": "sort", "value": "createdAt,DESC", "description": "Campo y dirección de ordenamiento", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Interaction",
+          "item": [
+            {
+              "name": "Get My Interactions",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/interactions?resourceType=FORUM_THREAD",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "interactions"],
+                  "query": [
+                    { "key": "resourceType", "value": "FORUM_THREAD", "description": "Tipo de recurso — requerido: USER | CAREER | SUBJECT | COURSE | COURSE_EVENT | COURSE_REVIEW | FORUM_TOPIC | FORUM_DISCUSSION | FORUM_THREAD | STUDY_RECORD | REPORT | PUNISHMENT | LOG" },
+                    { "key": "resourceId", "value": "42", "description": "ID del recurso específico (String) — opcional", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
