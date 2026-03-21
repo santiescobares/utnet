@@ -27,21 +27,28 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PunishmentService {
 
-    private final PunishmentRepository punishmentRepository;
-    private final PunishmentMapper punishmentMapper;
     private final UserService userService;
+
+    private final PunishmentRepository punishmentRepository;
     private final UserRepository userRepository;
+
+    private final PunishmentMapper punishmentMapper;
+
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public PunishmentDTO createPunishment(PunishmentCreateDTO dto) {
         User currentUser = userService.getCurrentUser();
-        assertIsAdmin(currentUser);
-
         User targetUser = userService.getById(dto.userId());
 
+        if (targetUser.equals(currentUser)) {
+            throw new InvalidOperationException("You can't punish yourself");
+        }
+        if (targetUser.getRole() == Role.ADMINISTRATOR) {
+            throw new InvalidOperationException("You can't punish that user");
+        }
         if (punishmentRepository.existsByUserIdAndExpirationDateAfter(dto.userId(), LocalDateTime.now())) {
-            throw new InvalidOperationException("Este usuario ya tiene una sanción activa");
+            throw new InvalidOperationException("That user already has an active punishment");
         }
 
         Punishment punishment = new Punishment();
@@ -62,45 +69,27 @@ public class PunishmentService {
 
     @Transactional(readOnly = true)
     public Page<PunishmentDTO> getAllPunishments(Pageable pageable) {
-        User currentUser = userService.getCurrentUser();
-        assertIsAdmin(currentUser);
-
-        return punishmentRepository.findAll(pageable)
-                .map(punishmentMapper::toDTO);
+        return punishmentRepository.findAll(pageable).map(punishmentMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
     public PunishmentDTO getPunishmentById(Long id) {
-        User currentUser = userService.getCurrentUser();
-        assertIsAdmin(currentUser);
-
         return punishmentMapper.toDTO(getById(id));
     }
 
     @Transactional(readOnly = true)
     public List<PunishmentDTO> getPunishmentsByUser(UUID userId) {
-        User currentUser = userService.getCurrentUser();
-        assertIsAdmin(currentUser);
-
         userService.getById(userId);
-
-        return punishmentRepository.findAllByUserId(userId)
-                .stream()
-                .map(punishmentMapper::toDTO)
-                .toList();
+        return punishmentMapper.toDTOList(punishmentRepository.findAllByUserId(userId));
     }
 
     @Transactional
     public void deletePunishment(Long id) {
-        User currentUser = userService.getCurrentUser();
-        assertIsAdmin(currentUser);
-
         Punishment punishment = getById(id);
         User punishedUser = punishment.getUser();
 
         punishmentRepository.delete(punishment);
         punishmentRepository.flush();
-
         punishmentRepository
                 .findFirstByUserIdAndExpirationDateAfterOrderByExpirationDateDesc(punishedUser.getId(), LocalDateTime.now())
                 .ifPresentOrElse(
@@ -117,14 +106,8 @@ public class PunishmentService {
         eventPublisher.publishEvent(new PunishmentDeleteEvent(punishment));
     }
 
-    Punishment getById(Long id) {
+    public Punishment getById(Long id) {
         return punishmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.PUNISHMENT, "id", id.toString()));
-    }
-
-    private void assertIsAdmin(User user) {
-        if (user.getRole().ordinal() < Role.ADMINISTRATOR.ordinal()) {
-            throw new InvalidOperationException("Se requiere ser Administrador para gestionar sanciones");
-        }
     }
 }

@@ -9,16 +9,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record PunishmentCreateDTO(
-
-        @NotNull(message = "El ID del usuario es obligatorio")
+        @NotNull(message = "User ID is required")
         UUID userId,
 
-        @NotBlank(message = "El motivo de la sanción es obligatorio")
-        @Size(min = 10, max = 500, message = "El motivo debe tener entre 10 y 500 caracteres")
+        @NotBlank(message = "Reason is required")
+        @Size(min = 10, max = 500, message = "Reason is either too short or too long")
         String reason,
 
-        @NotNull(message = "La fecha de vencimiento es obligatoria")
-        @Future(message = "La fecha de vencimiento debe ser en el futuro")
+        @Future(message = "Expiration date must be in the future")
         LocalDateTime expirationDate
 ) {
 }
