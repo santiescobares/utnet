@@ -12,7 +12,7 @@ import java.time.temporal.ChronoUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class LogScheduledTask {
+public class LogScheduler {
 
     private final LogRepository logRepository;
 
