@@ -12,7 +12,6 @@ public interface StudyRecordMapper {
 
     @Mapping(source = "createdBy.id", target = "createdById")
     @Mapping(source = "subject.id", target = "subjectId")
-    @Mapping(target = "hasFile", expression = "java(studyRecord.getResourceKey() != null)")
     StudyRecordDTO toDTO(StudyRecord studyRecord);
 
     void updateFromDTO(@MappingTarget StudyRecord studyRecord, StudyRecordUpdateDTO dto);

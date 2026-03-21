@@ -13,9 +13,6 @@ public record SubjectCreateDTO(
         @Size(max = 3, message = "Short name is too long")
         String shortName,
 
-        @PositiveOrZero(message = "Sort position must be positive or zero")
-        int sortPosition,
-
         @NotEmpty(message = "Careers are required")
         List<Long> careerIds,
 

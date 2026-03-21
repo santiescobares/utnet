@@ -15,7 +15,6 @@ public record StudyRecordDTO(
         String description,
         List<String> tags,
         int downloads,
-        boolean hidden,
-        boolean hasFile
+        boolean hidden
 ) {
 }
