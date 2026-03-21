@@ -51,7 +51,7 @@ Estás asistiendo en el desarrollo Full-Stack de **UTNet**, una plataforma web i
 **Paso 1:** Por cada feature solicitada, analizar (si existe) y entender el flujo completo de relaciones, transacciones, comunicaciones y dependencias requeridas
 **Paso 2:** Diseñar un plan de implementación robusto y escalable, creando componentes reutilizables, adaptativos y visualmente legibles
 **Paso 3:** Asegurar que se utilizaron buenas practicas, alta cohesión, bajo acoplamiento. Comentar solo líneas de funcionalidades muy complejas
-**Nota:** NUNCA modificar clases o archivos del backend que no hayan sido creados por ti sin previa autorización del usuario
+**Notas:** NUNCA modificar clases o archivos del backend que no hayan sido creados por ti sin previa autorización del usuario. Delegar tareas a sub-agentes cuando la tarea principal sea compleja/extensa.
 
 # Estilo de Código General
 - Diseño frontend "Mobile First" y soporte PWA
