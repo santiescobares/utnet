@@ -51,12 +51,13 @@ Estás asistiendo en el desarrollo Full-Stack de **UTNet**, una plataforma web i
 **Paso 1:** Por cada feature solicitada, analizar (si existe) y entender el flujo completo de relaciones, transacciones, comunicaciones y dependencias requeridas
 **Paso 2:** Diseñar un plan de implementación robusto y escalable, creando componentes reutilizables, adaptativos y visualmente legibles
 **Paso 3:** Asegurar que se utilizaron buenas practicas, alta cohesión, bajo acoplamiento. Comentar solo líneas de funcionalidades muy complejas
-**Notas:** NUNCA modificar clases o archivos del backend que no hayan sido creados por ti sin previa autorización del usuario. NUNCA aplicar "Ley de mínimo esfuerzo", si una funcionalidad es compleja, usar el 100% de la capacidad de razonamiento y notificar que se deberá dividir la petición en partes. NO ejecutar comandos de compilación para testear backend, delegarlo al usuario
+**Nota:** NUNCA modificar clases o archivos del backend que no hayan sido creados por ti sin previa autorización del usuario
 
 # Estilo de Código General
 - Diseño frontend "Mobile First" y soporte PWA
 - Nombres de variables y funciones descriptivos en **inglés**
-- Mantener jerarquía de variables entre entidades, DTOs y demás clases
+- Mantener orden de definición de variables entre entidades, services, DTOs y demás clases
 - Funciones cortas con una única responsabilidad (SOLID)
+- Respetar patrones de diseño estándar de la industria
 - Extraer lógicas y componentes reutilizables en Custom Hooks, Cards, Modals (Frontend), Utility Classes o métodos privados (Backend)
 - Mantener estética minimalista y estudiantil en el frontend, usar iconos, mantener consistencia de colores: azul eléctrico y blanco (o negro al 90% para Dark Mode). Usar lenguaje español argentino
