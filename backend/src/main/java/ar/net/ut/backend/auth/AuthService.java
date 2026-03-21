@@ -60,11 +60,11 @@ public class AuthService {
         try {
             idToken = googleIdTokenVerifier.verify(dto.googleIdToken());
             if (idToken == null) {
-                throw new TokenException("Invalid or expired Google idToken=" + dto.googleIdToken(), HttpStatus.FORBIDDEN);
+                throw new TokenException("Invalid or expired Google ID Token", HttpStatus.FORBIDDEN);
             }
         } catch (Exception e) {
-            log.error("An error ocurred while trying to login with Google. {}", e.getMessage());
-            throw new ThirdPartyException("An error ocurred while trying to login with Google");
+            log.error("An error occurred while trying to validate Google ID Token. {}", e.getMessage());
+            throw new ThirdPartyException("An error occurred while trying to validate your Google ID Token");
         }
 
         String incomingAccessToken = CookieUtil.getCookie(request, ACCESS_TOKEN_COOKIE);
@@ -80,7 +80,7 @@ public class AuthService {
         if (userOp.isPresent()) {
             User user = userOp.get();
             if (user.isBanned()) {
-                throw new BannedUserException("User with id=" + user.getId() + " is banned");
+                throw new BannedUserException("Your account is banned from UTNet");
             }
 
             CookieUtil.setHttpOnlyCookie(
