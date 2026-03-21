@@ -55,6 +55,13 @@ public class Subject {
                     throw new IllegalArgumentException("Subject with id = " + correlative.getId() + " is generating a circular " +
                             "dependency on subject with id = " + id);
                 }
+                // Transitive redundancy check
+                for (Subject other : correlatives) {
+                    if (!correlative.equals(other) && other.isCorrelativeOf(correlative)) {
+                        throw new IllegalArgumentException("Transitive redundancy: Subject with id = " + correlative.getId() +
+                                " is already implicitly required by subject with id = " + other.getId());
+                    }
+                }
             }
         }
         this.correlatives = correlatives;
