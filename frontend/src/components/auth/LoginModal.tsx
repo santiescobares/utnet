@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { GoogleLogin } from '@react-oauth/google';
 import { X, Loader2, ArrowLeft, ArrowRight, GraduationCap, UserRoundPlus, Calendar, User } from 'lucide-react';
 import { toast } from 'sonner';
@@ -150,6 +151,7 @@ function InputField({ id, label, type = 'text', value, placeholder, error, icon,
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
     const { setUser, setRegistrationToken, registrationToken } = useAuthStore();
+    const navigate = useNavigate();
 
     const [step, setStep] = useState<ModalStep>('login');
     const [isLoading, setIsLoading] = useState(false);
@@ -210,6 +212,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 setUser(result.user);
                 toast.success(`Se inició sesión como ${result.user.firstName} ${result.user.lastName}.`);
                 handleClose();
+                navigate('/home');
             } else if (result.registrationToken) {
                 setRegistrationToken(result.registrationToken);
 
@@ -276,6 +279,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
             setUser(user);
             toast.success(`Se creó tu cuenta de UTNet.`);
             handleClose();
+            navigate('/home');
         } catch (error: unknown) {
             const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message;
             toast.error(message ?? 'Error al crear la cuenta. Intentá de nuevo.');
