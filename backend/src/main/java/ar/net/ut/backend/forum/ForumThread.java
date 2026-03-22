@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,19 +37,11 @@ public class ForumThread extends CUDLoggableEntity {
     @Column(length = 5000)
     private String content;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
-    private List<String> imageKeys;
-
     @OneToMany(mappedBy = "root", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Setter(AccessLevel.NONE)
     private List<ForumThread> replies;
 
     private int likes, dislikes;
-
-    public List<String> getImageKeys() {
-        return imageKeys != null ? Collections.unmodifiableList(imageKeys) : Collections.emptyList();
-    }
 
     public boolean addReply(ForumThread reply) {
         if (replies == null) {
@@ -94,7 +84,6 @@ public class ForumThread extends CUDLoggableEntity {
                 ", \"postedById\":\"" + (postedBy != null ? postedBy.getId() : null) + "\"" +
                 ", \"rootId\":" + (root != null ? root.getId() : null) +
                 ", \"content\":\"" + (content != null ? content.replace("\"", "\\\"") : null) + "\"" +
-                ", \"imageKeys\":" + imageKeys +
                 ", \"likes\":" + likes +
                 ", \"dislikes\":" + dislikes +
                 ", \"createdAt\":\"" + getCreatedAt() + "\"" +

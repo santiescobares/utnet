@@ -27,12 +27,9 @@ public class ForumThreadController {
 
     private final ForumThreadService forumThreadService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ForumThreadDTO> createThread(
-            @RequestPart("data") @Valid ForumThreadCreateDTO dto,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
-    ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(forumThreadService.createThread(dto, images));
+    @PostMapping
+    public ResponseEntity<ForumThreadDTO> createThread(@RequestBody @Valid ForumThreadCreateDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(forumThreadService.createThread(dto));
     }
 
     @PutMapping("/{id}")

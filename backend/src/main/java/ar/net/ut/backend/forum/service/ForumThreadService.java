@@ -1,7 +1,5 @@
 package ar.net.ut.backend.forum.service;
 
-import ar.net.ut.backend.Global;
-import ar.net.ut.backend.config.S3Config;
 import ar.net.ut.backend.context.RequestContextData;
 import ar.net.ut.backend.context.RequestContextHolder;
 import ar.net.ut.backend.enums.ResourceType;
@@ -15,36 +13,22 @@ import ar.net.ut.backend.forum.dto.thread.ForumThreadUpdateDTO;
 import ar.net.ut.backend.forum.ForumDiscussion;
 import ar.net.ut.backend.forum.ForumThread;
 import ar.net.ut.backend.forum.mapper.ForumThreadMapper;
-import ar.net.ut.backend.service.StorageService;
-import ar.net.ut.backend.user.UserComment;
 import ar.net.ut.backend.user.UserInteraction;
-import ar.net.ut.backend.user.event.comment.UserCommentAddInteractionEvent;
-import ar.net.ut.backend.user.event.comment.UserCommentRemoveInteractionEvent;
 import ar.net.ut.backend.user.service.UserService;
 import ar.net.ut.backend.user.enums.Role;
-import ar.net.ut.backend.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ForumThreadService {
 
-    private static final int MAX_FILES_PER_THREAD = 3;
-    private static final Set<String> ALLOWED_IMAGE_FORMATS = Set.of("png", "jpg", "jpeg");
-    private static final long MAX_IMAGES_SIZE = 10_485_760; // In bytes
-
     private final ForumDiscussionService forumDiscussionService;
     private final UserService userService;
-    private final StorageService storageService;
 
     private final ForumThreadRepository forumThreadRepository;
 
@@ -52,26 +36,10 @@ public class ForumThreadService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    private final S3Config s3Config;
-
-    public ForumThreadDTO createThread(ForumThreadCreateDTO dto, List<MultipartFile> images) {
+    public ForumThreadDTO createThread(ForumThreadCreateDTO dto) {
         ForumDiscussion forumDiscussion = forumDiscussionService.getById(dto.discussionId());
         if (!forumDiscussion.isOpen()) {
             throw new InvalidOperationException("Can't post in a closed forum discussion");
-        }
-
-        boolean hasImages = images != null && !images.isEmpty();
-        if (hasImages) {
-            if (images.size() > MAX_FILES_PER_THREAD) {
-                throw new InvalidOperationException("You can only upload up to " + MAX_FILES_PER_THREAD + " images per thread");
-            }
-
-            long totalSize = 0;
-            for (MultipartFile image : images) {
-                FileUtil.validateExtension(image, ALLOWED_IMAGE_FORMATS);
-                totalSize += image.getSize();
-            }
-            FileUtil.validateSize(totalSize, MAX_IMAGES_SIZE);
         }
 
         ForumThread thread = new ForumThread();
@@ -94,15 +62,6 @@ public class ForumThreadService {
         }
 
         thread.setPostedBy(userService.getCurrentUser());
-
-        if (hasImages) {
-            List<String> imageKeys = storageService.uploadFilesInParallel(
-                    images,
-                    s3Config.getPublicBucket(),
-                    Global.R2.FORUM_THREAD_IMAGES_PATH.toString()
-            );
-            thread.setImageKeys(imageKeys);
-        }
 
         forumThreadRepository.save(thread);
 
