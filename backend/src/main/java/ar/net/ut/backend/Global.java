@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 public final class Global {
 
     public final String API_VERSION_PATH = "/v1";
-    public final String APP_URL = "https://ut.net.ar";
+    public final String APP_URL = "http://localhost:5173";
 
     public final String ACCESS_TOKEN_COOKIE = "access_token";
 
