@@ -93,9 +93,15 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseDTO> getCoursesByCareer(Long careerId) {
-        careerService.getById(careerId);
-        return courseMapper.toDTOList(courseRepository.findAllByCareerId(careerId));
+    public List<CourseDTO> getAllCourses(Long careerId) {
+        List<Course> courses;
+        if (careerId != null) {
+            careerService.getById(careerId);
+            courses = courseRepository.findAllByCareerId(careerId);
+        } else {
+            courses = courseRepository.findAll();
+        }
+        return courseMapper.toDTOList(courses);
     }
 
     @Transactional(readOnly = true)

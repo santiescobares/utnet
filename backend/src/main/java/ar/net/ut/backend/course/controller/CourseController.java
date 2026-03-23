@@ -41,8 +41,8 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CourseDTO>> getCoursesByCareer(@RequestParam Long careerId) {
-        return ResponseEntity.ok(courseService.getCoursesByCareer(careerId));
+    public ResponseEntity<List<CourseDTO>> getAllCourses(@RequestParam(name = "careerId", required = false) Long careerId) {
+        return ResponseEntity.ok(courseService.getAllCourses(careerId));
     }
 
     @GetMapping("/{id}")
