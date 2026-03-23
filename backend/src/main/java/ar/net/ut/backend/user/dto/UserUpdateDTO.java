@@ -1,11 +1,11 @@
 package ar.net.ut.backend.user.dto;
 
 import ar.net.ut.backend.user.dto.profile.UserProfileUpdateDTO;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record UserUpdateDTO(
         @Size(min = 3, max = 20, message = "First name is either too short or too long")
@@ -17,6 +17,8 @@ public record UserUpdateDTO(
         @Past(message = "Birthday must be a past date")
         LocalDate birthday,
 
-        UserProfileUpdateDTO profile
+        UserProfileUpdateDTO profile,
+
+        List<Long> bookmarkedCourseIds
 ) {
 }

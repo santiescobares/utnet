@@ -6,6 +6,8 @@ import ar.net.ut.backend.auth.token.TokenService;
 import ar.net.ut.backend.config.S3Config;
 import ar.net.ut.backend.context.RequestContextData;
 import ar.net.ut.backend.context.RequestContextHolder;
+import ar.net.ut.backend.course.Course;
+import ar.net.ut.backend.course.repository.CourseRepository;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InternalException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
@@ -39,10 +41,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static ar.net.ut.backend.Global.RedisKeys.*;
 
@@ -57,6 +58,7 @@ public class UserService {
     private final StorageService storageService;
 
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
     private final UserMapper userMapper;
 
@@ -125,7 +127,34 @@ public class UserService {
     public UserDTO updateUser(UserUpdateDTO dto) {
         User user = getCurrentUser();
         userMapper.updateFromDTO(user, dto);
-        userRepository.save(user);
+
+        List<Long> bookmarkedCourseIds = dto.bookmarkedCourseIds();
+        if (bookmarkedCourseIds != null) {
+            userRepository.clearUserBookmarkedCourses(user.getId());
+
+            List<Long> uniqueCoursesIds = bookmarkedCourseIds.stream()
+                    .distinct()
+                    .limit(6)
+                    .toList();
+
+            List<Course> courses = courseRepository.findAllById(uniqueCoursesIds);
+            Map<Long, Course> courseMap = courses.stream().collect(Collectors.toMap(Course::getId, course -> course));
+
+            int validSortPosition = 0;
+            for (Long requestedId : uniqueCoursesIds) {
+                Course course = courseMap.get(requestedId);
+
+                if (course != null) {
+                    User.BookmarkedCourse bookmarkedCourse = new User.BookmarkedCourse();
+                    bookmarkedCourse.setUser(user);
+                    bookmarkedCourse.setCourse(course);
+                    bookmarkedCourse.setSortPosition(validSortPosition);
+
+                    user.addBookmarkedCourse(bookmarkedCourse);
+                    validSortPosition++;
+                }
+            }
+        }
 
         eventPublisher.publishEvent(new UserUpdateEvent(user));
 

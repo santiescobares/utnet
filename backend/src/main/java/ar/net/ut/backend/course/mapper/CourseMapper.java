@@ -8,9 +8,11 @@ import ar.net.ut.backend.course.dto.CourseUpdateDTO;
 import ar.net.ut.backend.course.repository.CourseRepository;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.user.User;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Mapper(
@@ -40,5 +42,14 @@ public abstract class CourseMapper {
         if (courseId == null) return null;
         return courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "id", courseId.toString()));
+    }
+
+    @Named("bookmarkedCoursesToCourseDTOs")
+    public List<CourseDTO> mapBookmarkedCoursesToCourseDTOs(List<User.BookmarkedCourse> bookmarkedCourses) {
+        if (bookmarkedCourses == null) return null;
+        return bookmarkedCourses.stream()
+                .sorted(Comparator.comparingInt(User.BookmarkedCourse::getSortPosition))
+                .map(course -> toDTO(course.getCourse()))
+                .toList();
     }
 }

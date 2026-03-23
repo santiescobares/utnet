@@ -20,9 +20,16 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByReferralId(Long referralId);
 
     @Modifying
-    @Transactional
     @Query("UPDATE User u SET u.profile.career = null WHERE u.profile.career.id = :careerId")
     void unlinkUsersFromCareer(Long careerId);
+
+    @Modifying
+    @Query(value = "DELETE FROM user_bookmarked_courses WHERE course_id = :courseId", nativeQuery = true)
+    void unlinkUsersFromCourse(@Param("courseId") Long courseId);
+
+    @Modifying
+    @Query(value = "DELETE FROM user_bookmarked_courses WHERE user_id = :userId", nativeQuery = true)
+    void clearUserBookmarkedCourses(@Param("userId") UUID userId);
 
     @Modifying
     @Transactional

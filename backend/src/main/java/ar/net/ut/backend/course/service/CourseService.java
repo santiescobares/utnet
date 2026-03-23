@@ -14,6 +14,7 @@ import ar.net.ut.backend.course.event.CourseUpdateEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceAlreadyExistsException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.user.repository.UserRepository;
 import ar.net.ut.backend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,12 +28,12 @@ import java.util.List;
 public class CourseService {
 
     private final CareerService careerService;
+    private final UserService userService;
 
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
     private final CourseMapper courseMapper;
-
-    private final UserService userService;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -84,6 +85,8 @@ public class CourseService {
     @Transactional
     public void deleteCourse(Long id) {
         Course course = getById(id);
+
+        userRepository.unlinkUsersFromCourse(id);
         courseRepository.delete(course);
 
         eventPublisher.publishEvent(new CourseDeleteEvent(userService.getCurrentUser(), course));

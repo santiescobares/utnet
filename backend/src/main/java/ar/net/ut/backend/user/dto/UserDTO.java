@@ -1,10 +1,12 @@
 package ar.net.ut.backend.user.dto;
 
+import ar.net.ut.backend.course.dto.CourseDTO;
 import ar.net.ut.backend.user.dto.profile.UserProfileDTO;
 import ar.net.ut.backend.user.enums.Role;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record UserDTO(
@@ -17,6 +19,7 @@ public record UserDTO(
         Role role,
         Long referralId,
         UUID referredById,
-        UserProfileDTO profile
+        UserProfileDTO profile,
+        List<CourseDTO> bookmarkedCourses
 ) {
 }

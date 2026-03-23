@@ -1,5 +1,6 @@
 package ar.net.ut.backend.user;
 
+import ar.net.ut.backend.course.Course;
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
 import ar.net.ut.backend.user.enums.Role;
 import jakarta.persistence.*;
@@ -52,6 +53,9 @@ public class User extends CUDLoggableEntity {
     private List<UserContribution> contributions;
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserInteraction> interactions;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookmarkedCourse> bookmarkedCourses;
 
     public boolean isBanned() {
         return bannedUntil != null && Instant.now().isBefore(bannedUntil);
@@ -115,6 +119,21 @@ public class User extends CUDLoggableEntity {
         return interactions != null ? Collections.unmodifiableList(interactions) : Collections.emptyList();
     }
 
+    public boolean addBookmarkedCourse(BookmarkedCourse course) {
+        if (bookmarkedCourses == null) {
+            bookmarkedCourses = new ArrayList<>();
+        }
+        return bookmarkedCourses.add(course);
+    }
+
+    public boolean removeBookmarkedCourse(BookmarkedCourse course) {
+        return bookmarkedCourses.remove(course);
+    }
+
+    public List<BookmarkedCourse> getBookmarkedCourses() {
+        return bookmarkedCourses != null ? Collections.unmodifiableList(bookmarkedCourses) : Collections.emptyList();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof User other)) return false;
@@ -143,5 +162,25 @@ public class User extends CUDLoggableEntity {
                 ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
                 ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
                 "}";
+    }
+
+    @Entity
+    @Table(name = "user_bookmarked_courses")
+    @Getter
+    @Setter
+    public static class BookmarkedCourse {
+
+        @Id
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        private Long id;
+
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "user_id", nullable = false)
+        private User user;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "course_id", nullable = false)
+        private Course course;
+
+        private int sortPosition;
     }
 }
