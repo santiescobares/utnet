@@ -1,3 +1,5 @@
+import type { CourseDTO } from '@/types/course.types';
+
 // Espejo exacto de: ar.net.ut.backend.user.enums.Role
 export type Role =
     | 'NEW_USER'
@@ -15,6 +17,7 @@ export interface CareerDTO {
     name: string;
     idCharacter: string;
     sortPosition: number;
+    color: string; // hex 6 chars sin '#', ej: "FF5733"
 }
 
 // Espejo exacto de: ar.net.ut.backend.user.dto.profile.UserProfileDTO
@@ -50,6 +53,7 @@ export interface UserDTO {
     referralId: number | null;
     referredById: string | null;
     profile: UserProfileDTO;
+    bookmarkedCourses: CourseDTO[];  // espejo de List<CourseDTO>, ordenado por sortPosition
 }
 
 // Espejo exacto de: ar.net.ut.backend.user.dto.UserCreateDTO
@@ -66,4 +70,5 @@ export interface UserUpdateDTO {
     lastName: string | null;
     birthday: string | null; // ISO format: YYYY-MM-DD
     profile: UserProfileUpdateDTO | null;
+    bookmarkedCourseIds: number[] | null;  // espejo de List<Long>; null = no modificar
 }

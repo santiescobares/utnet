@@ -49,7 +49,7 @@ const ROLE_LABELS: Record<Role, string> = {
 
 const topNav: NavItem[] = [
     { kind: 'link', label: 'Inicio', icon: Home, href: '/home' },
-    { kind: 'link', label: 'Cursos', icon: BookOpen, href: '/cursos' },
+    { kind: 'link', label: 'Cursos', icon: BookOpen, href: '/courses' },
     { kind: 'link', label: 'Comunidad', icon: Users, href: '/comunidad' },
     { kind: 'link', label: 'Biblioteca', icon: Library, href: '/biblioteca' },
     {
