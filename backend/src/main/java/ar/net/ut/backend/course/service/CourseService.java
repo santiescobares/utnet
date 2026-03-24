@@ -109,6 +109,12 @@ public class CourseService {
         return courseMapper.toDTO(getById(id));
     }
 
+    @Transactional(readOnly = true)
+    public CourseDTO getCourseByName(String name) {
+        return courseMapper.toDTO(courseRepository.findByName(name)
+                .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "name", name)));
+    }
+
     public Course getById(Long id) {
         return courseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(ResourceType.COURSE, "id", id.toString()));
