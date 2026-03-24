@@ -18,6 +18,5 @@ public interface CourseReviewMapper {
     CourseReview createEntity(CourseReviewCreateDTO dto);
 
     @Mapping(source = "resource.id", target = "courseId")
-    @Mapping(source = "postedBy.id", target = "postedById")
     CourseReviewDTO toDTO(CourseReview review);
 }

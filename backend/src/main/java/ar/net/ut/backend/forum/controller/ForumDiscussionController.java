@@ -43,6 +43,7 @@ public class ForumDiscussionController {
 
     @GetMapping
     public ResponseEntity<Page<ForumDiscussionDTO>> getAllForumDiscussions(
+            @RequestParam(name = "")
             @PageableDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(forumDiscussionService.getAllDiscussions(pageable));

@@ -22,13 +22,9 @@ public interface CourseEventMapper {
     CourseEvent createEntity(CourseEventCreateDTO dto);
 
     @Mapping(source = "course.id", target = "courseId")
-    @Mapping(source = "createdBy.id", target = "createdById")
-    @Mapping(source = "lastEditor.id", target = "lastEditorId")
     CourseEventDTO toDTO(CourseEvent courseEvent);
 
     @Mapping(source = "course.id", target = "courseId")
-    @Mapping(source = "createdBy.id", target = "createdById")
-    @Mapping(source = "lastEditor.id", target = "lastEditorId")
     List<CourseEventDTO> toDTOList(List<CourseEvent> courseEvents);
 
     void updateFromDTO(@MappingTarget CourseEvent courseEvent, CourseEventUpdateDTO dto);

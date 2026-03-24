@@ -1,9 +1,10 @@
 package ar.net.ut.backend.course.dto.event;
 
+import ar.net.ut.backend.user.dto.UserSnapshotDTO;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 public record CourseEventDTO(
         Long id,
@@ -14,7 +15,7 @@ public record CourseEventDTO(
         LocalTime startTime,
         LocalTime endTime,
         String description,
-        UUID createdById,
-        UUID lastEditorId
+        UserSnapshotDTO createdBy,
+        UserSnapshotDTO lastEditor
 ) {
 }

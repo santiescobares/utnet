@@ -4,6 +4,7 @@ import ar.net.ut.backend.Global;
 import ar.net.ut.backend.career.CareerMapper;
 import ar.net.ut.backend.course.mapper.CourseMapper;
 import ar.net.ut.backend.user.dto.UserDTO;
+import ar.net.ut.backend.user.dto.UserSnapshotDTO;
 import ar.net.ut.backend.user.dto.UserUpdateDTO;
 import ar.net.ut.backend.user.dto.profile.UserProfileDTO;
 import ar.net.ut.backend.user.dto.profile.UserProfileUpdateDTO;
@@ -24,6 +25,9 @@ public abstract class UserMapper {
 
     @Mapping(source = "pictureKey", target = "pictureURL", qualifiedByName = "pictureKeyToURL")
     public abstract UserProfileDTO toProfileDTO(UserProfile profile);
+
+    @Mapping(source = "profile.pictureKey", target = "profilePictureURL", qualifiedByName = "pictureKeyToURL")
+    public abstract UserSnapshotDTO toSnapshotDTO(User user);
 
     @Mapping(target = "bookmarkedCourses", ignore = true)
     public abstract void updateFromDTO(@MappingTarget User user, UserUpdateDTO dto);
