@@ -8,6 +8,10 @@ public record CareerCreateDTO(
         @Size(max = 50, message = "Name is too long")
         String name,
 
-        char idCharacter
+        char idCharacter,
+
+        @NotBlank(message = "Color is required")
+        @Size(max = 6, message = "Color is too long")
+        String color
 ) {
 }

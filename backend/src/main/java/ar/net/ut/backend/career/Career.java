@@ -19,6 +19,8 @@ public class Career {
     @Column(unique = true)
     private char idCharacter;
     private int sortPosition;
+    @Column(length = 6)
+    private String color;
 
     @Override
     public String toString() {

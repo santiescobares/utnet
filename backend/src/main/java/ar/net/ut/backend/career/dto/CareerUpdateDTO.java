@@ -10,6 +10,9 @@ public record CareerUpdateDTO(
         Character idCharacter,
 
         @PositiveOrZero(message = "Sort position must be positive or zero")
-        Integer sortPosition
+        Integer sortPosition,
+
+        @Size(max = 6, message = "Color is too long")
+        String color
 ) {
 }

@@ -4,6 +4,7 @@ public record CareerDTO(
         Long id,
         String name,
         char idCharacter,
-        int sortPosition
+        int sortPosition,
+        String color
 ) {
 }
