@@ -4,6 +4,7 @@ import ar.net.ut.backend.course.CourseEvent;
 import ar.net.ut.backend.course.dto.event.CourseEventCreateDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventDTO;
 import ar.net.ut.backend.course.dto.event.CourseEventUpdateDTO;
+import ar.net.ut.backend.user.mapper.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -14,7 +15,7 @@ import java.util.List;
 @Mapper(
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {CourseMapper.class}
+        uses = {CourseMapper.class, UserMapper.class}
 )
 public interface CourseEventMapper {
 

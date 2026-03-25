@@ -3,6 +3,7 @@ package ar.net.ut.backend.course.mapper;
 import ar.net.ut.backend.course.CourseReview;
 import ar.net.ut.backend.course.dto.review.CourseReviewCreateDTO;
 import ar.net.ut.backend.course.dto.review.CourseReviewDTO;
+import ar.net.ut.backend.user.mapper.UserMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -10,7 +11,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-        uses = {CourseMapper.class}
+        uses = {CourseMapper.class, UserMapper.class}
 )
 public interface CourseReviewMapper {
 
