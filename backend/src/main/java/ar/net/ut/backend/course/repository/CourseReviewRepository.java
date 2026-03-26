@@ -12,6 +12,6 @@ public interface CourseReviewRepository extends JpaRepository<CourseReview, Long
 
     boolean existsByResourceIdAndPostedById(Long courseId, UUID userId);
 
-    @EntityGraph(attributePaths = {"postedBy", "postedBy.profile"})
+    @EntityGraph(attributePaths = {"postedBy", "postedBy.profile", "subjectTags"})
     Page<CourseReview> findByResourceId(Long courseId, Pageable pageable);
 }

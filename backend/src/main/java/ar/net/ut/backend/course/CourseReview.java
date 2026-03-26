@@ -1,10 +1,16 @@
 package ar.net.ut.backend.course;
 
 import ar.net.ut.backend.model.CommentEntity;
+import ar.net.ut.backend.subject.Subject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "course_reviews")
@@ -18,6 +24,29 @@ public class CourseReview extends CommentEntity<Course> {
     private Long id;
 
     private double rating;
+
+    @ManyToMany
+    @JoinTable(
+            name = "course_review_tags",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    private Set<Subject> subjectTags = new HashSet<>();
+
+    public boolean addSubjectTag(Subject subject) {
+        if (subjectTags == null) {
+            subjectTags = new HashSet<>();
+        }
+        return subjectTags.add(subject);
+    }
+
+    public boolean removeSubjectTag(Subject subject) {
+        return subjectTags.remove(subject);
+    }
+
+    public Set<Subject> getSubjectTags() {
+        return subjectTags != null ? Collections.unmodifiableSet(subjectTags) : Collections.emptySet();
+    }
 
     @Override
     public String toString() {

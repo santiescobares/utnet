@@ -2,6 +2,7 @@ package ar.net.ut.backend.course;
 
 import ar.net.ut.backend.career.Career;
 import ar.net.ut.backend.model.loggable.CUDLoggableEntity;
+import ar.net.ut.backend.subject.Subject;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -56,6 +57,14 @@ public class Course extends CUDLoggableEntity {
 
     public List<CourseSubject> getSubjects() {
         return subjects != null ? Collections.unmodifiableList(subjects) : Collections.emptyList();
+    }
+
+    public boolean isSubject(Long subjectId) {
+        return subjects.stream().anyMatch(courseSubject -> courseSubject.getSubject().getId().equals(subjectId));
+    }
+
+    public boolean isSubject(Subject subject) {
+        return isSubject(subject.getId());
     }
 
     public boolean addEvent(CourseEvent event) {

@@ -15,6 +15,8 @@ import ar.net.ut.backend.course.event.review.CourseReviewDeleteEvent;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.InvalidOperationException;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
+import ar.net.ut.backend.subject.Subject;
+import ar.net.ut.backend.subject.SubjectRepository;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.UserComment;
 import ar.net.ut.backend.user.UserInteraction;
@@ -27,6 +29,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class CourseReviewService {
@@ -35,6 +40,7 @@ public class CourseReviewService {
     private final UserService userService;
 
     private final CourseReviewRepository courseReviewRepository;
+    private final SubjectRepository subjectRepository;
 
     private final CourseReviewMapper courseReviewMapper;
 
@@ -50,6 +56,21 @@ public class CourseReviewService {
 
         CourseReview review = courseReviewMapper.createEntity(dto);
         review.setPostedBy(userService.getCurrentUser());
+
+        List<Long> subjectTagIds = dto.subjectTagIds();
+        if (subjectTagIds != null) {
+            if (subjectTagIds.size() > 3) {
+                subjectTagIds = subjectTagIds.stream()
+                        .limit(3)
+                        .toList();
+            }
+            for (Subject subject : subjectRepository.findAllById(subjectTagIds)) {
+                if (!review.getResource().isSubject(subject)) {
+                    throw new InvalidOperationException("Subject with id = " + subject.getId() + " doesn't belong to that course");
+                }
+                review.addSubjectTag(subject);
+            }
+        }
 
         courseReviewRepository.save(review);
 

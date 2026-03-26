@@ -2,6 +2,8 @@ package ar.net.ut.backend.course.dto.review;
 
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public record CourseReviewCreateDTO(
         @NotNull(message = "Course ID is required")
         Long courseId,
@@ -12,6 +14,8 @@ public record CourseReviewCreateDTO(
 
         @DecimalMin(value = "1.0", message = "Rating must be greater or equal to 1")
         @DecimalMax(value = "5.0", message = "Rating must be lower or equal to 5")
-        double rating
+        double rating,
+
+        List<Long> subjectTagIds
 ) {
 }
