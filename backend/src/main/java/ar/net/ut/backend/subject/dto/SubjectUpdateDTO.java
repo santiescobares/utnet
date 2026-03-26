@@ -12,6 +12,9 @@ public record SubjectUpdateDTO(
         @Size(max = 3, message = "Short name is too long")
         String shortName,
 
+        @Size(max = 6, message = "Color is too long")
+        String color,
+
         @PositiveOrZero(message = "Sort position must be positive or zero")
         Integer sortPosition,
 

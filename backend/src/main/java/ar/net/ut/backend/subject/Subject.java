@@ -24,6 +24,8 @@ public class Subject {
     @Column(length = 3, unique = true)
     private String shortName;
     private int sortPosition;
+    @Column(length = 6)
+    private String color;
 
     @ManyToMany
     @JoinTable(

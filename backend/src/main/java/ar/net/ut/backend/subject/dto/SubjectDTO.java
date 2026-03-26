@@ -8,6 +8,7 @@ public record SubjectDTO(
         Long id,
         String name,
         String shortName,
+        String color,
         int sortPosition,
         List<CareerDTO> careers,
         List<SubjectDTO> correlatives

@@ -13,6 +13,10 @@ public record SubjectCreateDTO(
         @Size(max = 3, message = "Short name is too long")
         String shortName,
 
+        @NotBlank(message = "Color is required")
+        @Size(max = 6, message = "Color is too long")
+        String color,
+
         @NotEmpty(message = "Careers are required")
         List<Long> careerIds,
 
