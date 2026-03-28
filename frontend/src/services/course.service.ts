@@ -11,7 +11,12 @@ export const courseService = {
     },
 
     getById: async (id: number): Promise<CourseDTO> => {
-        const response = await api.get<CourseDTO>(`/courses/${id}`);
+        const response = await api.get<CourseDTO>(`/courses/id/${id}`);
+        return response.data;
+    },
+
+    getByName: async (name: string): Promise<CourseDTO> => {
+        const response = await api.get<CourseDTO>(`/courses/${name}`);
         return response.data;
     },
 };
