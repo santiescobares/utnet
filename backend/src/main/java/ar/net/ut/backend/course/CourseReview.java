@@ -5,6 +5,7 @@ import ar.net.ut.backend.subject.Subject;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.SQLDelete;
 
 import java.util.Collections;
@@ -31,6 +32,7 @@ public class CourseReview extends CommentEntity<Course> {
             joinColumns = @JoinColumn(name = "review_id"),
             inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
+    @BatchSize(size = 30)
     private Set<Subject> subjectTags = new HashSet<>();
 
     public boolean addSubjectTag(Subject subject) {

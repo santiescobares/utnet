@@ -5,16 +5,14 @@ import ar.net.ut.backend.course.dto.subject.CourseSubjectCreateDTO;
 import ar.net.ut.backend.course.dto.subject.CourseSubjectDTO;
 import ar.net.ut.backend.course.dto.subject.CourseSubjectUpdateDTO;
 import ar.net.ut.backend.subject.SubjectMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        collectionMappingStrategy = CollectionMappingStrategy.TARGET_IMMUTABLE,
         uses = {CourseMapper.class, SubjectMapper.class}
 )
 public interface CourseSubjectMapper {
