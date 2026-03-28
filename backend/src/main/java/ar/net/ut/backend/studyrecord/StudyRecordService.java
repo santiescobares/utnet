@@ -40,7 +40,7 @@ import java.util.Set;
 public class StudyRecordService {
 
     private static final Set<String> ALLOWED_FILE_FORMATS = Set.of("pdf", "doc", "docx", "png", "jpg", "jpeg");
-    private static final long MAX_FILE_SIZE = 52_428_800L; // In bytes
+    private static final long MAX_FILE_SIZE = 31_457_280; // In bytes
 
     private final SubjectService subjectService;
     private final UserService userService;
@@ -109,14 +109,6 @@ public class StudyRecordService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StudyRecordDTO> getStudyRecordsBySubject(Long subjectId, Pageable pageable) {
-        Page<StudyRecord> records = RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR
-                ? studyRecordRepository.findAllBySubjectId(subjectId, pageable)
-                : studyRecordRepository.findAllBySubjectIdAndHiddenFalse(subjectId, pageable);
-        return records.map(studyRecordMapper::toDTO);
-    }
-
-    @Transactional(readOnly = true)
     public StudyRecordDTO getStudyRecordById(Long id) {
         return studyRecordMapper.toDTO(getById(id));
     }
@@ -130,6 +122,17 @@ public class StudyRecordService {
             throw new ResourceNotFoundException(ResourceType.STUDY_RECORD, "slug", slug);
         }
         return studyRecordMapper.toDTO(studyRecord.get());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StudyRecordDTO> searchStudyRecords(String query, Long subjectId, StudyRecord.Type type, Pageable pageable) {
+        return studyRecordRepository.searchStudyRecords(
+                query,
+                subjectId,
+                type,
+                RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR,
+                pageable
+        ).map(studyRecordMapper::toDTO);
     }
 
     @Transactional
