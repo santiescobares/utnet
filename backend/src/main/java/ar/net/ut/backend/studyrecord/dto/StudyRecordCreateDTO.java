@@ -1,5 +1,6 @@
 package ar.net.ut.backend.studyrecord.dto;
 
+import ar.net.ut.backend.studyrecord.StudyRecord;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,9 @@ public record StudyRecordCreateDTO(
         @NotBlank(message = "Description is required")
         @Size(max = 1000, message = "Description is too long")
         String description,
+
+        @NotNull(message = "Type is required")
+        StudyRecord.Type type,
 
         List<String> tags
 ) {

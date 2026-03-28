@@ -12,6 +12,7 @@ public interface StudyRecordMapper {
 
     @Mapping(source = "createdBy.id", target = "createdById")
     @Mapping(source = "subject.id", target = "subjectId")
+    @Mapping(source = "type.color", target = "typeColor")
     StudyRecordDTO toDTO(StudyRecord studyRecord);
 
     void updateFromDTO(@MappingTarget StudyRecord studyRecord, StudyRecordUpdateDTO dto);
