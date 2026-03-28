@@ -1,5 +1,13 @@
 import type { CourseDTO } from '@/types/course.types';
 
+// Espejo exacto de: ar.net.ut.backend.user.dto.UserSnapshotDTO
+export interface UserSnapshotDTO {
+    id: string;             // UUID
+    firstName: string;
+    lastName: string;
+    profilePictureURL: string | null;
+}
+
 // Espejo exacto de: ar.net.ut.backend.user.enums.Role
 export type Role =
     | 'NEW_USER'
