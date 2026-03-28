@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useNavigate } from 'react-router'
 import { Search, ChevronDown, BookOpen, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { courseService } from '@/services/course.service'
@@ -25,6 +26,7 @@ const MAX_BOOKMARKS = 6
 
 export function CoursesPage() {
     const { user, setUser } = useAuthStore()
+    const navigate = useNavigate()
 
     // ── Saved courses (bookmarks) ───────────────────────────────────────────
     const [savedCourses, setSavedCourses] = useState<CourseDTO[]>(
@@ -220,6 +222,7 @@ export function CoursesPage() {
                         careerColorMap={careerColorMap}
                         onReorder={handleReorder}
                         onBookmarkToggle={handleRemoveBookmark}
+                        onCardClick={(course) => navigate(`/courses/${course.name}`)}
                     />
                 </section>
             )}
@@ -367,6 +370,7 @@ export function CoursesPage() {
                                     careerColor={careerColorMap.get(course.careerId)}
                                     isBookmarked={bookmarkedIds.has(course.id)}
                                     onBookmarkToggle={(e) => handleBookmarkToggle(e, course)}
+                                    onClick={() => navigate(`/courses/${course.name}`)}
                                 />
                             ))}
                         </div>

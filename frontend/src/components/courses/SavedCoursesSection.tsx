@@ -26,6 +26,7 @@ interface SavedCoursesSectionProps {
     careerColorMap?: Map<number, string>
     onReorder: (fromIndex: number, toIndex: number) => void
     onBookmarkToggle?: (courseId: number) => void
+    onCardClick?: (course: CourseDTO) => void
 }
 
 function useIsMobile() {
@@ -45,9 +46,10 @@ interface SortableCardProps {
     careerColor?: string
     isCarousel: boolean
     onBookmarkToggle?: (courseId: number) => void
+    onCardClick?: (course: CourseDTO) => void
 }
 
-function SortableCard({ course, careerName, careerColor, isCarousel, onBookmarkToggle }: SortableCardProps) {
+function SortableCard({ course, careerName, careerColor, isCarousel, onBookmarkToggle, onCardClick }: SortableCardProps) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
         useSortable({ id: course.id })
 
@@ -66,6 +68,7 @@ function SortableCard({ course, careerName, careerColor, isCarousel, onBookmarkT
                 careerColor={careerColor}
                 isDraggable
                 isBookmarked
+                onClick={onCardClick ? () => onCardClick(course) : undefined}
                 onBookmarkToggle={onBookmarkToggle ? (e) => { e.stopPropagation(); onBookmarkToggle(course.id) } : undefined}
                 // En carousel: cancela translate para que no se vea raro en touch
                 className={cn(isCarousel && 'hover:translate-y-0 active:scale-100')}
@@ -75,7 +78,7 @@ function SortableCard({ course, careerName, careerColor, isCarousel, onBookmarkT
     )
 }
 
-export function SavedCoursesSection({ courses, careerMap, careerColorMap, onReorder, onBookmarkToggle }: SavedCoursesSectionProps) {
+export function SavedCoursesSection({ courses, careerMap, careerColorMap, onReorder, onBookmarkToggle, onCardClick }: SavedCoursesSectionProps) {
     const [activeId, setActiveId] = useState<number | null>(null)
     const isMobile = useIsMobile()
 
@@ -127,6 +130,7 @@ export function SavedCoursesSection({ courses, careerMap, careerColorMap, onReor
                                     careerColor={careerColorMap?.get(course.careerId)}
                                     isCarousel
                                     onBookmarkToggle={onBookmarkToggle}
+                                    onCardClick={onCardClick}
                                 />
                             ))}
                         </div>
@@ -141,6 +145,7 @@ export function SavedCoursesSection({ courses, careerMap, careerColorMap, onReor
                                 careerColor={careerColorMap?.get(course.careerId)}
                                 isCarousel={false}
                                 onBookmarkToggle={onBookmarkToggle}
+                                onCardClick={onCardClick}
                             />
                         ))}
                     </div>
