@@ -1,5 +1,6 @@
 package ar.net.ut.backend.course.dto.event;
 
+import ar.net.ut.backend.course.CourseEvent;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,9 @@ public record CourseEventCreateDTO(
 
         @NotBlank(message = "Description is required")
         @Size(max = 500, message = "Description is too long")
-        String description
+        String description,
+
+        @NotNull(message = "Tag is required")
+        CourseEvent.Tag tag
 ) {
 }

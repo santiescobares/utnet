@@ -1,5 +1,6 @@
 package ar.net.ut.backend.course.dto.event;
 
+import ar.net.ut.backend.course.CourseEvent;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,6 +19,8 @@ public record CourseEventUpdateDTO(
         LocalTime endTime,
 
         @Size(max = 500, message = "Description is too long")
-        String description
+        String description,
+
+        CourseEvent.Tag tag
 ) {
 }

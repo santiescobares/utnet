@@ -1,5 +1,6 @@
 package ar.net.ut.backend.course.dto.event;
 
+import ar.net.ut.backend.course.CourseEvent;
 import ar.net.ut.backend.user.dto.UserSnapshotDTO;
 
 import java.time.Instant;
@@ -15,6 +16,8 @@ public record CourseEventDTO(
         LocalTime startTime,
         LocalTime endTime,
         String description,
+        CourseEvent.Tag tag,
+        String tagColor,
         UserSnapshotDTO createdBy,
         UserSnapshotDTO lastEditor
 ) {
