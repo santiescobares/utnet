@@ -183,7 +183,7 @@ export function UploadRecordModal({ open, onClose, onSuccess }: UploadRecordModa
                         <textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            maxLength={1000}
+                            maxLength={2000}
                             rows={3}
                             placeholder="Describí brevemente el contenido del material..."
                             className={cn(
@@ -193,7 +193,7 @@ export function UploadRecordModal({ open, onClose, onSuccess }: UploadRecordModa
                                 'transition-all duration-150 placeholder:text-muted-foreground',
                             )}
                         />
-                        <span className="text-[11px] text-muted-foreground text-right">{description.length}/1000</span>
+                        <span className="text-[11px] text-muted-foreground text-right">{description.length}/2000</span>
                     </div>
 
                     {/* Materia */}

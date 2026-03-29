@@ -15,6 +15,7 @@ export interface StudyRecordDTO {
     type: StudyRecordType;
     typeColor: string;  // hex 6 chars sin '#', proveniente del enum backend
     tags: string[];
+    resourceSize: number; // tamaño en bytes, proveniente del backend
     downloads: number;
     hidden: boolean;
 }

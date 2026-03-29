@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router'
-import { Check, ChevronDown, Loader2, X } from 'lucide-react'
+import { Check, ChevronDown, Loader2, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { careerService } from '@/services/career.service'
-import { subjectService } from '@/services/subject.service'
 import { studyRecordService } from '@/services/studyRecord.service'
-import type { CareerDTO } from '@/types/user.types'
+import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal'
 import type { SubjectDTO } from '@/types/subject.types'
-import type { StudyRecordType } from '@/types/studyrecord.types'
+import type { StudyRecordDTO, StudyRecordType } from '@/types/studyrecord.types'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -19,9 +16,6 @@ const TYPE_OPTIONS: { value: StudyRecordType; label: string; color: string }[] =
     { value: 'EXAM_MODEL',   label: 'Modelo de Examen',       color: '#E68D00' },
 ]
 
-const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'png', 'jpg', 'jpeg']
-const MAX_FILE_SIZE_MB = 30
-
 const INPUT_BASE =
     'w-full px-3 py-2.5 text-sm rounded-xl border bg-secondary border-border text-foreground ' +
     'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 ' +
@@ -30,12 +24,11 @@ const INPUT_BASE =
 // ── TypeDropdown ──────────────────────────────────────────────────────────────
 
 interface TypeDropdownProps {
-    value: StudyRecordType | null
+    value: StudyRecordType
     onChange: (v: StudyRecordType) => void
-    error?: boolean
 }
 
-function TypeDropdown({ value, onChange, error }: TypeDropdownProps) {
+function TypeDropdown({ value, onChange }: TypeDropdownProps) {
     const [open, setOpen] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
 
@@ -55,17 +48,9 @@ function TypeDropdown({ value, onChange, error }: TypeDropdownProps) {
             <button
                 type="button"
                 onClick={() => setOpen((p) => !p)}
-                className={cn(
-                    INPUT_BASE,
-                    'flex items-center justify-between cursor-pointer pr-2.5',
-                    error && 'border-destructive focus:ring-destructive/30',
-                )}
+                className={cn(INPUT_BASE, 'flex items-center justify-between cursor-pointer pr-2.5')}
             >
-                {selected ? (
-                    <span className="text-foreground">{selected.label}</span>
-                ) : (
-                    <span className="text-muted-foreground">Seleccioná un tipo…</span>
-                )}
+                <span className="text-foreground">{selected?.label ?? value}</span>
                 <ChevronDown
                     size={15}
                     className={cn(
@@ -122,7 +107,6 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
     }, [shaking])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Strip any non-alphanumeric character silently as the user types
         const filtered = e.target.value.replace(/[^a-z0-9]/gi, '').toLowerCase()
         setInputValue(filtered)
     }
@@ -188,28 +172,29 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
     )
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// ── Modal ─────────────────────────────────────────────────────────────────────
 
-export function NewResourcePage() {
-    // Form fields
-    const [title, setTitle]               = useState('')
-    const [type, setType]                 = useState<StudyRecordType | null>(null)
-    const [description, setDescription]   = useState('')
-    const [careerId, setCareerId]         = useState<number | ''>('')
-    const [subjectId, setSubjectId]       = useState<number | ''>('')
-    const [tags, setTags]                 = useState<string[]>([])
-    const [file, setFile]                 = useState<File | null>(null)
-    const [agreed, setAgreed]             = useState(false)
+interface StudyRecordEditModalProps {
+    record: StudyRecordDTO
+    currentSubject: SubjectDTO | null
+    onClose: () => void
+    onSaved: (updated: StudyRecordDTO) => void
+    onDeleted: () => void
+}
 
-    // Async data
-    const [careers, setCareers]           = useState<CareerDTO[]>([])
-    const [subjects, setSubjects]         = useState<SubjectDTO[]>([])
-    const [loadingData, setLoadingData]   = useState(true)
+export function StudyRecordEditModal({ record, onClose, onSaved, onDeleted }: StudyRecordEditModalProps) {
+    // Form fields — pre-populated from record
+    const [title, setTitle]             = useState(record.title)
+    const [type, setType]               = useState<StudyRecordType>(record.type)
+    const [description, setDescription] = useState(record.description)
+    const [tags, setTags]               = useState<string[]>([...record.tags])
+    const [makeHidden, setMakeHidden]   = useState(record.hidden)
 
     // UI state
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [submitted, setSubmitted]       = useState(false)
-    const [fileError, setFileError]       = useState('')
+    const [isSubmitting, setIsSubmitting]       = useState(false)
+    const [submitted, setSubmitted]             = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [isDeleting, setIsDeleting]           = useState(false)
 
     // Blur tracking
     const touchedRef = useRef<Set<string>>(new Set())
@@ -219,108 +204,109 @@ export function NewResourcePage() {
         forceUpdate((n) => n + 1)
     }
 
-    const navigate     = useNavigate()
-    const fileInputRef = useRef<HTMLInputElement>(null)
-
+    // Close on Escape
     useEffect(() => {
-        Promise.all([careerService.getAll(), subjectService.getAll()])
-            .then(([careerData, subjectData]) => {
-                setCareers([...careerData].sort((a, b) => a.sortPosition - b.sortPosition))
-                setSubjects(subjectData)
-            })
-            .catch(() => toast.error('No se pudo cargar la información necesaria.'))
-            .finally(() => setLoadingData(false))
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+        const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+        document.addEventListener('keydown', handler)
+        return () => document.removeEventListener('keydown', handler)
+    }, [onClose])
 
-    const filteredSubjects = careerId === ''
-        ? []
-        : subjects.filter((s) => s.careers.some((c) => c.id === careerId))
+    // Lock body scroll while modal is open
+    useEffect(() => {
+        document.body.style.overflow = 'hidden'
+        return () => { document.body.style.overflow = '' }
+    }, [])
 
     const getErrors = () => ({
         title:
             title.trim().length < 5   ? 'El título debe tener al menos 5 caracteres.' :
             title.trim().length > 120 ? 'El título no puede superar los 120 caracteres.' : '',
-        type:        !type        ? 'Seleccioná un tipo de recurso.' : '',
         description:
             description.trim().length < 10   ? 'La descripción debe tener al menos 10 caracteres.' :
             description.trim().length > 2000 ? 'La descripción no puede superar los 2000 caracteres.' : '',
-        subject:  subjectId === '' ? 'Seleccioná una materia.' : '',
-        file:     !file           ? 'Seleccioná un archivo.'  : fileError,
-        agreed:   !agreed         ? 'required' : '',
     })
 
     const errors      = getErrors()
     const isFormValid = Object.values(errors).every((e) => e === '')
 
     const showErr = (field: keyof ReturnType<typeof getErrors>) =>
-        field !== 'agreed' &&
-        (submitted || touchedRef.current.has(field)) &&
-        errors[field] !== ''
+        (submitted || touchedRef.current.has(field)) && errors[field] !== ''
 
-    const handleCareerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setCareerId(e.target.value ? Number(e.target.value) : '')
-        setSubjectId('')
+    // Detect actual changes vs original record
+    const hasChanged =
+        title.trim()         !== record.title       ||
+        type                 !== record.type        ||
+        description.trim()   !== record.description ||
+        JSON.stringify(tags) !== JSON.stringify(record.tags) ||
+        makeHidden           !== record.hidden
+
+    const handleDelete = async () => {
+        setIsDeleting(true)
+        try {
+            await studyRecordService.deleteRecord(record.id)
+            toast.success('Recurso eliminado.')
+            onDeleted()
+        } catch {
+            toast.error('No se pudo eliminar el recurso. Intentá de nuevo.')
+        } finally {
+            setIsDeleting(false)
+        }
     }
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const selected = e.target.files?.[0] ?? null
-        setFileError('')
-        if (!selected) { setFile(null); return }
-
-        const ext = selected.name.split('.').pop()?.toLowerCase() ?? ''
-        if (!ALLOWED_EXTENSIONS.includes(ext)) {
-            setFileError(`Formato no permitido. Aceptados: ${ALLOWED_EXTENSIONS.join(', ')}.`)
-            setFile(null); e.target.value = ''; return
-        }
-        if (selected.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-            setFileError(`El archivo supera el límite de ${MAX_FILE_SIZE_MB} MB.`)
-            setFile(null); e.target.value = ''; return
-        }
-        setFile(selected)
-    }
-
-    const handleSubmit = async () => {
+    const handleSave = async () => {
         setSubmitted(true)
-        if (!isFormValid || isSubmitting) return
+        if (!isFormValid || !hasChanged || isSubmitting) return
         setIsSubmitting(true)
         try {
-            const result = await studyRecordService.create(
-                {
-                    subjectId:   subjectId as number,
-                    title:       title.trim(),
-                    description: description.trim(),
-                    type:        type!,
-                    tags:        tags.length > 0 ? tags : undefined,
-                },
-                file!,
-            )
-            toast.success('Recurso publicado correctamente')
-            navigate(`/library/${result.slug}`)
+            const updated = await studyRecordService.update(record.id, {
+                title:       title.trim(),
+                type,
+                description: description.trim(),
+                tags,
+                hidden:      makeHidden,
+            })
+            toast.success('Recurso actualizado correctamente.')
+            onSaved(updated)
         } catch {
-            toast.error('No se pudo publicar el recurso. Intentá de nuevo.')
+            toast.error('No se pudo guardar los cambios. Intentá de nuevo.')
         } finally {
             setIsSubmitting(false)
         }
     }
 
     return (
-        <div className="px-4 sm:px-6 pt-6 pb-10">
-            <div className="max-w-2xl mx-auto flex flex-col gap-6">
+        <div
+            className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+            onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+        >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
+
+            {/* Panel */}
+            <div className="relative z-10 w-full sm:max-w-2xl max-h-[92dvh] sm:max-h-[90dvh] flex flex-col bg-card border border-border rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden">
 
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-bold text-foreground">Nuevo Recurso</h1>
-                    <p className="text-sm text-muted-foreground mt-1">
-                        Compartí material de estudio con la comunidad
-                    </p>
+                <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                    <div>
+                        <h2 className="text-base font-bold text-foreground">Editar Recurso</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                            Modificá la información de la publicación
+                        </p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                        aria-label="Cerrar"
+                    >
+                        <X size={18} />
+                    </button>
                 </div>
 
-                {/* Form card */}
-                <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
+                {/* Scrollable body */}
+                <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
 
                     {/* ROW 1: Título + Tipo */}
                     <div className="flex flex-col gap-5 sm:flex-row sm:gap-4">
-
                         {/* Título */}
                         <div className="flex flex-col gap-1.5 sm:flex-[2]">
                             <label className="text-sm font-medium text-foreground">
@@ -349,14 +335,7 @@ export function NewResourcePage() {
                             <label className="text-sm font-medium text-foreground">
                                 Tipo <span className="text-destructive">*</span>
                             </label>
-                            <TypeDropdown
-                                value={type}
-                                onChange={(v) => { setType(v); touchField('type') }}
-                                error={showErr('type')}
-                            />
-                            {showErr('type') && (
-                                <p className="text-xs text-destructive">{errors.type}</p>
-                            )}
+                            <TypeDropdown value={type} onChange={setType} />
                         </div>
                     </div>
 
@@ -386,57 +365,7 @@ export function NewResourcePage() {
                         </div>
                     </div>
 
-                    {/* ROW 3: Carrera + Materia */}
-                    <div className="flex flex-col gap-5 sm:flex-row sm:gap-4">
-
-                        {/* Carrera */}
-                        <div className="flex flex-col gap-1.5 sm:flex-1">
-                            <label className="text-sm font-medium text-foreground">Carrera</label>
-                            <select
-                                value={careerId}
-                                onChange={handleCareerChange}
-                                disabled={loadingData}
-                                className={cn(INPUT_BASE, 'cursor-pointer', loadingData && 'opacity-50 cursor-not-allowed')}
-                            >
-                                <option value="">
-                                    {loadingData ? 'Cargando…' : 'Seleccioná una carrera…'}
-                                </option>
-                                {careers.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Materia */}
-                        <div className="flex flex-col gap-1.5 sm:flex-1">
-                            <label className="text-sm font-medium text-foreground">
-                                Materia <span className="text-destructive">*</span>
-                            </label>
-                            <select
-                                value={subjectId}
-                                onChange={(e) => setSubjectId(e.target.value ? Number(e.target.value) : '')}
-                                onBlur={() => touchField('subject')}
-                                disabled={careerId === '' || loadingData}
-                                className={cn(
-                                    INPUT_BASE, 'cursor-pointer',
-                                    showErr('subject') && 'border-destructive focus:ring-destructive/30',
-                                    (careerId === '' || loadingData) && 'opacity-50 cursor-not-allowed',
-                                )}
-                            >
-                                <option value="">
-                                    {careerId === '' ? 'Seleccioná primero una carrera' : 'Seleccioná una materia…'}
-                                </option>
-                                {filteredSubjects.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-                            {showErr('subject') && (
-                                <p className="text-xs text-destructive">{errors.subject}</p>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* ROW 4: Etiquetas */}
+                    {/* ROW 3: Etiquetas */}
                     <div className="flex flex-col gap-1.5">
                         <label className="text-sm font-medium text-foreground">
                             Etiquetas{' '}
@@ -447,83 +376,65 @@ export function NewResourcePage() {
                             Presioná Espacio o Enter para agregar. Solo letras y números, máximo 15 etiquetas.
                         </p>
                     </div>
+                </div>
 
-                    {/* ROW 5: Archivo */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-sm font-medium text-foreground">
-                            Recurso <span className="text-destructive">*</span>
-                        </label>
-                        <div className="flex items-center gap-3">
-                            <span className={cn('text-sm flex-1 truncate', file ? 'text-foreground' : 'text-muted-foreground')}>
-                                {file ? `Recurso: ${file.name}` : 'Ningún archivo seleccionado'}
-                            </span>
-                            <button
-                                type="button"
-                                onClick={() => fileInputRef.current?.click()}
-                                className="shrink-0 px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card text-foreground hover:bg-secondary transition-colors duration-150"
-                            >
-                                Seleccionar
-                            </button>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept={ALLOWED_EXTENSIONS.map((e) => `.${e}`).join(',')}
-                                onChange={handleFileChange}
-                                className="hidden"
-                            />
-                        </div>
-                        {(showErr('file') || fileError) && (
-                            <p className="text-xs text-destructive">{errors.file || fileError}</p>
-                        )}
-                        <p className="text-[11px] text-muted-foreground">
-                            {ALLOWED_EXTENSIONS.join(', ')} · Máx {MAX_FILE_SIZE_MB} MB
-                        </p>
-                    </div>
-
-                    {/* ROW 6: Toggle declaración */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="flex items-start gap-3 cursor-pointer">
-                            <button
-                                type="button"
-                                role="switch"
-                                aria-checked={agreed}
-                                onClick={() => { setAgreed((p) => !p); touchField('agreed') }}
-                                className={cn(
-                                    'relative mt-0.5 inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent',
-                                    'transition-colors duration-200',
-                                    'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-card',
-                                    agreed ? 'bg-primary' : 'bg-muted-foreground/30',
-                                )}
-                            >
-                                <span
-                                    className={cn(
-                                        'pointer-events-none block h-4 w-4 rounded-full bg-white shadow-sm',
-                                        'transform transition-transform duration-200',
-                                        agreed ? 'translate-x-4' : 'translate-x-0',
-                                    )}
-                                />
-                            </button>
-                            <span className="text-xs text-muted-foreground leading-relaxed">
-                                Declaro poseer los derechos de propiedad intelectual sobre este documento
-                                y acepto los Términos y Condiciones de publicación de UTNet.
-                            </span>
-                        </label>
-                    </div>
-
-                    {/* ROW 7: Botones */}
-                    <div className="flex items-center justify-end gap-2 pt-2">
+                {/* Footer */}
+                <div className="shrink-0 flex items-center gap-3 px-5 py-4 border-t border-border">
+                    {/* Delete button */}
+                    <button
+                        type="button"
+                        onClick={() => setShowDeleteConfirm(true)}
+                        disabled={isSubmitting || isDeleting}
+                        className="flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-xl text-destructive border border-destructive/30 hover:bg-destructive/10 transition-colors duration-150 disabled:opacity-40"
+                    >
+                        <Trash2 size={14} />
+                        Eliminar
+                    </button>
+                    
+                    {/* Hacer privado / público toggle */}
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
                         <button
                             type="button"
-                            onClick={() => navigate(-1)}
-                            disabled={isSubmitting}
+                            role="switch"
+                            aria-checked={makeHidden}
+                            onClick={() => setMakeHidden((v) => !v)}
+                            className={cn(
+                                'relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent',
+                                'transition-colors duration-200',
+                                'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-card',
+                                makeHidden ? 'bg-primary' : 'bg-muted-foreground/30',
+                            )}
+                        >
+                            <span
+                                className={cn(
+                                    'pointer-events-none block h-4 w-4 rounded-full bg-white shadow-sm',
+                                    'transform transition-transform duration-200',
+                                    makeHidden ? 'translate-x-4' : 'translate-x-0',
+                                )}
+                            />
+                        </button>
+                        <span className="text-xs text-muted-foreground">
+                            {makeHidden ? 'Hacer público' : 'Hacer privado'}
+                        </span>
+                    </label>
+
+                    {/* Spacer */}
+                    <div className="flex-1" />
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSubmitting || isDeleting}
                             className="px-4 py-2.5 text-sm font-medium rounded-xl border border-border bg-card text-foreground hover:bg-secondary transition-colors duration-150 disabled:opacity-40"
                         >
                             Cancelar
                         </button>
                         <button
                             type="button"
-                            onClick={handleSubmit}
-                            disabled={!isFormValid || isSubmitting}
+                            onClick={handleSave}
+                            disabled={!hasChanged || !isFormValid || isSubmitting || isDeleting}
                             className={cn(
                                 'px-4 py-2.5 text-sm font-medium rounded-xl flex items-center gap-2',
                                 'bg-primary text-primary-foreground hover:bg-primary/90',
@@ -531,12 +442,22 @@ export function NewResourcePage() {
                             )}
                         >
                             {isSubmitting && <Loader2 size={14} className="animate-spin" />}
-                            {isSubmitting ? 'Publicando…' : 'Publicar'}
+                            {isSubmitting ? 'Guardando…' : 'Guardar'}
                         </button>
                     </div>
-
                 </div>
             </div>
+
+            <ConfirmActionModal
+                open={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={handleDelete}
+                title="¿Eliminar recurso?"
+                description="Esta acción eliminará permanentemente la publicación y su archivo. No se puede deshacer."
+                confirmLabel="Eliminar"
+                confirmVariant="destructive"
+                isLoading={isDeleting}
+            />
         </div>
     )
 }

@@ -6,6 +6,7 @@ import { CoursesPage } from '@/pages/CoursesPage'
 import { CourseDetailPage } from '@/pages/CourseDetailPage'
 import { LibraryPage } from '@/pages/LibraryPage'
 import { NewResourcePage } from '@/pages/NewResourcePage'
+import { StudyRecordDetailPage } from '@/pages/StudyRecordDetailPage'
 import { useAuthStore } from '@/store/authStore'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
             {
                 path: 'library/new-resource',
                 element: <NewResourcePage />,
+            },
+            {
+                path: 'library/:slug',
+                element: <StudyRecordDetailPage />,
             },
         ],
     },

@@ -361,7 +361,12 @@ export function LibraryPage() {
                         </p>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-2 -my-2">
                             {searchResults.map((record) => (
-                                <LibraryCard key={record.id} record={record} className="min-w-0" />
+                                <LibraryCard
+                                    key={record.id}
+                                    record={record}
+                                    className="min-w-0"
+                                    onClick={() => navigate(`/library/${record.slug}`)}
+                                />
                             ))}
                         </div>
                     </div>
