@@ -5,8 +5,10 @@ import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.user.dto.activity.UserActivityDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +34,7 @@ public class UserActivityService {
                 activity.resourceType()
         );
 
-        redisTemplate.opsForZSet().add(key, activity.resourceId(), System.currentTimeMillis());
+        redisTemplate.opsForZSet().add(key, activity.resourceId(), activity.timestamp().toEpochMilli());
         redisTemplate.opsForZSet().removeRange(key, 0, -(MAX_HISTORY_PER_RESOURCE + 1));
         redisTemplate.expire(key, 7, TimeUnit.DAYS);
     }
@@ -42,10 +44,16 @@ public class UserActivityService {
 
         for (ResourceType type : TRACKED_RESOURCES) {
             String key = String.format(USER_RECENT_ACTIVITY.toString(), RequestContextHolder.getCurrentSession().userId(), type);
-            Set<String> resourceIds = redisTemplate.opsForZSet().reverseRange(key, 0, -1);
+            Set<ZSetOperations.TypedTuple<String>> tuples = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
-            if (resourceIds != null) {
-                resourceIds.forEach(id -> allActivities.add(new UserActivityDTO(type, id)));
+            if (tuples != null) {
+                for (ZSetOperations.TypedTuple<String> tuple : tuples) {
+                    allActivities.add(new UserActivityDTO(
+                            type,
+                            tuple.getValue(),
+                            Instant.ofEpochMilli(tuple.getScore() != null ? tuple.getScore().longValue() : Instant.now().toEpochMilli())
+                    ));
+                }
             }
         }
 
