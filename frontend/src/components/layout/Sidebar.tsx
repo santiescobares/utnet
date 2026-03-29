@@ -51,7 +51,7 @@ const topNav: NavItem[] = [
     { kind: 'link', label: 'Inicio', icon: Home, href: '/home' },
     { kind: 'link', label: 'Cursos', icon: BookOpen, href: '/courses' },
     { kind: 'link', label: 'Comunidad', icon: Users, href: '/comunidad' },
-    { kind: 'link', label: 'Biblioteca', icon: Library, href: '/biblioteca' },
+    { kind: 'link', label: 'Biblioteca', icon: Library, href: '/library' },
     {
         kind: 'expandable',
         label: 'Sitios Oficiales',

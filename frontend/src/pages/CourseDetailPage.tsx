@@ -177,7 +177,6 @@ export function CourseDetailPage() {
         }
         setUpcomingEventsLoading(true)
         try {
-            const from = new Date(dateStr)
             const to = new Date(dateStr)
             to.setDate(to.getDate() + 30)
             const toStr = to.toISOString().split('T')[0]
