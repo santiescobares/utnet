@@ -47,6 +47,7 @@ public class StudyRecord extends CUDLoggableEntity {
     private List<String> tags;
 
     private String resourceKey;
+    private long resourceSize;
 
     private int downloads;
 

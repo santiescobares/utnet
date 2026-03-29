@@ -80,6 +80,7 @@ public class StudyRecordService {
         record.setDescription(dto.description());
         record.setType(dto.type());
         record.setTags(dto.tags());
+        record.setResourceSize(file.getSize());
 
         String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), Global.R2.STUDY_RECORDS_PATH.toString());
         record.setResourceKey(resourceKey);

@@ -18,6 +18,7 @@ public record StudyRecordDTO(
         StudyRecord.Type type,
         String typeColor,
         List<String> tags,
+        long resourceSize,
         int downloads,
         boolean hidden
 ) {
