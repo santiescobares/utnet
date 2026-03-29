@@ -63,8 +63,8 @@ public class CourseEvent extends CUDLoggableEntity {
     @Getter
     @AllArgsConstructor
     public enum Tag {
-        MIDTERM_EXAM("B4E600"),
-        REMEDIAL_EXAM("E68D00"),
+        MIDTERM_EXAM("E68D00"),
+        REMEDIAL_EXAM("B4E600"),
         FINAL_EXAM("E60400"),
         PRACTICAL_WORK("00E2E6"),
         QUESTIONNAIRE("BB00E6"),

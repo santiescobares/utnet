@@ -15,6 +15,7 @@ export interface StudyRecordDTO {
     type: StudyRecordType;
     typeColor: string;  // hex 6 chars sin '#', proveniente del enum backend
     tags: string[];
+    resourceSize: number; // tamaño en bytes, proveniente del backend
     downloads: number;
     hidden: boolean;
 }
@@ -41,3 +42,10 @@ export interface StudyRecordUpdateDTO {
     tags?: string[];
     hidden?: boolean;
 }
+
+export const STUDY_RECORD_TYPE_LABELS: Record<StudyRecordType, string> = {
+    SUMMARY: 'Resumen',
+    NOTE: 'Apunte',
+    BIBLIOGRAPHY: 'Bibliografía',
+    EXAM_MODEL: 'Modelo de parcial',
+};

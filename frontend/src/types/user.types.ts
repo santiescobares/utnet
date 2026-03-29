@@ -80,3 +80,13 @@ export interface UserUpdateDTO {
     profile: UserProfileUpdateDTO | null;
     bookmarkedCourseIds: number[] | null;  // espejo de List<Long>; null = no modificar
 }
+
+// Espejo exacto de: ar.net.ut.backend.user.enums.ResourceType (solo los tipos rastreados)
+export type ResourceType = 'STUDY_RECORD' | 'SUBJECT' | 'COURSE' | 'FORUM_THREAD' | 'FORUM_TOPIC';
+
+// Espejo exacto de: ar.net.ut.backend.user.dto.activity.UserActivityDTO
+export interface UserActivityDTO {
+    resourceType: ResourceType;
+    resourceId: string;
+    timestamp: string; // ISO-8601 (Java Instant serializado como string)
+}

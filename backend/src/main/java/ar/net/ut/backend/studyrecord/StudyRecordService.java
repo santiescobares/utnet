@@ -27,20 +27,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
 public class StudyRecordService {
 
     private static final Set<String> ALLOWED_FILE_FORMATS = Set.of("pdf", "doc", "docx", "png", "jpg", "jpeg");
-    private static final long MAX_FILE_SIZE = 52_428_800L; // In bytes
+    private static final long MAX_FILE_SIZE = 31_457_280; // In bytes
 
     private final SubjectService subjectService;
     private final UserService userService;
@@ -49,6 +52,8 @@ public class StudyRecordService {
     private final StudyRecordRepository studyRecordRepository;
 
     private final StudyRecordMapper studyRecordMapper;
+
+    private final StringRedisTemplate redisTemplate;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -73,7 +78,9 @@ public class StudyRecordService {
         record.setTitle(dto.title());
         record.setSlug(generateUniqueSlug(dto.title()));
         record.setDescription(dto.description());
+        record.setType(dto.type());
         record.setTags(dto.tags());
+        record.setResourceSize(file.getSize());
 
         String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), Global.R2.STUDY_RECORDS_PATH.toString());
         record.setResourceKey(resourceKey);
@@ -91,7 +98,9 @@ public class StudyRecordService {
         assertCanManage(record);
 
         studyRecordMapper.updateFromDTO(record, dto);
-        studyRecordRepository.save(record);
+        if (dto.tags() != null) {
+            record.setTags(dto.tags());
+        }
 
         eventPublisher.publishEvent(new StudyRecordUpdateEvent(record));
 
@@ -106,14 +115,6 @@ public class StudyRecordService {
         studyRecordRepository.delete(record);
 
         eventPublisher.publishEvent(new StudyRecordDeleteEvent(record));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<StudyRecordDTO> getStudyRecordsBySubject(Long subjectId, Pageable pageable) {
-        Page<StudyRecord> records = RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR
-                ? studyRecordRepository.findAllBySubjectId(subjectId, pageable)
-                : studyRecordRepository.findAllBySubjectIdAndHiddenFalse(subjectId, pageable);
-        return records.map(studyRecordMapper::toDTO);
     }
 
     @Transactional(readOnly = true)
@@ -132,10 +133,36 @@ public class StudyRecordService {
         return studyRecordMapper.toDTO(studyRecord.get());
     }
 
+    @Transactional(readOnly = true)
+    public Page<StudyRecordDTO> searchStudyRecords(String query, Long subjectId, StudyRecord.Type type, Pageable pageable) {
+        return studyRecordRepository.searchStudyRecords(
+                query,
+                subjectId,
+                type != null ? type.name() : null,
+                RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR,
+                pageable
+        ).map(studyRecordMapper::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public StudyRecordDownloadResponseDTO previewStudyRecord(Long id) {
+        StudyRecord record = getById(id);
+        if (record.getResourceKey() == null) {
+            throw new IllegalStateException("No downloadable resource found for that study record");
+        }
+
+        String previewUrl = storageService.generateDownloadPresignedUrl(
+                s3Config.getPrivateBucket(),
+                record.getResourceKey(),
+                Duration.ofMinutes(3)
+        );
+
+        return new StudyRecordDownloadResponseDTO(previewUrl);
+    }
+
     @Transactional
     public StudyRecordDownloadResponseDTO downloadStudyRecord(Long id) {
         StudyRecord record = getById(id);
-
         if (record.getResourceKey() == null) {
             throw new IllegalStateException("No downloadable resource found for that study record");
         }
@@ -146,9 +173,11 @@ public class StudyRecordService {
                 Duration.ofMinutes(3)
         );
 
-        record.setDownloads(record.getDownloads() + 1);
-
-        studyRecordRepository.save(record);
+        String countCooldownKey = Global.RedisKeys.RESOURCE_DOWNLOAD_COUNT_COOLDOWN + Long.toString(id);
+        if (!redisTemplate.hasKey(countCooldownKey)) {
+            record.setDownloads(record.getDownloads() + 1);
+            redisTemplate.opsForValue().set(countCooldownKey, Instant.now().toString(), 1, TimeUnit.HOURS);
+        }
 
         return new StudyRecordDownloadResponseDTO(downloadUrl);
     }

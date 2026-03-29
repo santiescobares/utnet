@@ -21,9 +21,10 @@ export const studyRecordService = {
         type?: StudyRecordType,
         page = 0,
         size = 10,
+        sort = 'downloads,DESC',
     ): Promise<PageResponse<StudyRecordDTO>> => {
         const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records/search', {
-            params: { q, subjectId, type, page, size, sort: 'downloads,DESC' },
+            params: { q, subjectId, type, page, size, sort },
         });
         return response.data;
     },
@@ -70,6 +71,11 @@ export const studyRecordService = {
 
     getDownloadUrl: async (id: number): Promise<string> => {
         const response = await api.get<StudyRecordDownloadResponseDTO>(`/study-records/${id}/download`);
+        return response.data.downloadUrl;
+    },
+
+    getPreviewUrl: async (id: number): Promise<string> => {
+        const response = await api.get<StudyRecordDownloadResponseDTO>(`/study-records/${id}/preview`);
         return response.data.downloadUrl;
     },
 };

@@ -1,5 +1,6 @@
 package ar.net.ut.backend.studyrecord.dto;
 
+import ar.net.ut.backend.studyrecord.StudyRecord;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
@@ -8,8 +9,10 @@ public record StudyRecordUpdateDTO(
         @Size(min = 5, max = 100, message = "Title is either too short or too long")
         String title,
 
-        @Size(max = 1000, message = "Description is too long")
+        @Size(max = 2000, message = "Description is too long")
         String description,
+
+        StudyRecord.Type type,
 
         List<String> tags,
 

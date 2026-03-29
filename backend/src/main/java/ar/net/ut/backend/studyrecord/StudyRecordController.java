@@ -34,14 +34,6 @@ public class StudyRecordController {
         return ResponseEntity.status(HttpStatus.CREATED).body(studyRecordService.createStudyRecord(dto, file));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<StudyRecordDTO>> getStudyRecordsBySubject(
-            @RequestParam Long subjectId,
-            @PageableDefault(sort = "downloads", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(studyRecordService.getStudyRecordsBySubject(subjectId, pageable));
-    }
-
     @GetMapping("/id/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRATOR')")
     public ResponseEntity<StudyRecordDTO> getStudyRecordById(@PathVariable Long id) {
@@ -51,6 +43,16 @@ public class StudyRecordController {
     @GetMapping("/{slug}")
     public ResponseEntity<StudyRecordDTO> getStudyRecordBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(studyRecordService.getStudyRecordBySlug(slug));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<StudyRecordDTO>> searchStudyRecords(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Long subjectId,
+            @RequestParam(required = false) StudyRecord.Type type,
+            @PageableDefault(sort = "downloads", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(studyRecordService.searchStudyRecords(q, subjectId, type, pageable));
     }
 
     @PutMapping("/{id}")
@@ -65,6 +67,11 @@ public class StudyRecordController {
     public ResponseEntity<Void> deleteStudyRecord(@PathVariable Long id) {
         studyRecordService.deleteStudyRecord(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<StudyRecordDownloadResponseDTO> previewStudyRecord(@PathVariable Long id) {
+        return ResponseEntity.ok(studyRecordService.previewStudyRecord(id));
     }
 
     @GetMapping("/{id}/download")

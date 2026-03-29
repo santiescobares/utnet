@@ -1,5 +1,7 @@
 package ar.net.ut.backend.studyrecord.dto;
 
+import ar.net.ut.backend.studyrecord.StudyRecord;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +15,10 @@ public record StudyRecordDTO(
         String title,
         String slug,
         String description,
+        StudyRecord.Type type,
+        String typeColor,
         List<String> tags,
+        long resourceSize,
         int downloads,
         boolean hidden
 ) {

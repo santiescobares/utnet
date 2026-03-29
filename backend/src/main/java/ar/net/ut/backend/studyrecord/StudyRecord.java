@@ -5,6 +5,7 @@ import ar.net.ut.backend.subject.Subject;
 import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.util.StringUtil;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -36,14 +37,17 @@ public class StudyRecord extends CUDLoggableEntity {
     private String title;
     @Column(unique = true)
     private String slug;
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String description;
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> tags;
 
     private String resourceKey;
+    private long resourceSize;
 
     private int downloads;
 
@@ -86,5 +90,16 @@ public class StudyRecord extends CUDLoggableEntity {
                 ", \"updatedAt\":\"" + getUpdatedAt() + "\"" +
                 ", \"deletedAt\":\"" + getDeletedAt() + "\"" +
                 "}";
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public enum Type {
+        SUMMARY("0058E6"),
+        NOTE("00E2E6"),
+        BIBLIOGRAPHY("E60086"),
+        EXAM_MODEL("E68D00");
+
+        private final String color;
     }
 }

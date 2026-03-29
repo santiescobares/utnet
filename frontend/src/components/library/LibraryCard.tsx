@@ -22,9 +22,10 @@ export interface LibraryCardData {
 interface LibraryCardProps {
     record: LibraryCardData
     className?: string
+    onClick?: () => void
 }
 
-export function LibraryCard({ record, className }: LibraryCardProps) {
+export function LibraryCard({ record, className, onClick }: LibraryCardProps) {
     const config = TYPE_CONFIG[record.type]
     const label  = config?.label ?? record.type
     const color  = config?.color ?? (record.typeColor ? `#${record.typeColor}` : '#0066FF')
@@ -34,12 +35,14 @@ export function LibraryCard({ record, className }: LibraryCardProps) {
 
     return (
         <div
+            onClick={onClick}
             className={cn(
                 'flex flex-col justify-between',
                 'rounded-2xl border border-border bg-card',
-                'p-4 cursor-pointer select-none',
+                'p-4 select-none',
+                onClick && 'cursor-pointer',
                 'transition-[border-color,box-shadow,transform] duration-200',
-                'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1',
+                onClick && 'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1',
                 'active:scale-[0.98]',
                 className,
             )}
