@@ -119,8 +119,6 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
         return () => ro.disconnect()
     }, [limited.length, updateArrows])
 
-    if (!loading && limited.length === 0) return null
-
     const scrollByCard = (dir: 'left' | 'right') => {
         const el = scrollRef.current
         if (!el) return
@@ -144,6 +142,8 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
                         />
                     ))}
                 </div>
+            ) : limited.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4">No hay recursos publicados todavía.</p>
             ) : (
                 <div className="relative">
                     <button
@@ -213,7 +213,7 @@ export function LibraryPage() {
         try {
             const [popularPage, latestPage] = await Promise.all([
                 studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'downloads,DESC'),
-                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'createdAt,DESC'),
+                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'created_at,DESC'),
             ])
             setPopularRecords(popularPage.content)
             setLatestRecords(latestPage.content)
@@ -268,8 +268,6 @@ export function LibraryPage() {
         setActiveFilters((p) => ({ ...p, subjects: p.subjects.filter((s) => s.id !== id) }))
 
     const totalActive = activeFilters.types.length + activeFilters.careers.length + activeFilters.subjects.length
-
-    const sectionsEmpty = !sectionsLoading && popularRecords.length === 0 && latestRecords.length === 0
 
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-6 pt-6 pb-10">
@@ -408,17 +406,14 @@ export function LibraryPage() {
                         </div>
                     </div>
                 )
-            ) : sectionsEmpty ? (
-                /* Empty state */
-                <div className="flex flex-col items-center gap-2 py-16 text-center">
-                    <Search size={32} className="text-muted-foreground/40" />
-                    <p className="text-sm text-muted-foreground">
-                        No hay publicaciones para los filtros aplicados.
-                    </p>
-                </div>
             ) : (
                 /* Carousels */
                 <div className="flex flex-col gap-8">
+                    <LibrarySection
+                        title="Vistos recientemente"
+                        records={[]}
+                        loading={false}
+                    />
                     <LibrarySection
                         title="Más Descargados"
                         records={popularRecords}
