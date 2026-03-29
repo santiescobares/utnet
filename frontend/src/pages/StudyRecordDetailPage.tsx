@@ -15,8 +15,11 @@ import { toast } from 'sonner'
 import { studyRecordService } from '@/services/studyRecord.service'
 import { subjectService } from '@/services/subject.service'
 import { reportService } from '@/services/report.service'
+import { userService } from '@/services/user.service'
 import { useAuthStore } from '@/store/authStore'
+import { useActivityStore } from '@/store/activityStore'
 import type { StudyRecordDTO } from '@/types/studyrecord.types'
+import { STUDY_RECORD_TYPE_LABELS } from '@/types/studyrecord.types'
 import type { SubjectDTO } from '@/types/subject.types'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal'
@@ -48,6 +51,7 @@ export function StudyRecordDetailPage() {
     const { slug } = useParams<{ slug: string }>()
     const navigate = useNavigate()
     const { user } = useAuthStore()
+    const { recentItems, addItem } = useActivityStore()
 
     const [record, setRecord] = useState<StudyRecordDTO | null>(null)
     const [subject, setSubject] = useState<SubjectDTO | null>(null)
@@ -77,6 +81,22 @@ export function StudyRecordDetailPage() {
                 setRecord(rec)
                 const found = subjects.find((s) => s.id === rec.subjectId) ?? null
                 setSubject(found)
+                const last = recentItems[0]
+                const isSameAsLast = last?.type === 'apunte' && last.id === rec.slug
+                if (!isSameAsLast) {
+                    const recordAccessedAt = new Date().toISOString()
+                    userService.addRecentActivity({ resourceType: 'STUDY_RECORD', resourceId: rec.slug, timestamp: recordAccessedAt })
+                        .catch(() => { /* silencioso */ })
+                    const career = found?.careers[0]
+                    addItem({
+                        id: rec.slug,
+                        type: 'apunte',
+                        title: rec.title,
+                        subtitle: career && found ? `${career.name} · ${found.name}` : (found?.name ?? ''),
+                        href: `/library/${rec.slug}`,
+                        accessedAt: recordAccessedAt,
+                    })
+                }
             })
             .catch((err) => {
                 const status = err?.response?.status
@@ -87,7 +107,7 @@ export function StudyRecordDetailPage() {
                 }
             })
             .finally(() => setLoading(false))
-    }, [slug])
+    }, [slug, addItem])
 
     // Non-blocking preview URL fetch
     useEffect(() => {

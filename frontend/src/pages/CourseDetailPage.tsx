@@ -6,6 +6,8 @@ import {
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { courseService } from '@/services/course.service'
+import { userService } from '@/services/user.service'
+import { useActivityStore } from '@/store/activityStore'
 import { courseSubjectService } from '@/services/courseSubject.service'
 import { subjectService } from '@/services/subject.service'
 import { careerService } from '@/services/career.service'
@@ -62,6 +64,8 @@ export function CourseDetailPage() {
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const initialTabRef = useRef(searchParams.get('tab'))
+
+    const { recentItems, addItem } = useActivityStore()
 
     // ── Base data ────────────────────────────────────────────────────────────
     const [course, setCourse] = useState<CourseDTO | null>(null)
@@ -139,6 +143,13 @@ export function CourseDetailPage() {
             .getByName(courseName)
             .then(async (c) => {
                 setCourse(c)
+                const last = recentItems[0]
+                const isSameAsLast = last?.type === 'course' && last.id === String(c.id)
+                const courseAccessedAt = !isSameAsLast ? new Date().toISOString() : null
+                if (courseAccessedAt) {
+                    userService.addRecentActivity({ resourceType: 'COURSE', resourceId: String(c.id), timestamp: courseAccessedAt })
+                        .catch(() => { /* silencioso */ })
+                }
                 const [courseSubjs, allSubjects, allCareers] = await Promise.all([
                     courseSubjectService.getByCourseId(c.id),
                     subjectService.getAll(),
@@ -146,7 +157,18 @@ export function CourseDetailPage() {
                 ])
                 setCourseSubjects(courseSubjs)
                 setSubjectDetails(allSubjects)
-                setCareer(allCareers.find((ca) => ca.id === c.careerId) ?? null)
+                const resolvedCareer = allCareers.find((ca) => ca.id === c.careerId) ?? null
+                setCareer(resolvedCareer)
+                if (courseAccessedAt) {
+                    addItem({
+                        id: String(c.id),
+                        type: 'course',
+                        title: c.name,
+                        subtitle: resolvedCareer ? `${resolvedCareer.name} · ${c.year}° año` : `${c.year}° año`,
+                        href: `/courses/${c.name}`,
+                        accessedAt: courseAccessedAt,
+                    })
+                }
                 if (courseSubjs.length > 0) {
                     const tab = initialTabRef.current
                     const matched = tab
@@ -167,7 +189,7 @@ export function CourseDetailPage() {
                 else setPageError('No se pudo cargar el curso. Intentá de nuevo.')
             })
             .finally(() => setPageLoading(false))
-    }, [courseName])
+    }, [courseName, addItem])
 
     // ── Load upcoming events for a given date (cached) ───────────────────────
     const fetchUpcomingForDate = useCallback(async (courseId: number, dateStr: string) => {
