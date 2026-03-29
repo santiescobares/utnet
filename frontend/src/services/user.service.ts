@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import type {
+    UserActivityDTO,
     UserCreateDTO,
     UserDTO,
     UserProfileDTO,
@@ -38,5 +39,14 @@ export const userService = {
     updateUserProfile: async (data: UserProfileUpdateDTO): Promise<UserProfileDTO> => {
         const response = await api.put<UserProfileDTO>('/users/profile', data);
         return response.data;
+    },
+
+    getRecentActivity: async (): Promise<UserActivityDTO[]> => {
+        const response = await api.get<UserActivityDTO[]>('/users/recent-activity');
+        return response.data;
+    },
+
+    addRecentActivity: async (data: UserActivityDTO): Promise<void> => {
+        await api.post<void>('/users/recent-activity', data);
     },
 };

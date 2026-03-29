@@ -42,3 +42,10 @@ export interface StudyRecordUpdateDTO {
     tags?: string[];
     hidden?: boolean;
 }
+
+export const STUDY_RECORD_TYPE_LABELS: Record<StudyRecordType, string> = {
+    SUMMARY: 'Resumen',
+    NOTE: 'Apunte',
+    BIBLIOGRAPHY: 'Bibliografía',
+    EXAM_MODEL: 'Modelo de parcial',
+};
