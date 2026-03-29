@@ -34,7 +34,7 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
     Page<StudyRecord> searchStudyRecords(
             @Param("query") String query,
             @Param("subjectId") Long subjectId,
-            @Param("type") StudyRecord.Type type,
+            @Param("type") String type,
             @Param("includeHidden") boolean includeHidden,
             Pageable pageable
     );

@@ -73,6 +73,7 @@ public class StudyRecordService {
         record.setTitle(dto.title());
         record.setSlug(generateUniqueSlug(dto.title()));
         record.setDescription(dto.description());
+        record.setType(dto.type());
         record.setTags(dto.tags());
 
         String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), Global.R2.STUDY_RECORDS_PATH.toString());
@@ -129,7 +130,7 @@ public class StudyRecordService {
         return studyRecordRepository.searchStudyRecords(
                 query,
                 subjectId,
-                type,
+                type != null ? type.name() : null,
                 RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR,
                 pageable
         ).map(studyRecordMapper::toDTO);
