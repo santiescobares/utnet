@@ -16,7 +16,7 @@ public record StudyRecordCreateDTO(
         String title,
 
         @NotBlank(message = "Description is required")
-        @Size(max = 1000, message = "Description is too long")
+        @Size(max = 2000, message = "Description is too long")
         String description,
 
         @NotNull(message = "Type is required")

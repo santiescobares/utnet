@@ -37,7 +37,7 @@ public class StudyRecord extends CUDLoggableEntity {
     private String title;
     @Column(unique = true)
     private String slug;
-    @Column(length = 1000)
+    @Column(length = 2000)
     private String description;
     @Enumerated(EnumType.STRING)
     private Type type;
