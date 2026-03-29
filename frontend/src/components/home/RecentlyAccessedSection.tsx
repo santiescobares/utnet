@@ -60,7 +60,7 @@ export function RecentlyAccessedSection({ items }: RecentlyAccessedSectionProps)
                                 <p className="text-sm font-semibold text-foreground line-clamp-2 leading-snug group-hover:text-primary transition-colors duration-150">
                                     {item.title}
                                 </p>
-                                <p className="text-xs text-muted-foreground line-clamp-1">{item.subtitle}</p>
+                                <p className="text-xs text-muted-foreground line-clamp-2">{item.subtitle}</p>
                             </div>
                             <p className="text-[10px] text-muted-foreground mt-auto">{formatRelativeTime(item.accessedAt)}</p>
                         </Link>
