@@ -69,6 +69,11 @@ public class StudyRecordController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/preview")
+    public ResponseEntity<StudyRecordDownloadResponseDTO> previewStudyRecord(@PathVariable Long id) {
+        return ResponseEntity.ok(studyRecordService.previewStudyRecord(id));
+    }
+
     @GetMapping("/{id}/download")
     public ResponseEntity<StudyRecordDownloadResponseDTO> downloadStudyRecord(@PathVariable Long id) {
         return ResponseEntity.ok(studyRecordService.downloadStudyRecord(id));

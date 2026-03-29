@@ -27,13 +27,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +52,8 @@ public class StudyRecordService {
     private final StudyRecordRepository studyRecordRepository;
 
     private final StudyRecordMapper studyRecordMapper;
+
+    private final StringRedisTemplate redisTemplate;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -136,10 +141,25 @@ public class StudyRecordService {
         ).map(studyRecordMapper::toDTO);
     }
 
+    @Transactional(readOnly = true)
+    public StudyRecordDownloadResponseDTO previewStudyRecord(Long id) {
+        StudyRecord record = getById(id);
+        if (record.getResourceKey() == null) {
+            throw new IllegalStateException("No downloadable resource found for that study record");
+        }
+
+        String previewUrl = storageService.generateDownloadPresignedUrl(
+                s3Config.getPrivateBucket(),
+                record.getResourceKey(),
+                Duration.ofMinutes(3)
+        );
+
+        return new StudyRecordDownloadResponseDTO(previewUrl);
+    }
+
     @Transactional
     public StudyRecordDownloadResponseDTO downloadStudyRecord(Long id) {
         StudyRecord record = getById(id);
-
         if (record.getResourceKey() == null) {
             throw new IllegalStateException("No downloadable resource found for that study record");
         }
@@ -150,9 +170,11 @@ public class StudyRecordService {
                 Duration.ofMinutes(3)
         );
 
-        record.setDownloads(record.getDownloads() + 1);
-
-        studyRecordRepository.save(record);
+        String countCooldownKey = Global.RedisKeys.RESOURCE_DOWNLOAD_COUNT_COOLDOWN + Long.toString(id);
+        if (!redisTemplate.hasKey(countCooldownKey)) {
+            record.setDownloads(record.getDownloads() + 1);
+            redisTemplate.opsForValue().set(countCooldownKey, Instant.now().toString(), 1, TimeUnit.HOURS);
+        }
 
         return new StudyRecordDownloadResponseDTO(downloadUrl);
     }

@@ -31,7 +31,8 @@ public final class Global {
     public enum RedisKeys {
         TOKEN_BLACKLIST("token_blacklist:"),
         FORCED_LOGOUT("forced_logout:"),
-        COURSE_EVENT_COOLDOWN("course_event_cooldown:");
+        COURSE_EVENT_COOLDOWN("course_event_cooldown:"),
+        RESOURCE_DOWNLOAD_COUNT_COOLDOWN("download_count_cooldown:");
 
         final String value;
 
