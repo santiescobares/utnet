@@ -1,6 +1,7 @@
 package ar.net.ut.backend.studyrecord.dto;
 
 import ar.net.ut.backend.studyrecord.StudyRecord;
+import ar.net.ut.backend.user.dto.UserSnapshotDTO;
 
 import java.time.Instant;
 import java.util.List;
@@ -10,7 +11,7 @@ public record StudyRecordDTO(
         Long id,
         Instant createdAt,
         Instant updatedAt,
-        UUID createdById,
+        UserSnapshotDTO createdBy,
         Long subjectId,
         String title,
         String slug,
