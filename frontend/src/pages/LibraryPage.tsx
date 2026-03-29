@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils'
 import { LibraryCard } from '@/components/library/LibraryCard'
 import { LibraryFilterModal, type LibraryFilters } from '@/components/library/LibraryFilterModal'
 import { studyRecordService } from '@/services/studyRecord.service'
-import { mockLibraryRecords } from '@/data/mockData'
 import type { StudyRecordDTO, StudyRecordType } from '@/types/studyrecord.types'
 
 const TYPE_LABELS: Record<StudyRecordType, string> = {
@@ -17,7 +16,7 @@ const TYPE_LABELS: Record<StudyRecordType, string> = {
 
 const EMPTY_FILTERS: LibraryFilters = { types: [], careers: [], subjects: [] }
 
-// ── Active filter badge — identical to TagBadge in ReviewsSection ─────────────
+// ── Active filter badge ───────────────────────────────────────────────────────
 
 interface ActiveFilterBadgeProps {
     label: string
@@ -77,7 +76,7 @@ function ActiveFilterBadge({ label, onRemove }: ActiveFilterBadgeProps) {
     )
 }
 
-// ── Library section — carousel matching CareersCarousel style ─────────────────
+// ── Library section — carousel ─────────────────────────────────────────────
 
 const MAX_RECORDS = 10
 
@@ -92,12 +91,14 @@ const arrowBase = cn(
 
 interface LibrarySectionProps {
     title: string
-    records: typeof mockLibraryRecords
+    records: StudyRecordDTO[]
+    loading?: boolean
 }
 
-function LibrarySection({ title, records }: LibrarySectionProps) {
+function LibrarySection({ title, records, loading }: LibrarySectionProps) {
+    const navigate = useNavigate()
     const scrollRef = useRef<HTMLDivElement>(null)
-    const [canScrollLeft, setCanScrollLeft] = useState(false)
+    const [canScrollLeft, setCanScrollLeft]   = useState(false)
     const [canScrollRight, setCanScrollRight] = useState(false)
 
     const limited = records.slice(0, MAX_RECORDS)
@@ -118,7 +119,7 @@ function LibrarySection({ title, records }: LibrarySectionProps) {
         return () => ro.disconnect()
     }, [limited.length, updateArrows])
 
-    if (limited.length === 0) return null
+    if (!loading && limited.length === 0) return null
 
     const scrollByCard = (dir: 'left' | 'right') => {
         const el = scrollRef.current
@@ -133,40 +134,53 @@ function LibrarySection({ title, records }: LibrarySectionProps) {
         <section className="flex flex-col gap-3">
             <h2 className="text-base font-semibold text-foreground">{title}</h2>
 
-            <div className="relative">
-                <button
-                    onClick={() => scrollByCard('left')}
-                    aria-label="Anterior"
-                    className={cn(arrowBase, '-left-4', !canScrollLeft && 'opacity-0 pointer-events-none')}
-                >
-                    <ChevronLeft size={18} />
-                </button>
-
-                <button
-                    onClick={() => scrollByCard('right')}
-                    aria-label="Siguiente"
-                    className={cn(arrowBase, '-right-4', !canScrollRight && 'opacity-0 pointer-events-none')}
-                >
-                    <ChevronRight size={18} />
-                </button>
-
-                <div
-                    ref={scrollRef}
-                    onScroll={updateArrows}
-                    className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 -my-2"
-                >
-                    {limited.map((record) => (
-                        <LibraryCard
-                            key={record.id}
-                            record={record}
-                            className={cn(
-                                'snap-start shrink-0',
-                                'w-[175px] sm:w-[calc((100%-3rem)/5)]',
-                            )}
+            {loading ? (
+                <div className="flex gap-3 overflow-hidden py-2 -my-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className="shrink-0 w-[175px] sm:w-[calc((100%-3rem)/5)] rounded-2xl bg-secondary animate-pulse"
+                            style={{ height: 220 }}
                         />
                     ))}
                 </div>
-            </div>
+            ) : (
+                <div className="relative">
+                    <button
+                        onClick={() => scrollByCard('left')}
+                        aria-label="Anterior"
+                        className={cn(arrowBase, '-left-4', !canScrollLeft && 'opacity-0 pointer-events-none')}
+                    >
+                        <ChevronLeft size={18} />
+                    </button>
+
+                    <button
+                        onClick={() => scrollByCard('right')}
+                        aria-label="Siguiente"
+                        className={cn(arrowBase, '-right-4', !canScrollRight && 'opacity-0 pointer-events-none')}
+                    >
+                        <ChevronRight size={18} />
+                    </button>
+
+                    <div
+                        ref={scrollRef}
+                        onScroll={updateArrows}
+                        className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory py-2 -my-2"
+                    >
+                        {limited.map((record) => (
+                            <LibraryCard
+                                key={record.id}
+                                record={record}
+                                className={cn(
+                                    'snap-start shrink-0',
+                                    'w-[175px] sm:w-[calc((100%-3rem)/5)]',
+                                )}
+                                onClick={() => navigate(`/library/${record.slug}`)}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
         </section>
     )
 }
@@ -174,16 +188,46 @@ function LibrarySection({ title, records }: LibrarySectionProps) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function LibraryPage() {
-    const [searchQuery, setSearchQuery]     = useState('')
-    const [activeFilters, setActiveFilters] = useState<LibraryFilters>(EMPTY_FILTERS)
+    const [searchQuery, setSearchQuery]       = useState('')
+    const [activeFilters, setActiveFilters]   = useState<LibraryFilters>(EMPTY_FILTERS)
     const [showFilterModal, setShowFilterModal] = useState(false)
 
-    // Search state — null means "not searched yet", show sections instead
-    const [searchResults, setSearchResults]   = useState<StudyRecordDTO[] | null>(null)
+    // Search state
+    const [searchResults, setSearchResults]     = useState<StudyRecordDTO[] | null>(null)
     const [lastSearchQuery, setLastSearchQuery] = useState('')
-    const [isSearching, setIsSearching]       = useState(false)
+    const [isSearching, setIsSearching]         = useState(false)
+
+    // Section state
+    const [popularRecords, setPopularRecords] = useState<StudyRecordDTO[]>([])
+    const [latestRecords, setLatestRecords]   = useState<StudyRecordDTO[]>([])
+    const [sectionsLoading, setSectionsLoading] = useState(true)
 
     const navigate = useNavigate()
+
+    // Derive single API-compatible filter values from activeFilters
+    const filterType      = activeFilters.types.length === 1 ? activeFilters.types[0] : undefined
+    const filterSubjectId = activeFilters.subjects.length > 0 ? activeFilters.subjects[0].id : undefined
+
+    const loadSections = useCallback(async () => {
+        setSectionsLoading(true)
+        try {
+            const [popularPage, latestPage] = await Promise.all([
+                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'downloads,DESC'),
+                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'createdAt,DESC'),
+            ])
+            setPopularRecords(popularPage.content)
+            setLatestRecords(latestPage.content)
+        } catch {
+            setPopularRecords([])
+            setLatestRecords([])
+        } finally {
+            setSectionsLoading(false)
+        }
+    }, [filterType, filterSubjectId])
+
+    useEffect(() => {
+        if (searchResults === null) loadSections()
+    }, [loadSections, searchResults])
 
     const handleSearch = async (q: string) => {
         const trimmed = q.trim()
@@ -210,20 +254,10 @@ export function LibraryPage() {
         setLastSearchQuery('')
     }
 
-    // Mock sections — only used when not in search mode; filtered by activeFilters only
-    const filteredRecords = mockLibraryRecords.filter((r) => {
-        if (activeFilters.types.length > 0 && !activeFilters.types.includes(r.type)) return false
-        return true
-    })
-
-    const recent  = filteredRecords.filter((r) => r.section === 'recent')
-    const popular = filteredRecords.filter((r) => r.section === 'popular')
-    const latest  = filteredRecords.filter((r) => r.section === 'latest')
-
     const activeFilterLabels: { key: string; label: string }[] = [
-        ...activeFilters.types.map((t)   => ({ key: `type:${t}`,      label: TYPE_LABELS[t] })),
-        ...activeFilters.careers.map((c) => ({ key: `career:${c.id}`, label: c.name })),
-        ...activeFilters.subjects.map((s)=> ({ key: `subject:${s.id}`,label: s.name })),
+        ...activeFilters.types.map((t)   => ({ key: `type:${t}`,       label: TYPE_LABELS[t] })),
+        ...activeFilters.careers.map((c) => ({ key: `career:${c.id}`,  label: c.name })),
+        ...activeFilters.subjects.map((s)=> ({ key: `subject:${s.id}`, label: s.name })),
     ]
 
     const removeTypeFilter    = (type: StudyRecordType) =>
@@ -234,6 +268,8 @@ export function LibraryPage() {
         setActiveFilters((p) => ({ ...p, subjects: p.subjects.filter((s) => s.id !== id) }))
 
     const totalActive = activeFilters.types.length + activeFilters.careers.length + activeFilters.subjects.length
+
+    const sectionsEmpty = !sectionsLoading && popularRecords.length === 0 && latestRecords.length === 0
 
     return (
         <div className="flex flex-col gap-6 px-4 sm:px-6 pt-6 pb-10">
@@ -334,7 +370,7 @@ export function LibraryPage() {
                                     key={key}
                                     label={label}
                                     onRemove={() => {
-                                        if (key.startsWith('type:'))    removeTypeFilter(key.slice(5) as StudyRecordType)
+                                        if (key.startsWith('type:'))         removeTypeFilter(key.slice(5) as StudyRecordType)
                                         else if (key.startsWith('career:'))  removeCareerFilter(Number(key.slice(7)))
                                         else if (key.startsWith('subject:')) removeSubjectFilter(Number(key.slice(8)))
                                     }}
@@ -345,8 +381,9 @@ export function LibraryPage() {
                 )}
             </div>
 
-            {/* Search results */}
+            {/* Content */}
             {searchResults !== null ? (
+                /* Search results */
                 searchResults.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-center">
                         <Search size={32} className="text-muted-foreground/40" />
@@ -371,22 +408,28 @@ export function LibraryPage() {
                         </div>
                     </div>
                 )
+            ) : sectionsEmpty ? (
+                /* Empty state */
+                <div className="flex flex-col items-center gap-2 py-16 text-center">
+                    <Search size={32} className="text-muted-foreground/40" />
+                    <p className="text-sm text-muted-foreground">
+                        No hay publicaciones para los filtros aplicados.
+                    </p>
+                </div>
             ) : (
-                /* Mock sections */
-                recent.length === 0 && popular.length === 0 && latest.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-16 text-center">
-                        <Search size={32} className="text-muted-foreground/40" />
-                        <p className="text-sm text-muted-foreground">
-                            No se encontraron resultados para los filtros aplicados.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="flex flex-col gap-8">
-                        <LibrarySection title="Vistos recientemente" records={recent} />
-                        <LibrarySection title="Más Descargados"      records={popular} />
-                        <LibrarySection title="Últimas Publicaciones" records={latest} />
-                    </div>
-                )
+                /* Carousels */
+                <div className="flex flex-col gap-8">
+                    <LibrarySection
+                        title="Más Descargados"
+                        records={popularRecords}
+                        loading={sectionsLoading}
+                    />
+                    <LibrarySection
+                        title="Últimas Publicaciones"
+                        records={latestRecords}
+                        loading={sectionsLoading}
+                    />
+                </div>
             )}
 
             <LibraryFilterModal

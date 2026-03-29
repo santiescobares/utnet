@@ -21,9 +21,10 @@ export const studyRecordService = {
         type?: StudyRecordType,
         page = 0,
         size = 10,
+        sort = 'downloads,DESC',
     ): Promise<PageResponse<StudyRecordDTO>> => {
         const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records/search', {
-            params: { q, subjectId, type, page, size, sort: 'downloads,DESC' },
+            params: { q, subjectId, type, page, size, sort },
         });
         return response.data;
     },
