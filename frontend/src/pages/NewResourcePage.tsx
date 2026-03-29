@@ -243,7 +243,7 @@ export function NewResourcePage() {
         type:        !type        ? 'Seleccioná un tipo de recurso.' : '',
         description:
             description.trim().length < 10   ? 'La descripción debe tener al menos 10 caracteres.' :
-            description.trim().length > 1000 ? 'La descripción no puede superar los 1000 caracteres.' : '',
+            description.trim().length > 2000 ? 'La descripción no puede superar los 2000 caracteres.' : '',
         subject:  subjectId === '' ? 'Seleccioná una materia.' : '',
         file:     !file           ? 'Seleccioná un archivo.'  : fileError,
         agreed:   !agreed         ? 'required' : '',
@@ -369,7 +369,7 @@ export function NewResourcePage() {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             onBlur={() => touchField('description')}
-                            maxLength={1000}
+                            maxLength={2000}
                             rows={5}
                             placeholder="Describí brevemente el contenido del material…"
                             className={cn(
@@ -382,7 +382,7 @@ export function NewResourcePage() {
                                 ? <p className="text-xs text-destructive">{errors.description}</p>
                                 : <span />
                             }
-                            <span className="text-[11px] text-muted-foreground shrink-0">{description.length} / 1000</span>
+                            <span className="text-[11px] text-muted-foreground shrink-0">{description.length} / 2000</span>
                         </div>
                     </div>
 
