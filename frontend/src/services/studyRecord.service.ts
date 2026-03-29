@@ -72,4 +72,9 @@ export const studyRecordService = {
         const response = await api.get<StudyRecordDownloadResponseDTO>(`/study-records/${id}/download`);
         return response.data.downloadUrl;
     },
+
+    getPreviewUrl: async (id: number): Promise<string> => {
+        const response = await api.get<StudyRecordDownloadResponseDTO>(`/study-records/${id}/preview`);
+        return response.data.downloadUrl;
+    },
 };
