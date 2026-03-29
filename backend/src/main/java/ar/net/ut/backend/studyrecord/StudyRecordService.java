@@ -98,7 +98,9 @@ public class StudyRecordService {
         assertCanManage(record);
 
         studyRecordMapper.updateFromDTO(record, dto);
-        studyRecordRepository.save(record);
+        if (dto.tags() != null) {
+            record.setTags(dto.tags());
+        }
 
         eventPublisher.publishEvent(new StudyRecordUpdateEvent(record));
 

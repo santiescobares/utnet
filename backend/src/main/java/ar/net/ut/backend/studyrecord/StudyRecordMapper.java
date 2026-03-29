@@ -15,5 +15,6 @@ public interface StudyRecordMapper {
     @Mapping(source = "type.color", target = "typeColor")
     StudyRecordDTO toDTO(StudyRecord studyRecord);
 
+    @Mapping(target = "tags", ignore = true)
     void updateFromDTO(@MappingTarget StudyRecord studyRecord, StudyRecordUpdateDTO dto);
 }
