@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ChevronLeft, ChevronRight, Filter, Loader2, Search, Trash2, Upload, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { LibraryCard } from '@/components/library/LibraryCard'
 import { LibraryFilterModal, type LibraryFilters } from '@/components/library/LibraryFilterModal'
 import { studyRecordService } from '@/services/studyRecord.service'
+import { useActivityStore } from '@/store/activityStore'
 import type { StudyRecordDTO, StudyRecordType } from '@/types/studyrecord.types'
 
 const TYPE_LABELS: Record<StudyRecordType, string> = {
@@ -201,6 +202,32 @@ export function LibraryPage() {
     const [popularRecords, setPopularRecords] = useState<StudyRecordDTO[]>([])
     const [latestRecords, setLatestRecords]   = useState<StudyRecordDTO[]>([])
     const [sectionsLoading, setSectionsLoading] = useState(true)
+
+    // Recent study records — driven by activity store
+    const recentItems = useActivityStore(s => s.recentItems)
+    const recentSlugsKey = useMemo(
+        () => recentItems.filter(i => i.type === 'apunte').map(i => i.id).join(','),
+        [recentItems],
+    )
+    const [recentStudyRecords, setRecentStudyRecords] = useState<StudyRecordDTO[]>([])
+    const [recentLoading, setRecentLoading] = useState(false)
+
+    useEffect(() => {
+        if (!recentSlugsKey) {
+            setRecentStudyRecords([])
+            return
+        }
+        const slugs = recentSlugsKey.split(',')
+        setRecentLoading(true)
+        Promise.allSettled(slugs.map((slug) => studyRecordService.getBySlug(slug)))
+            .then((results) => {
+                const records = results
+                    .filter((r): r is PromiseFulfilledResult<StudyRecordDTO> => r.status === 'fulfilled')
+                    .map((r) => r.value)
+                setRecentStudyRecords(records)
+            })
+            .finally(() => setRecentLoading(false))
+    }, [recentSlugsKey])
 
     const navigate = useNavigate()
 
@@ -409,11 +436,13 @@ export function LibraryPage() {
             ) : (
                 /* Carousels */
                 <div className="flex flex-col gap-8">
-                    <LibrarySection
-                        title="Vistos recientemente"
-                        records={[]}
-                        loading={false}
-                    />
+                    {(recentLoading || recentStudyRecords.length > 0) && (
+                        <LibrarySection
+                            title="Vistos recientemente"
+                            records={recentStudyRecords}
+                            loading={recentLoading}
+                        />
+                    )}
                     <LibrarySection
                         title="Más Descargados"
                         records={popularRecords}
