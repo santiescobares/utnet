@@ -32,7 +32,8 @@ public final class Global {
         TOKEN_BLACKLIST("token_blacklist:"),
         FORCED_LOGOUT("forced_logout:"),
         COURSE_EVENT_COOLDOWN("course_event_cooldown:"),
-        RESOURCE_DOWNLOAD_COUNT_COOLDOWN("download_count_cooldown:");
+        RESOURCE_DOWNLOAD_COUNT_COOLDOWN("download_count_cooldown:"),
+        USER_RECENT_ACTIVITY("user:%s:recent_activity:%s");
 
         final String value;
 
