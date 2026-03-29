@@ -19,7 +19,6 @@ import { userService } from '@/services/user.service'
 import { useAuthStore } from '@/store/authStore'
 import { useActivityStore } from '@/store/activityStore'
 import type { StudyRecordDTO } from '@/types/studyrecord.types'
-import { STUDY_RECORD_TYPE_LABELS } from '@/types/studyrecord.types'
 import type { SubjectDTO } from '@/types/subject.types'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal'
@@ -117,7 +116,7 @@ export function StudyRecordDetailPage() {
         })
     }, [record?.id])
 
-    const isOwner = !!(user && record && user.id === record.createdById)
+    const isOwner = !!(user && record && user.id === record.createdBy.id)
     const isAdmin = user?.role === 'ADMINISTRATOR'
     const canEdit = isOwner || isAdmin
 
@@ -261,7 +260,7 @@ export function StudyRecordDetailPage() {
 
                 {/* Author row */}
                 <button
-                    onClick={() => navigate(`/users/${record.createdById}`)}
+                    onClick={() => navigate(`/users/${record.createdBy.id}`)}
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
                 >
                     {isOwner ? (
