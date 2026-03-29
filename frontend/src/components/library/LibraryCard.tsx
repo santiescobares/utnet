@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import { UserAvatar } from '@/components/ui/UserAvatar'
-import type { StudyRecordType } from '@/types/studyrecord.types'
+import type { StudyRecordType, UserSnapshotDTO } from '@/types/studyrecord.types'
 
 // Colors mirror the backend StudyRecord.Type enum
 export const TYPE_CONFIG: Record<StudyRecordType, { label: string; color: string }> = {
@@ -16,7 +16,7 @@ export interface LibraryCardData {
     description: string
     type: StudyRecordType
     typeColor?: string  // hex 6 chars sin '#', proveniente del backend (StudyRecordDTO)
-    author?: { firstName: string; lastName: string; pictureURL: string | null }
+    createdBy?: UserSnapshotDTO
 }
 
 interface LibraryCardProps {
@@ -68,17 +68,17 @@ export function LibraryCard({ record, className, onClick }: LibraryCardProps) {
                 </p>
             </div>
 
-            {record.author && (
-                <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border">
+            {record.createdBy && (
+                <div className="flex items-center gap-2 mt-4">
                     <UserAvatar
-                        firstName={record.author.firstName}
-                        lastName={record.author.lastName}
-                        pictureURL={record.author.pictureURL}
+                        firstName={record.createdBy.firstName}
+                        lastName={record.createdBy.lastName}
+                        pictureURL={record.createdBy.profilePictureURL}
                         size="sm"
                         className="w-6 h-6 text-[10px]"
                     />
                     <span className="text-xs text-muted-foreground truncate">
-                        {record.author.firstName} {record.author.lastName}
+                        Publicado por {record.createdBy.firstName} {record.createdBy.lastName}
                     </span>
                 </div>
             )}

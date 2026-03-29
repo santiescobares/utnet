@@ -2,12 +2,20 @@
 // Colores hex (sin '#') definidos en el enum del backend
 export type StudyRecordType = 'SUMMARY' | 'NOTE' | 'BIBLIOGRAPHY' | 'EXAM_MODEL';
 
+// Espejo exacto de: ar.net.ut.backend.user.dto.UserSnapshotDTO
+export interface UserSnapshotDTO {
+    id: string; // UUID
+    firstName: string;
+    lastName: string;
+    profilePictureURL: string | null;
+}
+
 // Espejo exacto de: ar.net.ut.backend.studyrecord.dto.StudyRecordDTO
 export interface StudyRecordDTO {
     id: number;
     createdAt: string;
     updatedAt: string;
-    createdById: string; // UUID
+    createdBy: UserSnapshotDTO;
     subjectId: number;
     title: string;
     slug: string;
