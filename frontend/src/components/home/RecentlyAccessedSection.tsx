@@ -36,7 +36,9 @@ export function RecentlyAccessedSection({ items }: RecentlyAccessedSectionProps)
     return (
         <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             <SectionHeader title="Accedido recientemente" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+            {/* Mobile: horizontal carousel showing 1.5 cards. Desktop: grid */}
+            <div className="-mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 sm:gap-3">
+                <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide sm:contents">
                 {items.map((item) => {
                     const Icon = iconByType[item.type]
                     return (
@@ -46,6 +48,8 @@ export function RecentlyAccessedSection({ items }: RecentlyAccessedSectionProps)
                             className={cn(
                                 'group flex flex-col gap-3 rounded-xl border border-border bg-card p-4',
                                 'hover:border-primary/30 hover:shadow-md transition-all duration-200 cursor-pointer',
+                                // Mobile: fixed width so 1.5 cards are visible; Desktop: let grid control sizing
+                                'snap-start shrink-0 w-[67vw] sm:w-auto',
                             )}
                         >
                             <div className="flex items-start justify-between gap-2">
@@ -66,6 +70,7 @@ export function RecentlyAccessedSection({ items }: RecentlyAccessedSectionProps)
                         </Link>
                     )
                 })}
+                </div>
             </div>
         </section>
     )
