@@ -91,13 +91,14 @@ export function UploadRecordModal({ open, onClose, onSuccess }: UploadRecordModa
 
     const isValid = title.trim().length >= 5 && description.trim().length >= 1 && subjectId !== '' && file !== null
 
+
     const handleSubmit = async () => {
         if (!isValid || isSubmitting) return
         setIsSubmitting(true)
         try {
             await studyRecordService.create(
                 {
-                    subjectId: subjectId as number,
+                    subjectIds: [subjectId as number],
                     title: title.trim(),
                     description: description.trim(),
                     type: recordType,

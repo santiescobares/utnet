@@ -2,6 +2,15 @@
 // Colores hex (sin '#') definidos en el enum del backend
 export type StudyRecordType = 'SUMMARY' | 'NOTE' | 'BIBLIOGRAPHY' | 'EXAM_MODEL';
 
+// Snapshot de materia embebido en StudyRecordDTO (sin correlatives para evitar ciclos)
+export interface SubjectSnapshotDTO {
+    id: number;
+    name: string;
+    shortName: string;
+    color: string | null; // hex 6 chars sin '#', null si no definido
+    careers: { id: number; name: string; color: string | null }[];
+}
+
 // Espejo exacto de: ar.net.ut.backend.user.dto.UserSnapshotDTO
 export interface UserSnapshotDTO {
     id: string; // UUID
@@ -10,29 +19,13 @@ export interface UserSnapshotDTO {
     profilePictureURL: string | null;
 }
 
-// Espejo exacto de: ar.net.ut.backend.career.dto.CareerSoftDTO
-export interface CareerSoftDTO {
-    id: number;
-    name: string;
-    color: string; // hex 6 chars sin '#'
-}
-
-// Espejo exacto de: ar.net.ut.backend.subject.dto.SubjectSoftDTO
-export interface SubjectSoftDTO {
-    id: number;
-    name: string;
-    shortName: string;
-    color: string | null; // hex 6 chars sin '#', null si no definido
-    careers: CareerSoftDTO[];
-}
-
 // Espejo exacto de: ar.net.ut.backend.studyrecord.dto.StudyRecordDTO
 export interface StudyRecordDTO {
     id: number;
     createdAt: string;
     updatedAt: string;
     createdBy: UserSnapshotDTO;
-    subjects: SubjectSoftDTO[];
+    subjects: SubjectSnapshotDTO[];
     title: string;
     slug: string;
     description: string;
@@ -63,7 +56,6 @@ export interface StudyRecordUpdateDTO {
     title?: string;
     description?: string;
     type?: StudyRecordType;
-    subjectIds?: number[];
     tags?: string[];
     hidden?: boolean;
 }

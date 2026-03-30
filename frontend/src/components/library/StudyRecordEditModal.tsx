@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { studyRecordService } from '@/services/studyRecord.service'
 import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal'
-import type { StudyRecordDTO, StudyRecordType, SubjectSoftDTO } from '@/types/studyrecord.types'
+import type { StudyRecordDTO, StudyRecordType } from '@/types/studyrecord.types'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -175,7 +175,6 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
 
 interface StudyRecordEditModalProps {
     record: StudyRecordDTO
-    currentSubject: SubjectSoftDTO | null
     onClose: () => void
     onSaved: (updated: StudyRecordDTO) => void
     onDeleted: () => void

@@ -25,13 +25,12 @@ async function enrichActivity(
     }
     if (dto.resourceType === 'STUDY_RECORD') {
         const record = await studyRecordService.getBySlug(dto.resourceId)
-        const subject = record.subjects[0]
-        const career = subject?.careers[0]
+        const firstSubject = record.subjects[0]
         return {
             id: record.slug,
             type: 'apunte',
             title: record.title,
-            subtitle: career && subject ? `${career.name} · ${subject.name}` : (subject?.name ?? ''),
+            subtitle: firstSubject ? firstSubject.name : '',
             href: `/library/${record.slug}`,
             accessedAt: dto.timestamp,
         }

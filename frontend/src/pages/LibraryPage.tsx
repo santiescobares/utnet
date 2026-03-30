@@ -125,7 +125,7 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
         const el = scrollRef.current
         if (!el) return
         const gap = 12
-        const cardWidth = (el.clientWidth - 4 * gap) / 5
+        const cardWidth = (el.clientWidth - 3 * gap) / 4
         const amount = cardWidth + gap
         el.scrollBy({ left: dir === 'right' ? amount : -amount, behavior: 'smooth' })
     }
@@ -139,7 +139,7 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
                     {Array.from({ length: 5 }).map((_, i) => (
                         <div
                             key={i}
-                            className="shrink-0 w-60 sm:w-[calc((100%-3rem)/5)] rounded-2xl bg-secondary animate-pulse"
+                            className="shrink-0 w-[calc((100vw-2.375rem)/1.5)] sm:w-[calc((100%-2.25rem)/4)] rounded-2xl bg-secondary animate-pulse"
                             style={{ height: 220 }}
                         />
                     ))}
@@ -175,7 +175,7 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
                                 record={record}
                                 className={cn(
                                     'snap-start shrink-0',
-                                    'w-60 sm:w-[calc((100%-3rem)/5)]',
+                                    'w-[calc((100vw-2.375rem)/1.5)] sm:w-[calc((100%-2.25rem)/4)]',
                                 )}
                                 onClick={() => navigate(`/library/${record.slug}`)}
                             />
@@ -235,8 +235,10 @@ export function LibraryPage() {
     const navigate = useNavigate()
 
     // Derive single API-compatible filter values from activeFilters
-    const filterType       = activeFilters.types.length === 1 ? activeFilters.types[0] : undefined
-    const filterSubjectIds = activeFilters.subjects.length > 0 ? activeFilters.subjects.map((s) => s.id) : undefined
+    const filterType      = activeFilters.types.length === 1 ? activeFilters.types[0] : undefined
+    const filterSubjectIds = activeFilters.subjects.length > 0
+        ? activeFilters.subjects.map((s) => s.id)
+        : undefined
 
     const loadSections = useCallback(async () => {
         setSectionsLoading(true)
@@ -300,7 +302,7 @@ export function LibraryPage() {
     const totalActive = activeFilters.types.length + activeFilters.careers.length + activeFilters.subjects.length
 
     return (
-        <div className="flex flex-col gap-6 px-4 sm:px-6 pt-6 pb-10">
+        <div className="flex flex-col gap-6 px-4 sm:px-[8%] pt-6 pb-10">
 
             {/* Header */}
             <div>
@@ -424,7 +426,7 @@ export function LibraryPage() {
                         <p className="text-sm text-muted-foreground">
                             {searchResults.length} resultado{searchResults.length !== 1 ? 's' : ''} para "<span className="font-medium text-foreground">{lastSearchQuery}</span>"
                         </p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 py-2 -my-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 py-2 -my-2">
                             {searchResults.map((record) => (
                                 <LibraryCard
                                     key={record.id}
