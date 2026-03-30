@@ -32,8 +32,8 @@ public class CourseReview extends CommentEntity<Course> {
             joinColumns = @JoinColumn(name = "review_id"),
             inverseJoinColumns = @JoinColumn(name = "subject_id")
     )
-    @BatchSize(size = 30)
-    private Set<Subject> subjectTags = new HashSet<>();
+    @BatchSize(size = 3)
+    private Set<Subject> subjectTags;
 
     public boolean addSubjectTag(Subject subject) {
         if (subjectTags == null) {

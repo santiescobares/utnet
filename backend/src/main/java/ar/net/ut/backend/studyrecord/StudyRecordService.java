@@ -15,9 +15,6 @@ import ar.net.ut.backend.studyrecord.dto.StudyRecordUpdateDTO;
 import ar.net.ut.backend.studyrecord.event.StudyRecordCreateEvent;
 import ar.net.ut.backend.studyrecord.event.StudyRecordDeleteEvent;
 import ar.net.ut.backend.studyrecord.event.StudyRecordUpdateEvent;
-import ar.net.ut.backend.subject.Subject;
-import ar.net.ut.backend.subject.SubjectService;
-import ar.net.ut.backend.user.User;
 import ar.net.ut.backend.user.enums.Role;
 import ar.net.ut.backend.user.service.UserService;
 import ar.net.ut.backend.util.FileUtil;
@@ -47,7 +44,6 @@ public class StudyRecordService {
     private static final Set<String> ALLOWED_FILE_FORMATS = Set.of("pdf", "doc", "docx", "png", "jpg", "jpeg");
     private static final long MAX_FILE_SIZE = 31_457_280; // In bytes
 
-    private final SubjectService subjectService;
     private final UserService userService;
     private final StorageService storageService;
 
@@ -65,27 +61,20 @@ public class StudyRecordService {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File can't be null or empty");
         }
-
-        User currentUser = userService.getCurrentUser();
-        assertCanCreate(currentUser);
+        if (RequestContextHolder.getCurrentSession().role().ordinal() < Role.CONTRIBUTOR_1.ordinal()) {
+            throw new InvalidOperationException("You must be a Level 1 Contributor in order to upload study records");
+        }
 
         FileUtil.validateExtension(file, ALLOWED_FILE_FORMATS);
         FileUtil.validateSize(file, MAX_FILE_SIZE);
 
-        Subject subject = subjectService.getById(dto.subjectId());
-
-        StudyRecord record = new StudyRecord();
-        record.setCreatedBy(currentUser);
-        record.setSubject(subject);
-        record.setTitle(dto.title());
+        StudyRecord record = studyRecordMapper.createEntity(dto);
+        record.setCreatedBy(userService.getCurrentUser());
         record.setSlug(generateUniqueSlug(dto.title()));
-        record.setDescription(dto.description());
-        record.setType(dto.type());
-        record.setTags(dto.tags());
-        record.setResourceSize(file.getSize());
 
         String resourceKey = storageService.uploadFile(file, s3Config.getPrivateBucket(), Global.R2.STUDY_RECORDS_PATH.toString());
         record.setResourceKey(resourceKey);
+        record.setResourceSize(file.getSize());
 
         studyRecordRepository.save(record);
 
@@ -202,12 +191,6 @@ public class StudyRecordService {
             return baseSlug;
         }
         return baseSlug + "-" + RandomUtil.randomHexString().substring(0, 6);
-    }
-
-    private void assertCanCreate(User user) {
-        if (user.getRole().ordinal() < Role.CONTRIBUTOR_1.ordinal()) {
-            throw new InvalidOperationException("You must be a Level 1 Contributor in order to upload study records");
-        }
     }
 
     private void assertCanManage(StudyRecord record) {

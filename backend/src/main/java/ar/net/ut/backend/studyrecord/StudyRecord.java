@@ -8,12 +8,15 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.type.SqlTypes;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "study_records")
@@ -29,9 +32,6 @@ public class StudyRecord extends CUDLoggableEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by_id", nullable = false)
     private User createdBy;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subject_id")
-    private Subject subject;
 
     @Column(length = 100)
     private String title;
@@ -42,6 +42,14 @@ public class StudyRecord extends CUDLoggableEntity {
     @Enumerated(EnumType.STRING)
     private Type type;
 
+    @ManyToMany
+    @JoinTable(
+            name = "study_record_subjects",
+            joinColumns = @JoinColumn(name = "study_record_id"),
+            inverseJoinColumns = @JoinColumn(name = "subject_id")
+    )
+    @BatchSize(size = 5)
+    private Set<Subject> subjects;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private List<String> tags;
@@ -52,6 +60,21 @@ public class StudyRecord extends CUDLoggableEntity {
     private int downloads;
 
     private boolean hidden;
+
+    public boolean addSubject(Subject subject) {
+        if (subjects == null) {
+            subjects = new HashSet<>();
+        }
+        return subjects.add(subject);
+    }
+
+    public boolean removeSubject(Subject subject) {
+        return subjects.remove(subject);
+    }
+
+    public Set<Subject> getSubjects() {
+        return subjects != null ? Collections.unmodifiableSet(subjects) : Collections.emptySet();
+    }
 
     public void setTags(List<String> tags) {
         if (tags != null) {
@@ -78,10 +101,10 @@ public class StudyRecord extends CUDLoggableEntity {
         return "{" +
                 "\"id\":" + id +
                 ", \"createdById\":\"" + (createdBy != null ? createdBy.getId() : null) + "\"" +
-                ", \"subjectId\":" + (subject != null ? subject.getId() : null) +
                 ", \"title\":\"" + (title != null ? title.replace("\"", "\\\"") : null) + "\"" +
                 ", \"slug\":\"" + (slug != null ? slug.replace("\"", "\\\"") : null) + "\"" +
                 ", \"description\":\"" + (description != null ? description.replace("\"", "\\\"") : null) + "\"" +
+                ", \"subjects\":" + subjects +
                 ", \"tags\":" + tags +
                 ", \"resourceKey\":\"" + resourceKey + "\"" +
                 ", \"downloads\":" + downloads +

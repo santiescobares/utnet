@@ -41,6 +41,6 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
 
     @Modifying
     @Transactional
-    @Query("UPDATE StudyRecord s SET s.subject = null WHERE s.subject.id = :subjectId")
+    @Query(value = "DELETE FROM study_record_subjects WHERE subject_id = :subjectId", nativeQuery = true)
     void unlinkStudyRecordsFromSubject(Long subjectId);
 }

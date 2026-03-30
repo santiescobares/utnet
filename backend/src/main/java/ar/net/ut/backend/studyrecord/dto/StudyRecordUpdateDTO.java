@@ -14,6 +14,8 @@ public record StudyRecordUpdateDTO(
 
         StudyRecord.Type type,
 
+        List<Long> subjectIds,
+
         List<String> tags,
 
         Boolean hidden

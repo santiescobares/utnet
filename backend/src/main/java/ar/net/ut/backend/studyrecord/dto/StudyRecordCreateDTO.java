@@ -2,15 +2,13 @@ package ar.net.ut.backend.studyrecord.dto;
 
 import ar.net.ut.backend.studyrecord.StudyRecord;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public record StudyRecordCreateDTO(
-        @NotNull(message = "Subject ID is required")
-        Long subjectId,
-
         @NotBlank(message = "Title is required")
         @Size(min = 5, max = 100, message = "Title is either too short or too long")
         String title,
@@ -21,6 +19,9 @@ public record StudyRecordCreateDTO(
 
         @NotNull(message = "Type is required")
         StudyRecord.Type type,
+
+        @NotEmpty(message = "Subjects are required")
+        List<Long> subjectIds,
 
         List<String> tags
 ) {
