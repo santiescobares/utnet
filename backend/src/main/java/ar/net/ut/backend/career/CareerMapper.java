@@ -2,6 +2,7 @@ package ar.net.ut.backend.career;
 
 import ar.net.ut.backend.career.dto.CareerCreateDTO;
 import ar.net.ut.backend.career.dto.CareerDTO;
+import ar.net.ut.backend.career.dto.CareerSoftDTO;
 import ar.net.ut.backend.career.dto.CareerUpdateDTO;
 import ar.net.ut.backend.enums.ResourceType;
 import ar.net.ut.backend.exception.impl.ResourceNotFoundException;
@@ -22,6 +23,8 @@ public abstract class CareerMapper {
     protected abstract Career createEntity(CareerCreateDTO dto);
 
     protected abstract CareerDTO toDTO(Career career);
+
+    protected abstract CareerSoftDTO toSoftDTO(Career career);
 
     protected abstract List<CareerDTO> toDTOList(List<Career> careers);
 
