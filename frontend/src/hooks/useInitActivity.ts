@@ -4,15 +4,12 @@ import { userService } from '@/services/user.service'
 import { courseService } from '@/services/course.service'
 import { studyRecordService } from '@/services/studyRecord.service'
 import { careerService } from '@/services/career.service'
-import { subjectService } from '@/services/subject.service'
 import type { UserActivityDTO, CareerDTO } from '@/types/user.types'
-import type { SubjectDTO } from '@/types/subject.types'
 import type { RecentItem } from '@/types/content.types'
 
 async function enrichActivity(
     dto: UserActivityDTO,
     allCareers: CareerDTO[],
-    allSubjects: SubjectDTO[],
 ): Promise<RecentItem | null> {
     if (dto.resourceType === 'COURSE') {
         const course = await courseService.getById(Number(dto.resourceId))
@@ -28,13 +25,12 @@ async function enrichActivity(
     }
     if (dto.resourceType === 'STUDY_RECORD') {
         const record = await studyRecordService.getBySlug(dto.resourceId)
-        const subject = allSubjects.find((s) => s.id === record.subjectId)
-        const career = subject?.careers[0]
+        const firstSubject = record.subjects[0]
         return {
             id: record.slug,
             type: 'apunte',
             title: record.title,
-            subtitle: career && subject ? `${career.name} · ${subject.name}` : (subject?.name ?? ''),
+            subtitle: firstSubject ? firstSubject.name : '',
             href: `/library/${record.slug}`,
             accessedAt: dto.timestamp,
         }
@@ -56,11 +52,10 @@ export function useInitActivity(): void {
         Promise.all([
             userService.getRecentActivity(),
             careerService.getAll(),
-            subjectService.getAll(),
         ])
-            .then(async ([activities, allCareers, allSubjects]) => {
+            .then(async ([activities, allCareers]) => {
                 const results = await Promise.allSettled(
-                    activities.map((dto) => enrichActivity(dto, allCareers, allSubjects))
+                    activities.map((dto) => enrichActivity(dto, allCareers))
                 )
                 const items: RecentItem[] = results
                     .filter(

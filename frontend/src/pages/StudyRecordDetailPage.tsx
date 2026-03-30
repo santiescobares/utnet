@@ -13,13 +13,11 @@ import {
 import { toast } from 'sonner'
 
 import { studyRecordService } from '@/services/studyRecord.service'
-import { subjectService } from '@/services/subject.service'
 import { reportService } from '@/services/report.service'
 import { userService } from '@/services/user.service'
 import { useAuthStore } from '@/store/authStore'
 import { useActivityStore } from '@/store/activityStore'
 import type { StudyRecordDTO } from '@/types/studyrecord.types'
-import type { SubjectDTO } from '@/types/subject.types'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import { ConfirmActionModal } from '@/components/ui/ConfirmActionModal'
 import { StudyRecordBadges } from '@/components/library/StudyRecordBadges'
@@ -53,7 +51,6 @@ export function StudyRecordDetailPage() {
     const { recentItems, addItem } = useActivityStore()
 
     const [record, setRecord] = useState<StudyRecordDTO | null>(null)
-    const [subject, setSubject] = useState<SubjectDTO | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [loading, setLoading] = useState(true)
     const [notFound, setNotFound] = useState(false)
@@ -72,26 +69,21 @@ export function StudyRecordDetailPage() {
         setNotFound(false)
         setLoadError(null)
 
-        Promise.all([
-            studyRecordService.getBySlug(slug),
-            subjectService.getAll(),
-        ])
-            .then(([rec, subjects]) => {
+        studyRecordService.getBySlug(slug)
+            .then((rec) => {
                 setRecord(rec)
-                const found = subjects.find((s) => s.id === rec.subjectId) ?? null
-                setSubject(found)
                 const last = recentItems[0]
                 const isSameAsLast = last?.type === 'apunte' && last.id === rec.slug
                 if (!isSameAsLast) {
                     const recordAccessedAt = new Date().toISOString()
                     userService.addRecentActivity({ resourceType: 'STUDY_RECORD', resourceId: rec.slug, timestamp: recordAccessedAt })
                         .catch(() => { /* silencioso */ })
-                    const career = found?.careers[0]
+                    const firstSubject = rec.subjects[0]
                     addItem({
                         id: rec.slug,
                         type: 'apunte',
                         title: rec.title,
-                        subtitle: career && found ? `${career.name} · ${found.name}` : (found?.name ?? ''),
+                        subtitle: firstSubject ? firstSubject.name : '',
                         href: `/library/${rec.slug}`,
                         accessedAt: recordAccessedAt,
                     })
@@ -256,7 +248,7 @@ export function StudyRecordDetailPage() {
                 </div>
 
                 {/* Badges */}
-                <StudyRecordBadges record={record} subject={subject} />
+                <StudyRecordBadges record={record} />
 
                 {/* Author row */}
                 <button
@@ -315,7 +307,7 @@ export function StudyRecordDetailPage() {
             {showEditModal && (
                 <StudyRecordEditModal
                     record={record}
-                    currentSubject={subject}
+
                     onClose={() => setShowEditModal(false)}
                     onSaved={(updated) => {
                         setRecord(updated)
