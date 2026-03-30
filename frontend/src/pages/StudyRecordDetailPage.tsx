@@ -202,7 +202,7 @@ export function StudyRecordDetailPage() {
         : 'un colaborador'
 
     return (
-        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)]">
+        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-4rem)] animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* ── Left panel ─────────────────────────────────────────── */}
             <div className="lg:w-1/2 overflow-y-auto px-4 sm:px-6 py-6 flex flex-col gap-5 lg:border-r border-border">
                 {/* Top action bar */}

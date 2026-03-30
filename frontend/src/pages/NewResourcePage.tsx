@@ -416,7 +416,7 @@ export function NewResourcePage() {
     }
 
     return (
-        <div className="px-4 sm:px-6 pt-6 pb-10">
+        <div className="px-4 sm:px-6 pt-6 pb-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="max-w-2xl mx-auto flex flex-col gap-6">
 
                 {/* Header */}

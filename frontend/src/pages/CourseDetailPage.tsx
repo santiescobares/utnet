@@ -370,7 +370,7 @@ export function CourseDetailPage() {
 
     // ── Main render ───────────────────────────────────────────────────────────
     return (
-        <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-4rem)] lg:overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-4rem)] lg:overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
 
             {/* ════════════════════════════════════════════════════
                 LEFT PANEL — scrolleable

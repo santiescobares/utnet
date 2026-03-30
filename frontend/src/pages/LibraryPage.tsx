@@ -302,7 +302,7 @@ export function LibraryPage() {
     const totalActive = activeFilters.types.length + activeFilters.careers.length + activeFilters.subjects.length
 
     return (
-        <div className="flex flex-col gap-6 px-4 sm:px-[8%] pt-6 pb-10">
+        <div className="flex flex-col gap-6 px-4 sm:px-[8%] pt-6 pb-10 animate-in fade-in slide-in-from-bottom-2 duration-300">
 
             {/* Header */}
             <div>
