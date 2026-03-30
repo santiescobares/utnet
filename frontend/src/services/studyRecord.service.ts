@@ -17,25 +17,26 @@ interface PageResponse<T> {
 export const studyRecordService = {
     search: async (
         q?: string,
-        subjectId?: number,
+        subjectIds?: number[],
         type?: StudyRecordType,
         page = 0,
         size = 10,
         sort = 'downloads,DESC',
     ): Promise<PageResponse<StudyRecordDTO>> => {
         const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records/search', {
-            params: { q, subjectId, type, page, size, sort },
-        });
-        return response.data;
-    },
-
-    getBySubject: async (
-        subjectId: number,
-        page = 0,
-        size = 8,
-    ): Promise<PageResponse<StudyRecordDTO>> => {
-        const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records/search', {
-            params: { subjectId, page, size, sort: 'downloads,DESC' },
+            params: { q, subjectIds, type, page, size, sort },
+            paramsSerializer: (params) => {
+                const sp = new URLSearchParams()
+                for (const [key, value] of Object.entries(params)) {
+                    if (value === undefined || value === null) continue
+                    if (Array.isArray(value)) {
+                        value.forEach((v) => sp.append(key, String(v)))
+                    } else {
+                        sp.append(key, String(value))
+                    }
+                }
+                return sp.toString()
+            },
         });
         return response.data;
     },
