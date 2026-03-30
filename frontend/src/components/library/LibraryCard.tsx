@@ -62,8 +62,8 @@ export function LibraryCard({ record, className, onClick }: LibraryCardProps) {
                 'rounded-2xl border border-border bg-card',
                 'p-4 select-none',
                 onClick && 'cursor-pointer',
-                'transition-[border-color,box-shadow,transform] duration-200',
-                onClick && 'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1',
+                'transition-[border-color,box-shadow] duration-200',
+                onClick && 'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
                 'active:scale-[0.98]',
                 className,
             )}
