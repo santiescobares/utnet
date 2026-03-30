@@ -20,20 +20,20 @@ public interface StudyRecordRepository extends JpaRepository<StudyRecord, Long> 
 
     @Query(value = "SELECT * FROM study_records s " +
             "WHERE s.deleted_at IS NULL " +
-            "AND (:query IS NULL OR :query = '' OR s.search_vector @@ websearch_to_tsquery('spanish', :query)) " +
-            "AND (:subjectId IS NULL OR s.subject_id = :subjectId) " +
-            "AND (:type IS NULL OR s.type = :type) " +
-            "AND (s.hidden = false OR :includeHidden = true)",
+            "AND (CAST(:query AS text) IS NULL OR CAST(:query AS text) = '' OR s.search_vector @@ websearch_to_tsquery('spanish', CAST(:query AS text))) " +
+            "AND (CAST(:subjectIds AS text) IS NULL OR CAST(:subjectIds AS text) = '' OR s.subject_id = ANY(string_to_array(CAST(:subjectIds AS text), ',')::bigint[])) " +
+            "AND (CAST(:type AS text) IS NULL OR s.type = CAST(:type AS text)) " +
+            "AND (s.hidden = false OR CAST(:includeHidden AS boolean) = true)",
             countQuery = "SELECT count(*) FROM study_records s " +
                     "WHERE s.deleted_at IS NULL " +
-                    "AND (:query IS NULL OR :query = '' OR s.search_vector @@ websearch_to_tsquery('spanish', :query)) " +
-                    "AND (:subjectId IS NULL OR s.subject_id = :subjectId) " +
-                    "AND (:type IS NULL OR s.type = :type) " +
-                    "AND (s.hidden = false OR :includeHidden = true)",
+                    "AND (CAST(:query AS text) IS NULL OR CAST(:query AS text) = '' OR s.search_vector @@ websearch_to_tsquery('spanish', CAST(:query AS text))) " +
+                    "AND (CAST(:subjectIds AS text) IS NULL OR CAST(:subjectIds AS text) = '' OR s.subject_id = ANY(string_to_array(CAST(:subjectIds AS text), ',')::bigint[])) " +
+                    "AND (CAST(:type AS text) IS NULL OR s.type = CAST(:type AS text)) " +
+                    "AND (s.hidden = false OR CAST(:includeHidden AS boolean) = true)",
             nativeQuery = true)
     Page<StudyRecord> searchStudyRecords(
             @Param("query") String query,
-            @Param("subjectId") Long subjectId,
+            @Param("subjectIds") String subjectIds,
             @Param("type") String type,
             @Param("includeHidden") boolean includeHidden,
             Pageable pageable

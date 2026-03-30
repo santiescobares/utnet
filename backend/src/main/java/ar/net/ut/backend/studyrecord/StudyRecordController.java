@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(Global.API_VERSION_PATH + "/study-records")
 @RequiredArgsConstructor
@@ -48,11 +50,11 @@ public class StudyRecordController {
     @GetMapping("/search")
     public ResponseEntity<Page<StudyRecordDTO>> searchStudyRecords(
             @RequestParam(required = false) String q,
-            @RequestParam(required = false) Long subjectId,
+            @RequestParam(required = false) List<Long> subjectIds,
             @RequestParam(required = false) StudyRecord.Type type,
             @PageableDefault(sort = "downloads", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(studyRecordService.searchStudyRecords(q, subjectId, type, pageable));
+        return ResponseEntity.ok(studyRecordService.searchStudyRecords(q, subjectIds, type, pageable));
     }
 
     @PutMapping("/{id}")

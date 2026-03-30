@@ -34,9 +34,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -134,10 +136,12 @@ public class StudyRecordService {
     }
 
     @Transactional(readOnly = true)
-    public Page<StudyRecordDTO> searchStudyRecords(String query, Long subjectId, StudyRecord.Type type, Pageable pageable) {
+    public Page<StudyRecordDTO> searchStudyRecords(String query, List<Long> subjectIds, StudyRecord.Type type, Pageable pageable) {
         return studyRecordRepository.searchStudyRecords(
                 query,
-                subjectId,
+                subjectIds != null && !subjectIds.isEmpty()
+                        ? subjectIds.stream().map(String::valueOf).collect(Collectors.joining(","))
+                        : null,
                 type != null ? type.name() : null,
                 RequestContextHolder.getCurrentSession().role() == Role.ADMINISTRATOR,
                 pageable
