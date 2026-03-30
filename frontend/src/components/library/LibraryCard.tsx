@@ -1,3 +1,4 @@
+import { Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { UserAvatar } from '@/components/ui/UserAvatar'
 import type { StudyRecordType, UserSnapshotDTO } from '@/types/studyrecord.types'
@@ -16,6 +17,7 @@ export interface LibraryCardData {
     description: string
     type: StudyRecordType
     typeColor?: string  // hex 6 chars sin '#', proveniente del backend (StudyRecordDTO)
+    downloads?: number
     createdBy?: UserSnapshotDTO
 }
 
@@ -41,23 +43,33 @@ export function LibraryCard({ record, className, onClick }: LibraryCardProps) {
                 'rounded-2xl border border-border bg-card',
                 'p-4 select-none',
                 onClick && 'cursor-pointer',
-                'transition-[border-color,box-shadow,transform] duration-200',
-                onClick && 'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1',
+                'transition-[border-color,box-shadow] duration-200',
+                onClick && 'hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5',
                 'active:scale-[0.98]',
                 className,
             )}
         >
             <div className="flex flex-col gap-2">
-                <span
-                    className="self-start inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border"
-                    style={{
-                        backgroundColor: `${color}22`,
-                        color,
-                        borderColor: `${color}44`,
-                    }}
-                >
-                    {label}
-                </span>
+                {/* Type badge + downloads */}
+                <div className="flex items-center justify-between gap-2">
+                    <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold border shrink-0"
+                        style={{
+                            backgroundColor: `${color}22`,
+                            color,
+                            borderColor: `${color}44`,
+                        }}
+                    >
+                        {label}
+                    </span>
+
+                    {record.downloads !== undefined && (
+                        <span className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                            <Download size={10} />
+                            {record.downloads.toLocaleString()}
+                        </span>
+                    )}
+                </div>
 
                 <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2">
                     {record.title}

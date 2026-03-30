@@ -10,13 +10,29 @@ export interface UserSnapshotDTO {
     profilePictureURL: string | null;
 }
 
+// Espejo exacto de: ar.net.ut.backend.career.dto.CareerSoftDTO
+export interface CareerSoftDTO {
+    id: number;
+    name: string;
+    color: string; // hex 6 chars sin '#'
+}
+
+// Espejo exacto de: ar.net.ut.backend.subject.dto.SubjectSoftDTO
+export interface SubjectSoftDTO {
+    id: number;
+    name: string;
+    shortName: string;
+    color: string | null; // hex 6 chars sin '#', null si no definido
+    careers: CareerSoftDTO[];
+}
+
 // Espejo exacto de: ar.net.ut.backend.studyrecord.dto.StudyRecordDTO
 export interface StudyRecordDTO {
     id: number;
     createdAt: string;
     updatedAt: string;
     createdBy: UserSnapshotDTO;
-    subjectId: number;
+    subjects: SubjectSoftDTO[];
     title: string;
     slug: string;
     description: string;
@@ -35,7 +51,7 @@ export interface StudyRecordDownloadResponseDTO {
 
 // Espejo exacto de: ar.net.ut.backend.studyrecord.dto.StudyRecordCreateDTO
 export interface StudyRecordCreateDTO {
-    subjectId: number;
+    subjectIds: number[];
     title: string;
     description: string;
     type: StudyRecordType;
@@ -47,6 +63,7 @@ export interface StudyRecordUpdateDTO {
     title?: string;
     description?: string;
     type?: StudyRecordType;
+    subjectIds?: number[];
     tags?: string[];
     hidden?: boolean;
 }

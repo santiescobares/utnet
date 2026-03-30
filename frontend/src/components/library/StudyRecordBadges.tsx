@@ -1,10 +1,9 @@
 import { TYPE_CONFIG } from '@/components/library/LibraryCard'
-import type { StudyRecordDTO } from '@/types/studyrecord.types'
-import type { SubjectDTO } from '@/types/subject.types'
+import type { StudyRecordDTO, SubjectSoftDTO } from '@/types/studyrecord.types'
 
 interface StudyRecordBadgesProps {
     record: StudyRecordDTO
-    subject: SubjectDTO | null
+    subject: SubjectSoftDTO | null
 }
 
 const FALLBACK_COLOR = '#6B7280'

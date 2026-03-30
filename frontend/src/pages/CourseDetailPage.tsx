@@ -79,6 +79,11 @@ export function CourseDetailPage() {
     // ── Selected subject ─────────────────────────────────────────────────────
     const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(null)
 
+    const courseSubjectIds = useMemo(
+        () => courseSubjects.map((cs) => cs.subjectId),
+        [courseSubjects],
+    )
+
     const selectedCourseSubject = useMemo(
         () => courseSubjects.find((cs) => cs.subjectId === selectedSubjectId) ?? null,
         [courseSubjects, selectedSubjectId],
@@ -517,7 +522,7 @@ export function CourseDetailPage() {
                     <section className="flex flex-col">
                         <SectionHeader title="Biblioteca" />
                         <LibraryCarousel
-                            subjectId={selectedSubjectId}
+                            subjectIds={courseSubjectIds}
                             accentColor={accentColor}
                         />
                     </section>

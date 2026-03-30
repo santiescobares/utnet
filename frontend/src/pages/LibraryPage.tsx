@@ -139,7 +139,7 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
                     {Array.from({ length: 5 }).map((_, i) => (
                         <div
                             key={i}
-                            className="shrink-0 w-[175px] sm:w-[calc((100%-3rem)/5)] rounded-2xl bg-secondary animate-pulse"
+                            className="shrink-0 w-60 sm:w-[calc((100%-3rem)/5)] rounded-2xl bg-secondary animate-pulse"
                             style={{ height: 220 }}
                         />
                     ))}
@@ -175,7 +175,7 @@ function LibrarySection({ title, records, loading }: LibrarySectionProps) {
                                 record={record}
                                 className={cn(
                                     'snap-start shrink-0',
-                                    'w-[175px] sm:w-[calc((100%-3rem)/5)]',
+                                    'w-60 sm:w-[calc((100%-3rem)/5)]',
                                 )}
                                 onClick={() => navigate(`/library/${record.slug}`)}
                             />
@@ -235,15 +235,15 @@ export function LibraryPage() {
     const navigate = useNavigate()
 
     // Derive single API-compatible filter values from activeFilters
-    const filterType      = activeFilters.types.length === 1 ? activeFilters.types[0] : undefined
-    const filterSubjectId = activeFilters.subjects.length > 0 ? activeFilters.subjects[0].id : undefined
+    const filterType       = activeFilters.types.length === 1 ? activeFilters.types[0] : undefined
+    const filterSubjectIds = activeFilters.subjects.length > 0 ? activeFilters.subjects.map((s) => s.id) : undefined
 
     const loadSections = useCallback(async () => {
         setSectionsLoading(true)
         try {
             const [popularPage, latestPage] = await Promise.all([
-                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'downloads,DESC'),
-                studyRecordService.search(undefined, filterSubjectId, filterType, 0, 10, 'created_at,DESC'),
+                studyRecordService.search(undefined, filterSubjectIds, filterType, 0, 10, 'downloads,DESC'),
+                studyRecordService.search(undefined, filterSubjectIds, filterType, 0, 10, 'created_at,DESC'),
             ])
             setPopularRecords(popularPage.content)
             setLatestRecords(latestPage.content)
@@ -253,7 +253,7 @@ export function LibraryPage() {
         } finally {
             setSectionsLoading(false)
         }
-    }, [filterType, filterSubjectId])
+    }, [filterType, filterSubjectIds])
 
     useEffect(() => {
         if (searchResults === null) loadSections()
