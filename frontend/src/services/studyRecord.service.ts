@@ -34,7 +34,7 @@ export const studyRecordService = {
         page = 0,
         size = 8,
     ): Promise<PageResponse<StudyRecordDTO>> => {
-        const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records', {
+        const response = await api.get<PageResponse<StudyRecordDTO>>('/study-records/search', {
             params: { subjectId, page, size, sort: 'downloads,DESC' },
         });
         return response.data;
