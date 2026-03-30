@@ -2,6 +2,15 @@
 // Colores hex (sin '#') definidos en el enum del backend
 export type StudyRecordType = 'SUMMARY' | 'NOTE' | 'BIBLIOGRAPHY' | 'EXAM_MODEL';
 
+// Snapshot de materia embebido en StudyRecordDTO (sin correlatives para evitar ciclos)
+export interface SubjectSnapshotDTO {
+    id: number;
+    name: string;
+    shortName: string;
+    color: string | null; // hex 6 chars sin '#', null si no definido
+    careers: { id: number; name: string; color: string | null }[];
+}
+
 // Espejo exacto de: ar.net.ut.backend.user.dto.UserSnapshotDTO
 export interface UserSnapshotDTO {
     id: string; // UUID
@@ -16,7 +25,7 @@ export interface StudyRecordDTO {
     createdAt: string;
     updatedAt: string;
     createdBy: UserSnapshotDTO;
-    subjectId: number;
+    subjects: SubjectSnapshotDTO[];
     title: string;
     slug: string;
     description: string;
@@ -35,7 +44,7 @@ export interface StudyRecordDownloadResponseDTO {
 
 // Espejo exacto de: ar.net.ut.backend.studyrecord.dto.StudyRecordCreateDTO
 export interface StudyRecordCreateDTO {
-    subjectId: number;
+    subjectIds: number[];
     title: string;
     description: string;
     type: StudyRecordType;
