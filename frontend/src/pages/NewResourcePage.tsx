@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router'
 import { Check, ChevronDown, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { careerService } from '@/services/career.service'
 import { subjectService } from '@/services/subject.service'
 import { studyRecordService } from '@/services/studyRecord.service'
-import type { CareerDTO } from '@/types/user.types'
 import type { SubjectDTO } from '@/types/subject.types'
 import type { StudyRecordType } from '@/types/studyrecord.types'
 
@@ -188,23 +186,150 @@ function TagsInput({ tags, onChange }: TagsInputProps) {
     )
 }
 
+// ── SubjectsInput ─────────────────────────────────────────────────────────────
+
+const MAX_SUBJECTS = 5
+
+interface SubjectsInputProps {
+    allSubjects: SubjectDTO[]
+    selected: SubjectDTO[]
+    onChange: (subjects: SubjectDTO[]) => void
+    error?: boolean
+    onBlur?: () => void
+}
+
+function SubjectsInput({ allSubjects, selected, onChange, error, onBlur }: SubjectsInputProps) {
+    const [query, setQuery]   = useState('')
+    const [open, setOpen]     = useState(false)
+    const containerRef        = useRef<HTMLDivElement>(null)
+    const inputRef            = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (!open) return
+        const handler = (e: MouseEvent) => {
+            if (!containerRef.current?.contains(e.target as Node)) {
+                setOpen(false)
+                setQuery('')
+            }
+        }
+        document.addEventListener('mousedown', handler)
+        return () => document.removeEventListener('mousedown', handler)
+    }, [open])
+
+    const suggestions = query.trim().length === 0
+        ? []
+        : allSubjects
+            .filter((s) => !selected.some((sel) => sel.id === s.id))
+            .filter((s) =>
+                s.name.toLowerCase().includes(query.toLowerCase()) ||
+                s.shortName.toLowerCase().includes(query.toLowerCase()),
+            )
+            .slice(0, 8)
+
+    const addSubject = (s: SubjectDTO) => {
+        if (selected.length >= MAX_SUBJECTS) return
+        onChange([...selected, s])
+        setQuery('')
+        setOpen(false)
+        inputRef.current?.focus()
+    }
+
+    const removeSubject = (id: number) => {
+        onChange(selected.filter((s) => s.id !== id))
+    }
+
+    const isFull = selected.length >= MAX_SUBJECTS
+
+    return (
+        <div ref={containerRef} className="relative">
+            <div
+                onClick={() => !isFull && inputRef.current?.focus()}
+                className={cn(
+                    'flex flex-wrap gap-1.5 px-3 py-2 min-h-[42px] rounded-xl border bg-secondary border-border',
+                    'focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary/50',
+                    'transition-all duration-150',
+                    !isFull && 'cursor-text',
+                    error && 'border-destructive focus-within:ring-destructive/30',
+                )}
+            >
+                {selected.map((s) => (
+                    <span
+                        key={s.id}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium border border-primary/20"
+                    >
+                        {s.name}
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); removeSubject(s.id) }}
+                            className="text-primary/60 hover:text-primary transition-colors duration-100"
+                            aria-label={`Eliminar ${s.name}`}
+                        >
+                            <X size={10} />
+                        </button>
+                    </span>
+                ))}
+                {!isFull && (
+                    <input
+                        ref={inputRef}
+                        value={query}
+                        onChange={(e) => { setQuery(e.target.value); setOpen(true) }}
+                        onFocus={() => setOpen(true)}
+                        onBlur={() => { onBlur?.() }}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Escape') { setOpen(false); setQuery('') }
+                            if (e.key === 'Backspace' && query === '' && selected.length > 0) {
+                                removeSubject(selected[selected.length - 1].id)
+                            }
+                            if (e.key === 'Enter' && suggestions.length > 0) {
+                                e.preventDefault()
+                                addSubject(suggestions[0])
+                            }
+                        }}
+                        placeholder={selected.length === 0 ? 'Buscá una materia…' : ''}
+                        className="flex-1 min-w-[120px] bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                    />
+                )}
+            </div>
+
+            {open && suggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-card border border-border rounded-xl shadow-lg py-1 overflow-hidden max-h-52 overflow-y-auto">
+                    {suggestions.map((s) => (
+                        <button
+                            key={s.id}
+                            type="button"
+                            onMouseDown={(e) => { e.preventDefault(); addSubject(s) }}
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-secondary transition-colors duration-100"
+                        >
+                            {s.color && (
+                                <span
+                                    className="w-2 h-2 rounded-full shrink-0"
+                                    style={{ backgroundColor: `#${s.color}` }}
+                                />
+                            )}
+                            <span className="text-foreground">{s.name}</span>
+                            <span className="text-muted-foreground text-xs ml-auto shrink-0">{s.shortName}</span>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function NewResourcePage() {
     // Form fields
-    const [title, setTitle]               = useState('')
-    const [type, setType]                 = useState<StudyRecordType | null>(null)
-    const [description, setDescription]   = useState('')
-    const [careerId, setCareerId]         = useState<number | ''>('')
-    const [subjectId, setSubjectId]       = useState<number | ''>('')
-    const [tags, setTags]                 = useState<string[]>([])
-    const [file, setFile]                 = useState<File | null>(null)
-    const [agreed, setAgreed]             = useState(false)
+    const [title, setTitle]                       = useState('')
+    const [type, setType]                         = useState<StudyRecordType | null>(null)
+    const [description, setDescription]           = useState('')
+    const [selectedSubjects, setSelectedSubjects] = useState<SubjectDTO[]>([])
+    const [tags, setTags]                         = useState<string[]>([])
+    const [file, setFile]                         = useState<File | null>(null)
+    const [agreed, setAgreed]                     = useState(false)
 
     // Async data
-    const [careers, setCareers]           = useState<CareerDTO[]>([])
-    const [subjects, setSubjects]         = useState<SubjectDTO[]>([])
-    const [loadingData, setLoadingData]   = useState(true)
+    const [allSubjects, setAllSubjects] = useState<SubjectDTO[]>([])
 
     // UI state
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -223,30 +348,22 @@ export function NewResourcePage() {
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     useEffect(() => {
-        Promise.all([careerService.getAll(), subjectService.getAll()])
-            .then(([careerData, subjectData]) => {
-                setCareers([...careerData].sort((a, b) => a.sortPosition - b.sortPosition))
-                setSubjects(subjectData)
-            })
+        subjectService.getAll()
+            .then((data) => setAllSubjects([...data].sort((a, b) => a.sortPosition - b.sortPosition)))
             .catch(() => toast.error('No se pudo cargar la información necesaria.'))
-            .finally(() => setLoadingData(false))
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-    const filteredSubjects = careerId === ''
-        ? []
-        : subjects.filter((s) => s.careers.some((c) => c.id === careerId))
 
     const getErrors = () => ({
         title:
             title.trim().length < 5   ? 'El título debe tener al menos 5 caracteres.' :
             title.trim().length > 120 ? 'El título no puede superar los 120 caracteres.' : '',
-        type:        !type        ? 'Seleccioná un tipo de recurso.' : '',
+        type:        !type                      ? 'Seleccioná un tipo de recurso.' : '',
         description:
             description.trim().length < 10   ? 'La descripción debe tener al menos 10 caracteres.' :
             description.trim().length > 2000 ? 'La descripción no puede superar los 2000 caracteres.' : '',
-        subject:  subjectId === '' ? 'Seleccioná una materia.' : '',
-        file:     !file           ? 'Seleccioná un archivo.'  : fileError,
-        agreed:   !agreed         ? 'required' : '',
+        subjects: selectedSubjects.length === 0 ? 'Seleccioná al menos una materia.' : '',
+        file:     !file                         ? 'Seleccioná un archivo.'           : fileError,
+        agreed:   !agreed                       ? 'required'                         : '',
     })
 
     const errors      = getErrors()
@@ -256,11 +373,6 @@ export function NewResourcePage() {
         field !== 'agreed' &&
         (submitted || touchedRef.current.has(field)) &&
         errors[field] !== ''
-
-    const handleCareerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setCareerId(e.target.value ? Number(e.target.value) : '')
-        setSubjectId('')
-    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selected = e.target.files?.[0] ?? null
@@ -286,7 +398,7 @@ export function NewResourcePage() {
         try {
             const result = await studyRecordService.create(
                 {
-                    subjectId:   subjectId as number,
+                    subjectIds:  selectedSubjects.map((s) => s.id),
                     title:       title.trim(),
                     description: description.trim(),
                     type:        type!,
@@ -386,54 +498,25 @@ export function NewResourcePage() {
                         </div>
                     </div>
 
-                    {/* ROW 3: Carrera + Materia */}
-                    <div className="flex flex-col gap-5 sm:flex-row sm:gap-4">
-
-                        {/* Carrera */}
-                        <div className="flex flex-col gap-1.5 sm:flex-1">
-                            <label className="text-sm font-medium text-foreground">Carrera</label>
-                            <select
-                                value={careerId}
-                                onChange={handleCareerChange}
-                                disabled={loadingData}
-                                className={cn(INPUT_BASE, 'cursor-pointer', loadingData && 'opacity-50 cursor-not-allowed')}
-                            >
-                                <option value="">
-                                    {loadingData ? 'Cargando…' : 'Seleccioná una carrera…'}
-                                </option>
-                                {careers.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Materia */}
-                        <div className="flex flex-col gap-1.5 sm:flex-1">
-                            <label className="text-sm font-medium text-foreground">
-                                Materia <span className="text-destructive">*</span>
-                            </label>
-                            <select
-                                value={subjectId}
-                                onChange={(e) => setSubjectId(e.target.value ? Number(e.target.value) : '')}
-                                onBlur={() => touchField('subject')}
-                                disabled={careerId === '' || loadingData}
-                                className={cn(
-                                    INPUT_BASE, 'cursor-pointer',
-                                    showErr('subject') && 'border-destructive focus:ring-destructive/30',
-                                    (careerId === '' || loadingData) && 'opacity-50 cursor-not-allowed',
-                                )}
-                            >
-                                <option value="">
-                                    {careerId === '' ? 'Seleccioná primero una carrera' : 'Seleccioná una materia…'}
-                                </option>
-                                {filteredSubjects.map((s) => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-                            {showErr('subject') && (
-                                <p className="text-xs text-destructive">{errors.subject}</p>
-                            )}
-                        </div>
+                    {/* ROW 3: Materias */}
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-foreground">
+                            Materias <span className="text-destructive">*</span>
+                        </label>
+                        <SubjectsInput
+                            allSubjects={allSubjects}
+                            selected={selectedSubjects}
+                            onChange={setSelectedSubjects}
+                            error={showErr('subjects')}
+                            onBlur={() => touchField('subjects')}
+                        />
+                        {showErr('subjects') ? (
+                            <p className="text-xs text-destructive">{errors.subjects}</p>
+                        ) : (
+                            <p className="text-[11px] text-muted-foreground">
+                                Escribí para buscar. Podés agregar hasta {MAX_SUBJECTS} materias, mínimo 1 requerida.
+                            </p>
+                        )}
                     </div>
 
                     {/* ROW 4: Etiquetas */}
