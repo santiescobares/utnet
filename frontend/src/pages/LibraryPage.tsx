@@ -6,6 +6,7 @@ import { LibraryCard } from '@/components/library/LibraryCard'
 import { LibraryFilterModal, type LibraryFilters } from '@/components/library/LibraryFilterModal'
 import { studyRecordService } from '@/services/studyRecord.service'
 import { useActivityStore } from '@/store/activityStore'
+import { useInitActivity } from '@/hooks/useInitActivity'
 import type { StudyRecordDTO, StudyRecordType } from '@/types/studyrecord.types'
 
 const TYPE_LABELS: Record<StudyRecordType, string> = {
@@ -202,6 +203,8 @@ export function LibraryPage() {
     const [popularRecords, setPopularRecords] = useState<StudyRecordDTO[]>([])
     const [latestRecords, setLatestRecords]   = useState<StudyRecordDTO[]>([])
     const [sectionsLoading, setSectionsLoading] = useState(true)
+
+    useInitActivity()
 
     // Recent study records — driven by activity store
     const recentItems = useActivityStore(s => s.recentItems)
