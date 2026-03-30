@@ -25,7 +25,7 @@ const linkClass = 'text-sm text-muted-foreground hover:text-foreground transitio
 export function Footer() {
     return (
         <footer className="border-t border-border/50 bg-background shrink-0">
-            <div className="max-w-7xl mx-auto px-6 py-6">
+            <div className="px-4 sm:px-[8%] py-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* Col 1: Logo + tagline + socials */}
                     <div className="flex flex-col gap-3">
@@ -101,7 +101,7 @@ export function Footer() {
 
             {/* Bottom bar */}
             <div className="border-t border-border/30">
-                <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div className="px-4 sm:px-[8%] py-3 flex flex-col sm:flex-row items-center justify-between gap-2">
                     <span className="text-xs text-muted-foreground">© 2025 UTNet</span>
                     <span className="text-xs text-muted-foreground text-center">
                         Creado por y para estudiantes de UTN
